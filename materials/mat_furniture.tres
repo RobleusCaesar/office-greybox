@@ -1,7 +1,12 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://textures/tex_metal.png" id="1"]
 
 [resource]
 resource_name = "Furniture"
-albedo_color = Color(0.25, 0.36, 0.44, 1)
-roughness = 0.8
-metallic = 0.0
+albedo_color = Color(0.42, 0.48, 0.52, 1)
+albedo_texture = ExtResource("1")
+roughness = 0.55
+metallic = 0.35
+uv1_scale = Vector3(1.4, 1.4, 1.4)
+uv1_triplanar = true

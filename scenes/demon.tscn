@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/demon.gd" id="1_demon"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_demon"]
+radius = 0.38
+height = 1.85
+
+[node name="Demon" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 3
+floor_snap_length = 0.15
+script = ExtResource("1_demon")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.92, 0)
+shape = SubResource("CapsuleShape3D_demon")
