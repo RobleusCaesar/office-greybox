@@ -20,6 +20,26 @@ func _run() -> void:
 		errors.append("jump action still present")
 	if not InputMap.has_action("interact"):
 		errors.append("missing interact action")
+	if not FileAccess.file_exists("res://textures/hero/title-street-fire.png"):
+		errors.append("title-street-fire.png missing")
+	if not FileAccess.file_exists("res://textures/hero/shotgun-walnut-steel.png"):
+		errors.append("shotgun-walnut-steel.png missing")
+	var title_src := FileAccess.get_file_as_string("res://scripts/title.gd")
+	if title_src.contains("denver-fire-vista"):
+		errors.append("title must not use denver-fire-vista")
+	var title_ps: PackedScene = load("res://scenes/title.tscn")
+	if title_ps == null:
+		errors.append("could not load title.tscn")
+	else:
+		var title_n: Node = title_ps.instantiate()
+		root.add_child(title_n)
+		await process_frame
+		if title_n.get_node_or_null("%Backdrop") == null:
+			errors.append("title backdrop missing")
+		if title_n.get_node_or_null("%Play") == null or title_n.get_node_or_null("%Quit") == null:
+			errors.append("title Play/Quit unique names missing")
+		title_n.queue_free()
+		await process_frame
 
 	var packed: PackedScene = load("res://scenes/level.tscn")
 	if packed == null:
@@ -112,6 +132,14 @@ func _run() -> void:
 	var player := level.get_node_or_null("Player")
 	if d1 == null:
 		errors.append("Demon_01 missing")
+	if d1 and d1.get_node_or_null("Rig/Pelvis/Spine/Chest/ShoulderL") == null:
+		errors.append("Ashwight missing named bones")
+	if d1 and d1.get_node_or_null("Rig/Pelvis/Spine/Chest/Neck/Head/JawL") == null:
+		errors.append("Ashwight missing vertical split jaw")
+	if d1:
+		_check_ashwight_arms(d1, errors)
+	if d1 == null:
+		errors.append("Demon_01 missing for combat QA")
 	elif player == null:
 		errors.append("player missing")
 	else:
@@ -144,9 +172,73 @@ func _run() -> void:
 	_finish(errors)
 
 
+func _check_ashwight_arms(d1: Node, errors: PackedStringArray) -> void:
+	var names := [
+		"UpperArmL", "UpperArmLFlesh", "ForeArmL", "ForeArmLFlesh", "HandLMesh", "HandLClaws",
+		"UpperArmR", "UpperArmRFlesh", "ForeArmR", "ForeArmRFlesh", "HandRMesh", "HandRClaws",
+	]
+	var meshes: Dictionary = {}
+	for mi in _collect_meshes(d1):
+		meshes[mi.name] = mi
+	var rib: MeshInstance3D = meshes.get("Ribcage", null)
+	if rib == null:
+		errors.append("Ashwight Ribcage missing")
+		return
+	var hide := rib.material_override
+	if hide == null:
+		errors.append("Ribcage Hide missing")
+		return
+	if hide is StandardMaterial3D:
+		var hm := hide as StandardMaterial3D
+		if hm.uv1_triplanar:
+			errors.append("Hide must not be triplanar")
+		if hm.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED:
+			errors.append("Hide must not be unlit")
+		if hm.albedo_color.r > 0.35:
+			errors.append("Hide albedo too light (white-arm risk)")
+	var found := 0
+	for nm in names:
+		var mi: MeshInstance3D = meshes.get(nm, null)
+		if mi == null:
+			errors.append("Ashwight arm mesh missing: %s" % nm)
+			continue
+		found += 1
+		if mi.material_override != hide:
+			errors.append("%s is not the shared Hide material" % nm)
+		if mi.material_override is StandardMaterial3D:
+			var sm := mi.material_override as StandardMaterial3D
+			if sm.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED:
+				errors.append("%s is unlit (white-arm bug)" % nm)
+			if sm.albedo_color.r > 0.45 and sm.albedo_color.g > 0.45:
+				errors.append("%s albedo is near-white" % nm)
+	if found != 12:
+		errors.append("expected 12 arm hide meshes, found %d" % found)
+	var vein: MeshInstance3D = meshes.get("ArmVeinL", null)
+	if vein and vein.material_override is StandardMaterial3D:
+		var em := vein.material_override as StandardMaterial3D
+		if em.emission_energy_multiplier > 0.55:
+			errors.append("arm ember energy %.2f > 0.55" % em.emission_energy_multiplier)
+	var core: MeshInstance3D = meshes.get("EmberCore", null)
+	if core == null:
+		errors.append("EmberCore missing")
+	elif core.material_override is StandardMaterial3D:
+		var cm := core.material_override as StandardMaterial3D
+		if cm.emission_energy_multiplier <= 0.55:
+			errors.append("EmberCore is not hotter than arm ember")
+
+
+func _collect_meshes(n: Node) -> Array[MeshInstance3D]:
+	var out: Array[MeshInstance3D] = []
+	if n is MeshInstance3D:
+		out.append(n as MeshInstance3D)
+	for c in n.get_children():
+		out.append_array(_collect_meshes(c))
+	return out
+
+
 func _finish(errors: PackedStringArray) -> void:
 	if errors.is_empty():
-		print("QA_OK title, crouch, one demon 3-5 shells, diorama, LOS, death")
+		print("QA_OK title, crouch, hero shotgun, one Ashwight 3-5 shells, diorama, LOS, death")
 		quit(0)
 	else:
 		for e in errors:

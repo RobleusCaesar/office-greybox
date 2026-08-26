@@ -1,25 +1,32 @@
 extends Control
-## Title card. Play loads the office. Esc releases the mouse here too.
+
+@onready var play_btn: Button = %Play
+@onready var quit_btn: Button = %Quit
+@onready var backdrop: TextureRect = %Backdrop
 
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	var play := get_node_or_null("VBox/Play") as Button
-	if play:
-		play.grab_focus()
+	play_btn.pressed.connect(_on_play)
+	quit_btn.pressed.connect(_on_quit)
+	play_btn.grab_focus()
+	clip_contents = true
+	_center_backdrop_pivot()
+	resized.connect(_center_backdrop_pivot)
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	elif event.is_action_pressed("ui_accept"):
-		_on_play()
-	elif event is InputEventMouseButton and event.pressed:
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+func _center_backdrop_pivot() -> void:
+	if backdrop:
+		backdrop.pivot_offset = backdrop.size * 0.5
+
+
+func _process(_delta: float) -> void:
+	var t := Time.get_ticks_msec() * 0.001
+	var s := 1.0 + 0.02 * (1.0 + sin(t * TAU / 28.0))
+	backdrop.scale = Vector2(s, s)
 
 
 func _on_play() -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	get_tree().change_scene_to_file("res://scenes/level.tscn")
 
 

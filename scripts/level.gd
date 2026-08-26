@@ -109,7 +109,7 @@ func _spawn_demon() -> void:
 		return
 	var d1: CharacterBody3D = packed.instantiate()
 	d1.name = "Demon_01"
-	d1.max_hp = 100.0
+	d1.max_hp = 120.0
 	d1.move_speed = 3.15
 	d1.attack_damage = 18.0
 	d1.attack_range = 1.5
