@@ -1,0 +1,14 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://textures/denver_fire_pane_03.png" id="1_tex"]
+
+[resource]
+resource_name = "WindowPane03"
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 1)
+albedo_texture = ExtResource("1_tex")
+emission_enabled = true
+emission = Color(1.0, 0.40, 0.10, 1)
+emission_texture = ExtResource("1_tex")
+emission_energy_multiplier = 3.6
+texture_filter = 4

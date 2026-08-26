@@ -1,7 +1,8 @@
 [gd_resource type="StandardMaterial3D" format=3]
 
 [resource]
-resource_name = "Wall"
-albedo_color = Color(0.76, 0.73, 0.66, 1)
-roughness = 0.95
+resource_name = "WallWarmPlaster"
+albedo_color = Color(0.78, 0.71, 0.61, 1)
 metallic = 0.0
+roughness = 0.88
+uv1_scale = Vector3(1, 1, 1)
