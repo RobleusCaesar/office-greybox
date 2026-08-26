@@ -4,9 +4,9 @@
 
 [resource]
 resource_name = "WalnutPolish"
-albedo_color = Color(0.55, 0.32, 0.18, 1)
+albedo_color = Color(0.72, 0.48, 0.28, 1)
 albedo_texture = ExtResource("1")
-metallic = 0.18
-roughness = 0.28
+metallic = 0.08
+roughness = 0.42
 uv1_scale = Vector3(1.1, 1.1, 1.1)
 uv1_triplanar = true
