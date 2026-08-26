@@ -78,6 +78,47 @@ class Mesh:
                         p10, p01 = p01, p10
                     self.add_quad(p00, p10, p11, p01, n, uv)
 
+    def add_tube(self, path: list[tuple[float, float, float]], radius: float, segs: int = 10) -> None:
+        rings = []
+        for i, p in enumerate(path):
+            if i < len(path) - 1:
+                d = (path[i + 1][0] - p[0], path[i + 1][1] - p[1], path[i + 1][2] - p[2])
+            else:
+                d = (p[0] - path[i - 1][0], p[1] - path[i - 1][1], p[2] - path[i - 1][2])
+            ln = math.sqrt(d[0] ** 2 + d[1] ** 2 + d[2] ** 2) or 1.0
+            d = (d[0] / ln, d[1] / ln, d[2] / ln)
+            up = (0.0, 1.0, 0.0) if abs(d[1]) < 0.9 else (1.0, 0.0, 0.0)
+            sx = (up[1] * d[2] - up[2] * d[1], up[2] * d[0] - up[0] * d[2], up[0] * d[1] - up[1] * d[0])
+            sl = math.sqrt(sx[0] ** 2 + sx[1] ** 2 + sx[2] ** 2) or 1.0
+            sx = (sx[0] / sl, sx[1] / sl, sx[2] / sl)
+            sy = (d[1] * sx[2] - d[2] * sx[1], d[2] * sx[0] - d[0] * sx[2], d[0] * sx[1] - d[1] * sx[0])
+            ring = []
+            for s in range(segs):
+                a = s / segs * math.tau
+                c, si = math.cos(a), math.sin(a)
+                ring.append(
+                    (
+                        p[0] + (sx[0] * c + sy[0] * si) * radius,
+                        p[1] + (sx[1] * c + sy[1] * si) * radius,
+                        p[2] + (sx[2] * c + sy[2] * si) * radius,
+                    )
+                )
+            rings.append(ring)
+        for i in range(len(rings) - 1):
+            for s in range(segs):
+                t = (s + 1) % segs
+                p00, p10, p11, p01 = rings[i][s], rings[i][t], rings[i + 1][t], rings[i + 1][s]
+                ax = (p10[0] - p00[0], p10[1] - p00[1], p10[2] - p00[2])
+                ay = (p01[0] - p00[0], p01[1] - p00[1], p01[2] - p00[2])
+                n = (
+                    ax[1] * ay[2] - ax[2] * ay[1],
+                    ax[2] * ay[0] - ax[0] * ay[2],
+                    ax[0] * ay[1] - ax[1] * ay[0],
+                )
+                ln = math.sqrt(n[0] ** 2 + n[1] ** 2 + n[2] ** 2) or 1.0
+                n = (n[0] / ln, n[1] / ln, n[2] / ln)
+                self.add_quad(p00, p10, p11, p01, n, 1.0)
+
 
 def _minmax(vals: list[float], stride: int) -> tuple[list[float], list[float]]:
     mins = [min(vals[i::stride]) for i in range(stride)]
@@ -191,69 +232,65 @@ def write_glb(path: Path, meshes: list[Mesh], colors: list[list[float]]) -> None
 def desk() -> None:
     wood = Mesh("WalnutBody")
     metal = Mesh("MetalHardware")
-    # Top slab + under-bevel. Depth X toward the window, long axis Z.
-    wood.add_box((0.00, 0.735, 0.00), (1.12, 0.05, 2.48), (4, 1, 8), 2.2)
-    wood.add_box((0.00, 0.702, 0.00), (1.06, 0.018, 2.40), (3, 1, 6), 1.8)
-    # Pedestals with knee well in the middle (player side -X)
-    wood.add_box((-0.18, 0.35, -0.92), (0.70, 0.70, 0.52), (2, 3, 2), 1.4)
-    wood.add_box((-0.18, 0.35, 0.92), (0.70, 0.70, 0.52), (2, 3, 2), 1.4)
-    # Inner knee returns
-    wood.add_box((-0.02, 0.35, -0.62), (0.38, 0.70, 0.08), (1, 2, 1), 1.0)
-    wood.add_box((-0.02, 0.35, 0.62), (0.38, 0.70, 0.08), (1, 2, 1), 1.0)
-    # Modesty panel on the window side
-    wood.add_box((0.46, 0.34, 0.00), (0.04, 0.62, 2.20), (1, 2, 6), 1.6)
-    # Feet
-    for z in (-1.10, -0.74, 0.74, 1.10):
-        wood.add_box((-0.42, 0.03, z), (0.16, 0.06, 0.16), (1, 1, 1), 0.6)
-        wood.add_box((0.22, 0.03, z), (0.16, 0.06, 0.16), (1, 1, 1), 0.6)
-    # Drawer fronts (player-facing, -X)
-    for z0, zs in ((-0.92, 0.42), (0.92, 0.42)):
-        for i, y in enumerate((0.56, 0.38, 0.20)):
-            wood.add_box((-0.535, y, z0), (0.03, 0.15, zs - 0.04), (1, 1, 2), 0.8)
-            metal.add_box((-0.555, y, z0), (0.02, 0.018, 0.16), (1, 1, 1), 0.4)
-    # Pencil drawer over the knee well
-    wood.add_box((-0.50, 0.64, 0.00), (0.08, 0.07, 0.92), (1, 1, 3), 0.7)
-    metal.add_box((-0.55, 0.64, 0.00), (0.018, 0.014, 0.20), (1, 1, 1), 0.4)
-    write_glb(OUT / "executive_desk.glb", [wood, metal], [[0.36, 0.20, 0.11, 1.0], [0.55, 0.54, 0.52, 1.0]])
+    # Quiet executive desk. +X = back, -X = knee well. Long axis Z. Not a window-spanning slab.
+    wood.add_box((0.00, 0.742, 0.00), (0.80, 0.036, 1.62), (5, 1, 8), 2.4)
+    wood.add_box((0.00, 0.718, 0.00), (0.76, 0.014, 1.56), (4, 1, 6), 2.0)
+    wood.add_box((0.00, 0.704, 0.00), (0.72, 0.012, 1.50), (3, 1, 5), 1.6)
+    # Pedestals + knee well
+    wood.add_box((-0.06, 0.35, -0.62), (0.62, 0.70, 0.30), (3, 4, 2), 1.5)
+    wood.add_box((-0.06, 0.35, 0.62), (0.62, 0.70, 0.30), (3, 4, 2), 1.5)
+    wood.add_box((0.22, 0.34, -0.46), (0.08, 0.68, 0.06), (1, 3, 1), 0.8)
+    wood.add_box((0.22, 0.34, 0.46), (0.08, 0.68, 0.06), (1, 3, 1), 0.8)
+    wood.add_box((0.34, 0.32, 0.00), (0.04, 0.62, 1.28), (1, 3, 6), 1.4)
+    for z in (-0.70, -0.54, 0.54, 0.70):
+        wood.add_box((-0.30, 0.025, z), (0.12, 0.05, 0.10), (1, 1, 1), 0.5)
+        wood.add_box((0.18, 0.025, z), (0.12, 0.05, 0.10), (1, 1, 1), 0.5)
+    # Recessed drawer fronts + bar handles on the knee side
+    for z0 in (-0.62, 0.62):
+        for y in (0.54, 0.34, 0.16):
+            wood.add_box((-0.375, y, z0), (0.022, 0.14, 0.24), (1, 1, 2), 0.7)
+            metal.add_box((-0.392, y, z0), (0.012, 0.012, 0.12), (1, 1, 1), 0.3)
+    wood.add_box((-0.36, 0.66, 0.00), (0.06, 0.055, 0.72), (1, 1, 3), 0.8)
+    metal.add_box((-0.395, 0.66, 0.00), (0.010, 0.010, 0.16), (1, 1, 1), 0.3)
+    write_glb(OUT / "executive_desk.glb", [wood, metal], [[0.34, 0.18, 0.10, 1.0], [0.42, 0.40, 0.38, 1.0]])
 
 
 def coffee_cup() -> None:
     body = Mesh("CupBody")
-    segs = 28
-    # Lathe profile (radius, y) — cup ~9 cm
+    segs = 36
     outer = [
-        (0.012, 0.000),
-        (0.032, 0.004),
-        (0.036, 0.012),
-        (0.038, 0.040),
-        (0.040, 0.070),
-        (0.039, 0.086),
-        (0.036, 0.090),
+        (0.010, 0.000),
+        (0.030, 0.003),
+        (0.034, 0.010),
+        (0.036, 0.028),
+        (0.037, 0.052),
+        (0.038, 0.074),
+        (0.036, 0.086),
+        (0.033, 0.090),
+        (0.031, 0.088),
     ]
     inner = [
-        (0.030, 0.086),
-        (0.031, 0.050),
-        (0.028, 0.016),
-        (0.010, 0.010),
+        (0.029, 0.084),
+        (0.030, 0.055),
+        (0.028, 0.022),
+        (0.012, 0.012),
+        (0.008, 0.010),
     ]
-    profile = outer + inner + [(0.012, 0.000)]
+    profile = outer + inner
 
-    def ring(radius: float, y: float, v: float):
+    def ring(radius: float, y: float):
         pts = []
         for i in range(segs):
             a = (i / segs) * math.tau
-            pts.append(((radius * math.cos(a), y, radius * math.sin(a)), (i / segs, v)))
+            pts.append((radius * math.cos(a), y, radius * math.sin(a)))
         return pts
 
-    rings = [ring(r, y, i / (len(profile) - 1)) for i, (r, y) in enumerate(profile)]
+    rings = [ring(r, y) for r, y in profile]
     for i in range(len(rings) - 1):
         a, b = rings[i], rings[i + 1]
         for s in range(segs):
             t = (s + 1) % segs
-            p00, u00 = a[s]
-            p10, u10 = a[t]
-            p11, u11 = b[t]
-            p01, u01 = b[s]
+            p00, p10, p11, p01 = a[s], a[t], b[t], b[s]
             ax = (p10[0] - p00[0], p10[1] - p00[1], p10[2] - p00[2])
             ay = (p01[0] - p00[0], p01[1] - p00[1], p01[2] - p00[2])
             n = (
@@ -264,53 +301,43 @@ def coffee_cup() -> None:
             ln = math.sqrt(n[0] ** 2 + n[1] ** 2 + n[2] ** 2) or 1.0
             n = (n[0] / ln, n[1] / ln, n[2] / ln)
             body.add_quad(p00, p10, p11, p01, n, 1.0)
-            # overwrite UVs of last 6 verts (2 tris)
-            # already set by add_quad; fine
 
-    # Handle as a bent tube
     handle = Mesh("CupHandle")
-    for i in range(14):
-        t = i / 13.0
-        ang = math.radians(40 + 200 * t)
-        cx = 0.038 + 0.022 * math.cos(ang)
-        cy = 0.048 + 0.022 * math.sin(ang)
-        handle.add_box((cx, cy, 0.0), (0.008, 0.008, 0.008), (1, 1, 1), 0.4)
-    write_glb(OUT / "coffee_cup.glb", [body, handle], [[0.90, 0.90, 0.88, 1.0], [0.82, 0.82, 0.80, 1.0]])
+    path = []
+    for i in range(18):
+        t = i / 17.0
+        ang = math.radians(55 + 230 * t)
+        path.append((0.036 + 0.020 * math.cos(ang), 0.046 + 0.020 * math.sin(ang), 0.0))
+    handle.add_tube(path, 0.0042, 8)
+    write_glb(OUT / "coffee_cup.glb", [body, handle], [[0.86, 0.84, 0.80, 1.0], [0.78, 0.76, 0.72, 1.0]])
 
 
 def book() -> None:
     cover = Mesh("Cover")
     pages = Mesh("Pages")
-    # Closed hardcover, spine on -X
-    cover.add_box((0.00, 0.018, 0.00), (0.165, 0.008, 0.235), (2, 1, 2), 1.0)  # front
-    cover.add_box((0.00, -0.018, 0.00), (0.165, 0.008, 0.235), (2, 1, 2), 1.0)  # back
-    cover.add_box((-0.086, 0.00, 0.00), (0.012, 0.044, 0.235), (1, 1, 2), 0.8)  # spine
-    pages.add_box((0.004, 0.00, 0.00), (0.150, 0.028, 0.220), (2, 1, 2), 1.2)
-    write_glb(OUT / "hardcover_book.glb", [cover, pages], [[0.28, 0.08, 0.08, 1.0], [0.93, 0.90, 0.82, 1.0]])
+    cover.add_box((0.00, 0.017, 0.00), (0.158, 0.007, 0.228), (3, 1, 3), 1.0)
+    cover.add_box((0.00, -0.017, 0.00), (0.158, 0.007, 0.228), (3, 1, 3), 1.0)
+    cover.add_box((-0.082, 0.00, 0.00), (0.010, 0.040, 0.228), (1, 2, 3), 0.8)
+    cover.add_box((-0.078, 0.00, 0.112), (0.004, 0.036, 0.006), (1, 1, 1), 0.3)
+    pages.add_box((0.006, 0.00, 0.00), (0.144, 0.026, 0.214), (3, 1, 3), 1.2)
+    write_glb(OUT / "hardcover_book.glb", [cover, pages], [[0.22, 0.08, 0.08, 1.0], [0.90, 0.86, 0.78, 1.0]])
 
 
 def copier() -> None:
     body = Mesh("CopierBody")
     dark = Mesh("CopierDark")
-    # Main cabinet
-    body.add_box((0.00, 0.42, 0.00), (0.72, 0.84, 0.62), (3, 3, 2), 1.6)
-    # Recessed paper cassette
-    dark.add_box((0.00, 0.18, -0.28), (0.58, 0.10, 0.12), (2, 1, 1), 0.8)
-    dark.add_box((0.00, 0.34, -0.28), (0.58, 0.10, 0.12), (2, 1, 1), 0.8)
-    # Output tray
-    body.add_box((0.00, 0.78, -0.42), (0.50, 0.03, 0.26), (2, 1, 1), 0.7)
-    dark.add_box((0.00, 0.76, -0.42), (0.46, 0.02, 0.22), (1, 1, 1), 0.5)
-    # Platen / glass bed
-    dark.add_box((0.00, 0.86, 0.04), (0.64, 0.03, 0.50), (2, 1, 2), 1.0)
-    # Lid slightly ajar
-    body.add_box((0.00, 0.96, 0.10), (0.66, 0.04, 0.52), (3, 1, 2), 1.2)
-    # Control panel wedge
-    body.add_box((0.28, 0.90, -0.22), (0.16, 0.10, 0.18), (1, 1, 1), 0.5)
-    dark.add_box((0.28, 0.96, -0.22), (0.12, 0.02, 0.14), (1, 1, 1), 0.4)
-    # Feet
-    for x, z in ((-0.30, -0.26), (0.30, -0.26), (-0.30, 0.26), (0.30, 0.26)):
-        dark.add_box((x, 0.03, z), (0.08, 0.06, 0.08), (1, 1, 1), 0.3)
-    write_glb(OUT / "office_copier.glb", [body, dark], [[0.78, 0.78, 0.80, 1.0], [0.12, 0.12, 0.14, 1.0]])
+    body.add_box((0.00, 0.40, 0.02), (0.68, 0.80, 0.58), (4, 4, 3), 1.8)
+    dark.add_box((0.00, 0.16, -0.26), (0.54, 0.08, 0.10), (2, 1, 1), 0.7)
+    dark.add_box((0.00, 0.32, -0.26), (0.54, 0.08, 0.10), (2, 1, 1), 0.7)
+    body.add_box((0.00, 0.76, -0.40), (0.46, 0.025, 0.22), (3, 1, 2), 0.7)
+    dark.add_box((0.00, 0.748, -0.40), (0.42, 0.012, 0.18), (2, 1, 1), 0.5)
+    dark.add_box((0.00, 0.84, 0.04), (0.60, 0.018, 0.48), (3, 1, 3), 1.0)
+    body.add_box((0.00, 0.93, 0.08), (0.62, 0.03, 0.50), (4, 1, 3), 1.1)
+    body.add_box((0.26, 0.88, -0.20), (0.14, 0.08, 0.16), (1, 1, 1), 0.4)
+    dark.add_box((0.26, 0.93, -0.20), (0.11, 0.014, 0.12), (1, 1, 1), 0.3)
+    for x, z in ((-0.28, -0.24), (0.28, -0.24), (-0.28, 0.24), (0.28, 0.24)):
+        dark.add_box((x, 0.025, z), (0.07, 0.05, 0.07), (1, 1, 1), 0.3)
+    write_glb(OUT / "office_copier.glb", [body, dark], [[0.62, 0.62, 0.64, 1.0], [0.10, 0.10, 0.11, 1.0]])
 
 
 if __name__ == "__main__":

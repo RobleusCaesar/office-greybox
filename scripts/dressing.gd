@@ -8,6 +8,7 @@ func apply(level: Node3D) -> void:
 	_bathroom(level)
 	_dread(level)
 	_ceo(level)
+	_walls(level)
 	_diorama(level)
 	_ammo(level)
 	_emergency(level)
@@ -175,6 +176,8 @@ func _texture_existing(level: Node3D) -> void:
 		"FutureAssetSlots/CEOOffice/CEODeskPedestal_R",
 		"FutureAssetSlots/CEOOffice/CEOBlotter",
 		"FutureAssetSlots/CEOOffice/CEOSideChair",
+		"FutureAssetSlots/CEOOffice/CEOLamp",
+		"FutureAssetSlots/CEOOffice/CEOLampShade",
 		"FutureAssetSlots/EastHall/Copier",
 		"FutureAssetSlots/EastHall/CopierLid",
 		"FutureAssetSlots/EastHall/CopierTray",
@@ -343,17 +346,16 @@ func _ceo(level: Node3D) -> void:
 	var leather := _mat("res://materials/mat_leather.tres")
 	var wood := _mat("res://materials/mat_wood.tres")
 	var paper := _mat("res://materials/mat_paper.tres")
-	# Leather chair west of the window desk
-	_box(ceo, "LeatherSeat", Vector3(0.52, 0.08, 0.5), Vector3(35.45, 0.52, 11.50), leather, Vector3.ZERO, false)
-	_box(ceo, "LeatherBack", Vector3(0.5, 0.7, 0.08), Vector3(35.12, 0.95, 11.50), leather, Vector3.ZERO, false)
-	_box(ceo, "LeatherArm_L", Vector3(0.08, 0.22, 0.42), Vector3(35.45, 0.62, 11.22), leather, Vector3.ZERO, false)
-	_box(ceo, "LeatherArm_R", Vector3(0.08, 0.22, 0.42), Vector3(35.45, 0.62, 11.78), leather, Vector3.ZERO, false)
-	# Executive desk ON the window — long axis along the glass, knee well facing west
-	var desk := _instance_glb(ceo, "res://models/executive_desk.glb", "ExecutiveDesk", Vector3(36.85, 0.0, 11.50), Vector3.ZERO, Vector3.ONE)
+	# Quiet desk off the first window sightline — south wall, knee well faces into the room
+	_box(ceo, "LeatherSeat", Vector3(0.48, 0.07, 0.46), Vector3(34.80, 0.50, 8.85), leather, Vector3.ZERO, false)
+	_box(ceo, "LeatherBack", Vector3(0.46, 0.62, 0.07), Vector3(34.80, 0.90, 9.12), leather, Vector3.ZERO, false)
+	_box(ceo, "LeatherArm_L", Vector3(0.07, 0.20, 0.38), Vector3(34.54, 0.58, 8.85), leather, Vector3.ZERO, false)
+	_box(ceo, "LeatherArm_R", Vector3(0.07, 0.20, 0.38), Vector3(35.06, 0.58, 8.85), leather, Vector3.ZERO, false)
+	var desk := _instance_glb(ceo, "res://models/executive_desk.glb", "ExecutiveDesk", Vector3(34.80, 0.0, 8.05), Vector3(0, -90, 0), Vector3.ONE)
 	_apply_mesh_mats(desk, "res://materials/mat_walnut.tres", "res://materials/mat_metal_furn.tres")
 	_desk_collision(desk)
-	_instance_glb(ceo, "res://models/hardcover_book.glb", "DeskBook", Vector3(36.55, 0.78, 11.95), Vector3(0, 18, 0), Vector3(1, 1, 1))
-	_instance_glb(ceo, "res://models/coffee_cup.glb", "DeskCup", Vector3(36.50, 0.76, 10.85), Vector3(0, -12, 0), Vector3(1, 1, 1))
+	_instance_glb(ceo, "res://models/hardcover_book.glb", "DeskBook", Vector3(35.05, 0.76, 8.12), Vector3(0, 12, 0), Vector3(1, 1, 1))
+	_instance_glb(ceo, "res://models/coffee_cup.glb", "DeskCup", Vector3(34.55, 0.76, 8.00), Vector3(0, -8, 0), Vector3(1, 1, 1))
 	# Short bookshelf + fallen books (north wall, off window walk)
 	_box(ceo, "ShortShelf", Vector3(1.1, 1.15, 0.3), Vector3(31.4, 0.58, 16.18), wood)
 	_box(ceo, "ShortBooks", Vector3(0.9, 0.2, 0.14), Vector3(31.4, 0.85, 16.05), paper, Vector3.ZERO, false)
@@ -531,9 +533,72 @@ func _apply_mesh_mats_walk(n: Node, wood: Material, metal: Material) -> void:
 
 
 func _desk_collision(desk: Node3D) -> void:
-	_box_collision(desk, Vector3(1.12, 0.08, 2.48), Vector3(0.0, 0.735, 0.0))
-	_box_collision(desk, Vector3(0.70, 0.70, 0.52), Vector3(-0.18, 0.35, -0.92))
-	_box_collision(desk, Vector3(0.70, 0.70, 0.52), Vector3(-0.18, 0.35, 0.92))
+	_box_collision(desk, Vector3(0.80, 0.06, 1.62), Vector3(0.0, 0.742, 0.0))
+	_box_collision(desk, Vector3(0.62, 0.70, 0.30), Vector3(-0.06, 0.35, -0.62))
+	_box_collision(desk, Vector3(0.62, 0.70, 0.30), Vector3(-0.06, 0.35, 0.62))
+
+
+func _walls(level: Node3D) -> void:
+	var root := Node3D.new()
+	root.name = "WallDressing"
+	level.add_child(root)
+	var trim := _tex_mat("res://textures/tex_walnut.png", Color(0.22, 0.14, 0.10), 0.45, 0.05)
+	var scuff := _tex_mat("res://textures/tex_scuff.png", Color(0.55, 0.48, 0.40, 0.55), 0.9)
+	scuff.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	# Baseboards along the main L — interior faces, quiet dark trim
+	var boards := [
+		[Vector3(7.00, 0.06, 0.10), Vector3(7.00, 0.12, 0.04)],
+		[Vector3(0.10, 0.06, 3.25), Vector3(0.04, 0.12, 6.30)],
+		[Vector3(6.90, 0.06, 3.25), Vector3(0.04, 0.12, 6.30)],
+		[Vector3(3.50, 0.06, 11.00), Vector3(0.04, 0.12, 8.80)],
+		[Vector3(3.50, 0.06, 6.40), Vector3(4.80, 0.12, 0.04)],
+		[Vector3(12.50, 0.06, 10.55), Vector3(14.00, 0.12, 0.04)],
+		[Vector3(12.50, 0.06, 13.45), Vector3(14.00, 0.12, 0.04)],
+		[Vector3(22.00, 0.06, 6.70), Vector3(8.00, 0.12, 0.04)],
+		[Vector3(22.00, 0.06, 16.30), Vector3(8.00, 0.12, 0.04)],
+		[Vector3(32.00, 0.06, 6.70), Vector3(11.50, 0.12, 0.04)],
+		[Vector3(32.00, 0.06, 16.30), Vector3(11.50, 0.12, 0.04)],
+		[Vector3(26.18, 0.06, 11.50), Vector3(0.04, 0.12, 5.80)],
+	]
+	var i := 0
+	for b in boards:
+		_box(root, "Baseboard_%d" % i, b[1], b[0], trim, Vector3.ZERO, false)
+		i += 1
+	# Lower-wall scuffs — lived-in, not gore
+	var scuffs := [
+		[Vector3(3.2, 0.22, 0.12), Vector2(1.4, 0.28), Vector3(0, 0, 0)],
+		[Vector3(8.8, 0.24, 10.62), Vector2(1.1, 0.26), Vector3(0, 0, 0)],
+		[Vector3(16.4, 0.22, 13.38), Vector2(1.2, 0.24), Vector3(0, 180, 0)],
+		[Vector3(26.22, 0.28, 11.2), Vector2(1.0, 0.32), Vector3(0, 90, 0)],
+		[Vector3(31.0, 0.26, 6.72), Vector2(1.3, 0.28), Vector3(0, 0, 0)],
+	]
+	var j := 0
+	for s in scuffs:
+		_quad(root, "Scuff_%d" % j, s[1], s[0], s[2], scuff)
+		j += 1
+	var wood := _mat("res://materials/mat_wood.tres")
+	var mountains := _tex_mat("res://textures/painting_mountains.png")
+	var cert := _tex_mat("res://textures/painting_certificate.png")
+	var city := _tex_mat("res://textures/painting_map.png")
+	# Extra wall paper — rooms stay dressed, desk does not become the hero
+	_frame(root, "HallMap", Vector3(14.8, 1.65, 10.62), Vector2(0.85, 0.62), Vector3(0, 0, 0), wood, city)
+	_frame(root, "HallCert", Vector3(18.4, 1.70, 13.38), Vector2(0.48, 0.62), Vector3(0, 180, 0), wood, cert)
+	_frame(root, "ReceptionMap", Vector3(20.6, 1.72, 16.28), Vector2(0.95, 0.68), Vector3(0, 180, 0), wood, city)
+	_frame(root, "ReceptionMountains", Vector3(22.4, 1.70, 6.72), Vector2(1.05, 0.70), Vector3(0, 0, 0), wood, mountains)
+	_frame(root, "CEONorthMap", Vector3(30.4, 1.72, 16.28), Vector2(0.90, 0.64), Vector3(0, 180, 0), wood, city)
+	_frame(root, "BreakCert", Vector3(0.12, 1.60, 4.4), Vector2(0.42, 0.55), Vector3(0, 90, 0), wood, cert)
+
+
+func _frame(parent: Node, name: String, pos: Vector3, size: Vector2, rot: Vector3, wood: Material, art: Material) -> void:
+	_box(parent, name + "Frame", Vector3(size.x + 0.08, size.y + 0.08, 0.035), pos, wood, rot, false)
+	var face := pos
+	if abs(rot.y) < 1.0:
+		face.z += 0.022
+	elif abs(rot.y - 180.0) < 1.0:
+		face.z -= 0.022
+	elif abs(rot.y - 90.0) < 1.0:
+		face.x += 0.022
+	_quad(parent, name + "Art", size, face, rot, art)
 
 
 func _box_collision(parent: Node3D, size: Vector3, pos: Vector3) -> void:

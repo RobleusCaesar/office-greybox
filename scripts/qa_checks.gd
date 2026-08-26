@@ -58,8 +58,13 @@ func _run() -> void:
 				errors.append("diorama backdrop is %s, expected denver-fire-vista" % tp)
 		if dia.find_child("SmokeParticles", true, false) == null:
 			errors.append("diorama smoke particles missing")
-	if level.get_node_or_null("FutureAssetSlots/CEOOffice/ExecutiveDesk") == null:
+	var desk_n := level.get_node_or_null("FutureAssetSlots/CEOOffice/ExecutiveDesk")
+	if desk_n == null:
 		errors.append("executive desk mesh missing")
+	elif desk_n.position.z > 9.15 and desk_n.position.z < 13.85:
+		errors.append("desk is on the first window sightline")
+	if level.get_node_or_null("WallDressing") == null:
+		errors.append("wall dressing missing")
 	if level.get_node_or_null("FutureAssetSlots/Bathroom/Toilet_1") == null:
 		errors.append("bathroom toilets missing")
 	if level.get_node_or_null("FutureAssetSlots/Bathroom/Urinal_0") == null:
