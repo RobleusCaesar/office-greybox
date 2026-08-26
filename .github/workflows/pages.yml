@@ -31,7 +31,20 @@ jobs:
           curl -fL --retry 5 --retry-delay 4 -o export_templates.tpz \
             "${BASE}/Godot_v${GODOT_VER}-stable_export_templates.tpz"
           unzip -q godot.zip
-          GODOT_BIN="$(find "$PWD" -maxdepth 1 -type f -name 'Godot_v*-linux.x86_64' | head -n1)"
+          EXACT="Godot_v${GODOT_VER}-stable_linux.x86_64"
+          if [ -f "$EXACT" ]; then
+            GODOT_BIN="$PWD/$EXACT"
+          else
+            GODOT_BIN="$(find "$PWD" -type f -name 'Godot_v*' ! -name '*.zip' | head -n1)"
+          fi
+          if [ -z "$GODOT_BIN" ] || [ ! -f "$GODOT_BIN" ]; then
+            echo "Could not find Godot Linux binary after unzip (GODOT_BIN is empty)."
+            echo "--- ls ---"
+            ls -la
+            echo "--- find Godot_v* ---"
+            find "$PWD" -name 'Godot_v*' -print
+            exit 1
+          fi
           chmod +x "$GODOT_BIN"
           echo "GODOT_BIN=$GODOT_BIN" >> "$GITHUB_ENV"
           DEST="${HOME}/.local/share/godot/export_templates/${GODOT_VER}.stable"
@@ -57,6 +70,7 @@ jobs:
           "$GODOT_BIN" --headless --path . --export-release "Web" export/web/index.html
           touch export/web/.nojekyll
           test -f export/web/index.html
+          test -f export/web/index.wasm
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
