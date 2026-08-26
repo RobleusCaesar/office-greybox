@@ -39,6 +39,46 @@ func _run() -> void:
 		errors.append("break room TV missing")
 	if level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive") == null:
 		errors.append("dead executive missing")
+	var tv_src := FileAccess.get_file_as_string("res://scripts/tv.gd")
+	if not tv_src.contains("tv_not_a_test.png"):
+		errors.append("TV missing THIS IS NOT A TEST card")
+	if level.get_node_or_null("Ammo_Cubicle") == null:
+		errors.append("ammo pickup missing")
+	if level.get_node_or_null("Ammo_Break") != null:
+		errors.append("second ammo pickup must not exist")
+	var dia := level.get_node_or_null("ExteriorDiorama")
+	if dia:
+		var backdrop := dia.get_node_or_null("Backdrop") as MeshInstance3D
+		if backdrop and backdrop.material_override is StandardMaterial3D:
+			var bm := backdrop.material_override as StandardMaterial3D
+			var tp := ""
+			if bm.albedo_texture:
+				tp = bm.albedo_texture.resource_path
+			if not tp.contains("denver-fire-vista"):
+				errors.append("diorama backdrop is %s, expected denver-fire-vista" % tp)
+		if dia.find_child("SmokeParticles", true, false) == null:
+			errors.append("diorama smoke particles missing")
+	if level.get_node_or_null("FutureAssetSlots/CEOOffice/ExecutiveDesk") == null:
+		errors.append("executive desk mesh missing")
+	if level.get_node_or_null("FutureAssetSlots/Bathroom/Toilet_1") == null:
+		errors.append("bathroom toilets missing")
+	if level.get_node_or_null("FutureAssetSlots/Bathroom/Urinal_0") == null:
+		errors.append("bathroom urinals missing")
+	var env_node := level.get_node_or_null("WorldEnvironment") as WorldEnvironment
+	if env_node and env_node.environment and env_node.environment.sdfgi_enabled:
+		errors.append("SDFGI must stay off")
+	var pane := level.get_node_or_null("FutureAssetSlots/CEOOffice/MoneyShotWindow/Pane_02") as CSGBox3D
+	if pane and pane.material is StandardMaterial3D:
+		if (pane.material as StandardMaterial3D).albedo_color.a > 0.35:
+			errors.append("window pane is not transparent glass")
+	if not FileAccess.file_exists("res://models/executive_desk.glb"):
+		errors.append("executive_desk.glb missing")
+	if not FileAccess.file_exists("res://models/coffee_cup.glb"):
+		errors.append("coffee_cup.glb missing")
+	if not FileAccess.file_exists("res://models/hardcover_book.glb"):
+		errors.append("hardcover_book.glb missing")
+	if not FileAccess.file_exists("res://models/office_copier.glb"):
+		errors.append("office_copier.glb missing")
 
 	var space: PhysicsDirectSpaceState3D = level.get_world_3d().direct_space_state
 	var window := Vector3(38.1, 1.7, 11.5)
@@ -73,6 +113,11 @@ func _run() -> void:
 			errors.append("demon died in %d shells, expected 3–5" % shots)
 		if is_instance_valid(d1) and d1.hp > 0.0:
 			errors.append("demon 1 survived expected shells")
+		var glass_q := PhysicsRayQueryParameters3D.create(Vector3(37.2, 1.2, 11.5), Vector3(40.0, 1.2, 11.5))
+		glass_q.collision_mask = 1
+		var glass_hit := space.intersect_ray(glass_q)
+		if glass_hit.is_empty() or glass_hit.position.x > 39.0:
+			errors.append("player can walk through money-shot glass")
 		player.take_damage(200.0)
 		if not player.dead:
 			errors.append("player did not die")

@@ -1,17 +1,18 @@
 extends Node3D
-## Break-room TV: EAS / DENVER METRO / snow loop.
+## Break-room TV: PLEASE STAND BY / THIS IS NOT A TEST / DENVER METRO / snow.
 
 @onready var _screen: MeshInstance3D = $Screen
 
 var _mats: Array[StandardMaterial3D] = []
 var _i: int = 0
 var _t: float = 0.0
-const HOLDS := [2.4, 2.1, 1.35]
+const HOLDS := [2.4, 2.2, 2.1, 1.35]
 
 
 func _ready() -> void:
 	for path in [
 		"res://textures/tv_eas_standby.png",
+		"res://textures/tv_not_a_test.png",
 		"res://textures/tv_denver_metro.png",
 		"res://textures/tv_snow.png",
 	]:

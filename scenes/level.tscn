@@ -15,7 +15,7 @@
 [ext_resource type="Material" path="res://materials/mat_furniture.tres" id="5_furn"]
 [ext_resource type="Material" path="res://materials/mat_locked_door.tres" id="6_door"]
 [ext_resource type="Material" path="res://materials/mat_door_frame.tres" id="7_frame"]
-[ext_resource type="Material" path="res://materials/mat_window.tres" id="8_win"]
+[ext_resource type="Material" path="res://materials/mat_clear_glass.tres" id="8_win"]
 [ext_resource type="Material" path="res://materials/mat_dim_glass.tres" id="9_dim"]
 [ext_resource type="Material" path="res://materials/mat_demon.tres" id="10_demon"]
 
@@ -1780,7 +1780,7 @@ collision_mask = 1
 material = ExtResource("6_door")
 
 [node name="CEOLamp" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.5000, 1.0500, 11.1000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.5500, 1.0500, 10.5500)
 size = Vector3(0.1200, 0.4800, 0.1200)
 use_collision = true
 collision_layer = 1
@@ -1788,7 +1788,7 @@ collision_mask = 1
 material = ExtResource("7_frame")
 
 [node name="CEOLampShade" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.5000, 1.3200, 11.1000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.5500, 1.3200, 10.5500)
 size = Vector3(0.2200, 0.1000, 0.2200)
 use_collision = true
 collision_layer = 1
@@ -1957,7 +1957,7 @@ use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("8_win")
-editor_description = "Emissive ember pane 1 (south)."
+editor_description = "Clear glass pane 1 (south). Vista lives in ExteriorDiorama."
 
 [node name="Pane_02" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice/MoneyShotWindow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, 0.0000)
@@ -1966,7 +1966,7 @@ use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("8_win")
-editor_description = "Emissive ember pane 2 (center)."
+editor_description = "Clear glass pane 2 (center). Vista lives in ExteriorDiorama."
 
 [node name="Pane_03" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice/MoneyShotWindow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, 1.7734)
@@ -1975,7 +1975,7 @@ use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("8_win")
-editor_description = "Emissive ember pane 3 (north)."
+editor_description = "Clear glass pane 3 (north). Vista lives in ExteriorDiorama."
 
 [node name="Mullion_Left" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice/MoneyShotWindow"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, -2.6600)

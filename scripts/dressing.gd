@@ -82,15 +82,25 @@ func _texture_existing(level: Node3D) -> void:
 	var paper := _mat("res://materials/mat_paper.tres")
 	var glass := _mat("res://materials/mat_clear_glass.tres")
 	var plant := _mat("res://materials/mat_plant.tres")
-	var stone := _tex_mat("res://textures/tex_stone.png", Color(0.22, 0.22, 0.24), 0.2, 0.65)
+	var walnut := _mat("res://materials/mat_walnut.tres")
+	var porcelain := _tex_mat("res://textures/tex_porcelain.png", Color(0.92, 0.92, 0.90), 0.18, 0.04)
+	var stone := _tex_mat("res://textures/tex_stone.png", Color(0.16, 0.12, 0.10), 0.16, 0.55)
 	for p in [
 		"FutureAssetSlots/BreakRoom/KitchenetteCounter",
 		"FutureAssetSlots/BreakRoom/KitchenetteCabinets",
 		"FutureAssetSlots/BreakRoom/BreakRoomTable",
+		"FutureAssetSlots/BreakRoom/TablePedestal",
 		"FutureAssetSlots/CEOOffice/LiquorCabinet",
 		"FutureAssetSlots/CEOOffice/Bookshelf_01",
 		"FutureAssetSlots/CEOOffice/Bookshelf_02",
 		"FutureAssetSlots/CEOOffice/Bookshelf_03",
+		"FutureAssetSlots/Reception/MagazineTable",
+		"FutureAssetSlots/Reception/ReceptionSideboard",
+		"FutureAssetSlots/Bathroom/Bench",
+		"FutureAssetSlots/Bathroom/StallDoor_01",
+		"FutureAssetSlots/Bathroom/StallDoor_02",
+		"FutureAssetSlots/Bathroom/StallDoor_03",
+		"FutureAssetSlots/Bathroom/StallDoor_04",
 	]:
 		_set_csg_mat(_find(level, p), wood)
 	for p in [
@@ -107,6 +117,12 @@ func _texture_existing(level: Node3D) -> void:
 		"FutureAssetSlots/CEOOffice/CEOSideChair",
 		"FutureAssetSlots/CEOOffice/CEOGuestChair_01",
 		"FutureAssetSlots/CEOOffice/CEOGuestChair_02",
+		"FutureAssetSlots/Reception/WaitingChair_01",
+		"FutureAssetSlots/Reception/WaitingChair_02",
+		"FutureAssetSlots/Reception/WaitingChair_03",
+		"FutureAssetSlots/Reception/WaitingChair_01_Back",
+		"FutureAssetSlots/Reception/WaitingChair_02_Back",
+		"FutureAssetSlots/Reception/WaitingChair_03_Back",
 	]:
 		_set_csg_mat(_find(level, p), leather)
 	for p in [
@@ -114,19 +130,31 @@ func _texture_existing(level: Node3D) -> void:
 		"FutureAssetSlots/BreakRoom/Microwave",
 		"FutureAssetSlots/BreakRoom/VendingMachine",
 		"FutureAssetSlots/EastHall/CubicleDesk",
-		"FutureAssetSlots/EastHall/Copier",
 		"FutureAssetSlots/Reception/ReceptionDesk",
-		"FutureAssetSlots/CEOOffice/CEODesk",
-		"FutureAssetSlots/CEOOffice/CEODeskPedestal_L",
-		"FutureAssetSlots/CEOOffice/CEODeskPedestal_R",
+		"FutureAssetSlots/BreakRoom/TrashBin",
+		"FutureAssetSlots/EastHall/CubicleBin",
+		"FutureAssetSlots/EastHall/MailSlotBank",
+		"FutureAssetSlots/Bathroom/PaperTowel",
 	]:
 		_set_csg_mat(_find(level, p), metal)
+	for p in [
+		"FutureAssetSlots/Bathroom/Sink",
+		"FutureAssetSlots/Bathroom/Sink_02",
+		"FutureAssetSlots/Bathroom/SinkPedestal",
+		"FutureAssetSlots/Bathroom/SinkBacksplash",
+	]:
+		_set_csg_mat(_find(level, p), porcelain)
 	_set_csg_mat(_find(level, "FutureAssetSlots/BreakRoom/FridgeHandle"), wood)
 	_set_csg_mat(_find(level, "FutureAssetSlots/EastHall/CubicleMonitor"), _tex_mat("res://textures/tv_snow.png", Color.WHITE, 0.4, 0.0, 0.4))
 	_set_csg_mat(_find(level, "FutureAssetSlots/CEOOffice/PlantFoliage"), plant)
 	_set_csg_mat(_find(level, "FutureAssetSlots/CEOOffice/PlantPot"), wood)
-	_set_csg_mat(_find(level, "FutureAssetSlots/CEOOffice/CEOBlotter"), leather)
-	_set_csg_mat(_find(level, "Architecture/Floors/CEOOfficeFloor"), stone)
+	_set_csg_mat(_find(level, "FutureAssetSlots/CEOOffice/Books_01"), paper)
+	_set_csg_mat(_find(level, "FutureAssetSlots/CEOOffice/Books_02"), paper)
+	_set_csg_mat(_find(level, "FutureAssetSlots/CEOOffice/Books_03"), paper)
+	_set_csg_mat(_find(level, "Architecture/Floors/CEOOfficeFloor"), walnut if walnut else stone)
+	var mirror := _find(level, "FutureAssetSlots/Bathroom/Mirror")
+	if mirror:
+		_set_csg_mat(mirror, _tex_mat("res://textures/tex_metal.png", Color(0.72, 0.78, 0.82), 0.08, 0.85))
 	var win := _find(level, "FutureAssetSlots/CEOOffice/MoneyShotWindow")
 	if win:
 		for n in ["Pane_01", "Pane_02", "Pane_03"]:
@@ -134,12 +162,63 @@ func _texture_existing(level: Node3D) -> void:
 			if pane:
 				pane.material = glass
 				pane.visible = true
+				pane.use_collision = true
 		var mull := _mat("res://materials/mat_mullion.tres")
 		for n in ["Mullion_Left", "Mullion_01", "Mullion_02", "Mullion_Right", "Sill", "Head"]:
 			_set_csg_mat(win.get_node_or_null(n), mull)
 	var spot2 := _find(level, "DemonSpots/DemonSpot_02")
 	if spot2:
 		spot2.visible = false
+	_hide_csg(level, [
+		"FutureAssetSlots/CEOOffice/CEODesk",
+		"FutureAssetSlots/CEOOffice/CEODeskPedestal_L",
+		"FutureAssetSlots/CEOOffice/CEODeskPedestal_R",
+		"FutureAssetSlots/CEOOffice/CEOBlotter",
+		"FutureAssetSlots/CEOOffice/CEOSideChair",
+		"FutureAssetSlots/EastHall/Copier",
+		"FutureAssetSlots/EastHall/CopierLid",
+		"FutureAssetSlots/EastHall/CopierTray",
+		"FutureAssetSlots/Bathroom/StallVolume_01",
+		"FutureAssetSlots/Bathroom/StallVolume_02",
+		"FutureAssetSlots/Bathroom/StallVolume_03",
+		"FutureAssetSlots/Bathroom/StallVolume_04",
+	])
+	_paint_remaining(level)
+
+
+func _hide_csg(level: Node3D, paths: Array) -> void:
+	for p in paths:
+		var n := _find(level, p)
+		if n is CSGPrimitive3D:
+			var c := n as CSGPrimitive3D
+			c.visible = false
+			c.use_collision = false
+
+
+func _paint_remaining(n: Node) -> void:
+	if n is CSGPrimitive3D:
+		var c := n as CSGPrimitive3D
+		if c.operation == 0 and c.visible:
+			var m := c.material
+			var needs := m == null
+			if m is StandardMaterial3D:
+				needs = (m as StandardMaterial3D).albedo_texture == null and (m as StandardMaterial3D).transparency == BaseMaterial3D.TRANSPARENCY_DISABLED
+			if needs:
+				var nm := String(c.name)
+				if nm.begins_with("Pane") or nm.contains("Glass") or nm.contains("Bottle") or nm.contains("Window") or nm.contains("Mirror"):
+					pass
+				elif nm.contains("Chair"):
+					c.material = _mat("res://materials/mat_leather.tres")
+				elif nm.contains("Book") or nm.contains("Paper"):
+					c.material = _mat("res://materials/mat_paper.tres")
+				elif nm.contains("Plant"):
+					c.material = _mat("res://materials/mat_plant.tres")
+				elif nm.contains("Stall") or nm.contains("Sink") or nm.contains("Toilet") or nm.contains("Urinal"):
+					c.material = _tex_mat("res://textures/tex_porcelain.png", Color(0.9, 0.9, 0.88), 0.2, 0.04)
+				else:
+					c.material = _mat("res://materials/mat_furniture.tres")
+	for ch in n.get_children():
+		_paint_remaining(ch)
 
 
 func _breakroom(level: Node3D) -> void:
@@ -168,6 +247,7 @@ func _breakroom(level: Node3D) -> void:
 		_box(rec, "ReceptionDrawer", Vector3(0.4, 0.12, 0.02), Vector3(23.9, 0.55, 10.1), wood, Vector3.ZERO, false)
 	# Table papers
 	_box(br, "TablePapers", Vector3(0.28, 0.01, 0.2), Vector3(3.7, 0.77, 3.55), paper, Vector3(0, 18, 0), false)
+	_instance_glb(br, "res://models/coffee_cup.glb", "CoffeeCup", Vector3(3.52, 0.77, 3.72), Vector3(0, 20, 0), Vector3(1, 1, 1))
 	# Wall TV facing into the room
 	var tv := Node3D.new()
 	tv.name = "BreakRoomTV"
@@ -189,15 +269,22 @@ func _bathroom(level: Node3D) -> void:
 	var bath := _find(level, "FutureAssetSlots/Bathroom")
 	if bath == null:
 		return
-	var porcelain := _tex_mat("", Color(0.86, 0.86, 0.84), 0.22, 0.05)
+	var porcelain := _tex_mat("res://textures/tex_porcelain.png", Color(0.90, 0.90, 0.88), 0.18, 0.04)
 	var metal := _mat("res://materials/mat_metal_furn.tres")
 	var wood := _mat("res://materials/mat_wood.tres")
-	# Real fixtures: urinal, extra sink faucet, soap
-	_box(bath, "Urinal", Vector3(0.36, 0.72, 0.28), Vector3(1.6, 0.85, 12.55), porcelain)
-	_box(bath, "UrinalFlush", Vector3(0.08, 0.08, 0.06), Vector3(1.6, 1.28, 12.68), metal, Vector3.ZERO, false)
+	# Toilets in the four stalls (west run)
+	var tz := [7.95, 9.10, 10.25, 11.40]
+	for i in tz.size():
+		_toilet(bath, "Toilet_%d" % (i + 1), Vector3(-5.35, 0.0, tz[i]), porcelain, metal)
+	# Urinal bank on the north wall
+	for i in 3:
+		var ux := -0.15 + i * 0.85
+		_box(bath, "Urinal_%d" % i, Vector3(0.34, 0.70, 0.26), Vector3(ux, 0.82, 12.58), porcelain)
+		_box(bath, "UrinalFlush_%d" % i, Vector3(0.08, 0.08, 0.06), Vector3(ux, 1.24, 12.70), metal, Vector3.ZERO, false)
+	_box(bath, "SinkPedestal_02", Vector3(0.28, 0.44, 0.28), Vector3(1.05, 0.22, 6.92), porcelain)
 	_box(bath, "Faucet", Vector3(0.04, 0.12, 0.16), Vector3(0.2, 0.62, 6.78), metal, Vector3.ZERO, false)
 	_box(bath, "Faucet_02", Vector3(0.04, 0.12, 0.16), Vector3(1.05, 0.62, 6.78), metal, Vector3.ZERO, false)
-	_box(bath, "Soap", Vector3(0.08, 0.12, 0.06), Vector3(-0.2, 1.15, 6.74), _tex_mat("", Color(0.7, 0.75, 0.6)), Vector3.ZERO, false)
+	_box(bath, "Soap", Vector3(0.08, 0.12, 0.06), Vector3(-0.2, 1.15, 6.74), _tex_mat("res://textures/tex_porcelain.png", Color(0.7, 0.75, 0.6)), Vector3.ZERO, false)
 	# Ajar MEN door on the north-hall opening
 	var door := Node3D.new()
 	door.name = "MensDoorAjar"
@@ -242,6 +329,11 @@ func _dread(level: Node3D) -> void:
 	_box(root, "BloodCubicle", Vector3(0.9, 0.01, 0.45), Vector3(9.1, 0.015, 10.2), blood, Vector3(0, 30, 0), false)
 	_box(root, "BloodHall", Vector3(0.7, 0.01, 0.28), Vector3(12.4, 0.015, 11.55), blood, Vector3(0, -12, 0), false)
 	_box(root, "BloodWall", Vector3(0.02, 0.55, 0.35), Vector3(11.08, 0.9, 9.6), blood, Vector3.ZERO, false)
+	var hall := _find(level, "FutureAssetSlots/EastHall")
+	if hall:
+		var copier := _instance_glb(hall, "res://models/office_copier.glb", "OfficeCopier", Vector3(8.35, 0.0, 15.15), Vector3(0, 180, 0), Vector3.ONE)
+		_apply_mesh_mats(copier, "res://materials/mat_metal_furn.tres", "res://materials/mat_metal_furn.tres")
+		_box_collision(copier, Vector3(0.74, 1.10, 0.68), Vector3(0.0, 0.55, 0.0))
 
 
 func _ceo(level: Node3D) -> void:
@@ -250,29 +342,33 @@ func _ceo(level: Node3D) -> void:
 		return
 	var leather := _mat("res://materials/mat_leather.tres")
 	var wood := _mat("res://materials/mat_wood.tres")
-	var metal := _mat("res://materials/mat_metal_furn.tres")
 	var paper := _mat("res://materials/mat_paper.tres")
-	# Leather chair parts on the existing side chair
-	_box(ceo, "LeatherSeat", Vector3(0.52, 0.08, 0.5), Vector3(33.70, 0.52, 10.55), leather, Vector3.ZERO, false)
-	_box(ceo, "LeatherBack", Vector3(0.5, 0.7, 0.08), Vector3(33.42, 0.95, 10.55), leather, Vector3.ZERO, false)
-	_box(ceo, "LeatherArm_L", Vector3(0.08, 0.22, 0.42), Vector3(33.70, 0.62, 10.28), leather, Vector3.ZERO, false)
-	_box(ceo, "LeatherArm_R", Vector3(0.08, 0.22, 0.42), Vector3(33.70, 0.62, 10.82), leather, Vector3.ZERO, false)
-	# Desk drawers
-	_box(ceo, "DeskDrawer_L", Vector3(0.36, 0.12, 0.02), Vector3(34.55, 0.42, 10.98), wood, Vector3.ZERO, false)
-	_box(ceo, "DeskDrawer_R", Vector3(0.36, 0.12, 0.02), Vector3(36.15, 0.42, 10.98), wood, Vector3.ZERO, false)
+	# Leather chair west of the window desk
+	_box(ceo, "LeatherSeat", Vector3(0.52, 0.08, 0.5), Vector3(35.45, 0.52, 11.50), leather, Vector3.ZERO, false)
+	_box(ceo, "LeatherBack", Vector3(0.5, 0.7, 0.08), Vector3(35.12, 0.95, 11.50), leather, Vector3.ZERO, false)
+	_box(ceo, "LeatherArm_L", Vector3(0.08, 0.22, 0.42), Vector3(35.45, 0.62, 11.22), leather, Vector3.ZERO, false)
+	_box(ceo, "LeatherArm_R", Vector3(0.08, 0.22, 0.42), Vector3(35.45, 0.62, 11.78), leather, Vector3.ZERO, false)
+	# Executive desk ON the window — long axis along the glass, knee well facing west
+	var desk := _instance_glb(ceo, "res://models/executive_desk.glb", "ExecutiveDesk", Vector3(36.85, 0.0, 11.50), Vector3.ZERO, Vector3.ONE)
+	_apply_mesh_mats(desk, "res://materials/mat_walnut.tres", "res://materials/mat_metal_furn.tres")
+	_desk_collision(desk)
+	_instance_glb(ceo, "res://models/hardcover_book.glb", "DeskBook", Vector3(36.55, 0.78, 11.95), Vector3(0, 18, 0), Vector3(1, 1, 1))
+	_instance_glb(ceo, "res://models/coffee_cup.glb", "DeskCup", Vector3(36.50, 0.76, 10.85), Vector3(0, -12, 0), Vector3(1, 1, 1))
 	# Short bookshelf + fallen books (north wall, off window walk)
 	_box(ceo, "ShortShelf", Vector3(1.1, 1.15, 0.3), Vector3(31.4, 0.58, 16.18), wood)
 	_box(ceo, "ShortBooks", Vector3(0.9, 0.2, 0.14), Vector3(31.4, 0.85, 16.05), paper, Vector3.ZERO, false)
 	_box(ceo, "FallenBook_01", Vector3(0.22, 0.04, 0.16), Vector3(31.9, 0.03, 15.7), paper, Vector3(0, 40, 8), false)
-	_box(ceo, "FallenBook_02", Vector3(0.2, 0.04, 0.14), Vector3(31.55, 0.03, 15.45), _tex_mat("", Color(0.25, 0.08, 0.08), 0.7), Vector3(0, -22, 6), false)
+	_box(ceo, "FallenBook_02", Vector3(0.2, 0.04, 0.14), Vector3(31.55, 0.03, 15.45), _tex_mat("res://textures/tex_leather.png", Color(0.25, 0.08, 0.08), 0.7), Vector3(0, -22, 6), false)
 	_box(ceo, "FallenBook_03", Vector3(0.18, 0.03, 0.13), Vector3(32.15, 0.025, 15.85), paper, Vector3(0, 70, 4), false)
-	# Framed art
+	# Framed art — mountain on south wall + frame with the plant (right of the window)
 	var paint := _tex_mat("res://textures/painting_mountains.png")
 	var cert := _tex_mat("res://textures/painting_certificate.png")
 	_box(ceo, "FrameMountain", Vector3(1.15, 0.8, 0.04), Vector3(32.2, 1.75, 6.62), wood, Vector3.ZERO, false)
 	_quad(ceo, "PaintingMountain", Vector2(1.05, 0.7), Vector3(32.2, 1.75, 6.65), Vector3(0, 180, 0), paint)
+	_box(ceo, "FramePlant", Vector3(0.70, 0.88, 0.04), Vector3(35.15, 1.70, 6.62), wood, Vector3.ZERO, false)
+	_quad(ceo, "PaintingPlant", Vector2(0.62, 0.78), Vector3(35.15, 1.70, 6.65), Vector3(0, 180, 0), cert)
 	_box(ceo, "FrameCert", Vector3(0.55, 0.7, 0.04), Vector3(27.2, 1.7, 14.2), wood, Vector3(0, 90, 0), false)
-	_quad(ceo, "PaintingCert", Vector2(0.48, 0.62), Vector3(27.23, 1.7, 14.2), Vector3(0, 90, 0), cert)
+	_quad(ceo, "PaintingCert", Vector2(0.48, 0.62), Vector3(27.23, 1.7, 14.2), Vector3(0, 90, 0), paint)
 	# Dead executive — north of desk, off the window walk (Z~14.3, X~33.4)
 	_dead_exec(ceo)
 
@@ -283,12 +379,12 @@ func _dead_exec(ceo: Node) -> void:
 	body.position = Vector3(33.35, 0.02, 14.35)
 	body.rotation_degrees = Vector3(0, 18, 0)
 	ceo.add_child(body)
-	var skin := _tex_mat("", Color(0.62, 0.46, 0.38), 0.55)
-	var hair := _tex_mat("", Color(0.12, 0.09, 0.07), 0.8)
-	var shirt := _tex_mat("", Color(0.85, 0.86, 0.88), 0.7)
-	var tie := _tex_mat("", Color(0.35, 0.05, 0.06), 0.45)
-	var suit := _tex_mat("", Color(0.12, 0.13, 0.16), 0.55)
-	var shoe := _tex_mat("", Color(0.08, 0.06, 0.05), 0.4)
+	var skin := _tex_mat("res://textures/tex_leather.png", Color(0.62, 0.46, 0.38), 0.55)
+	var hair := _tex_mat("res://textures/tex_leather.png", Color(0.12, 0.09, 0.07), 0.8)
+	var shirt := _tex_mat("res://textures/tex_paper.png", Color(0.85, 0.86, 0.88), 0.7)
+	var tie := _tex_mat("res://textures/tex_leather.png", Color(0.35, 0.05, 0.06), 0.45)
+	var suit := _tex_mat("res://textures/tex_leather.png", Color(0.12, 0.13, 0.16), 0.55)
+	var shoe := _tex_mat("res://textures/tex_leather.png", Color(0.08, 0.06, 0.05), 0.4)
 	# Lying on back, head west, feet east — north of desk so window approach stays clear
 	_box(body, "Head", Vector3(0.18, 0.16, 0.2), Vector3(-0.72, 0.12, 0.0), skin, Vector3.ZERO, false)
 	_box(body, "Hair", Vector3(0.18, 0.06, 0.2), Vector3(-0.74, 0.20, 0.02), hair, Vector3.ZERO, false)
@@ -310,9 +406,10 @@ func _diorama(level: Node3D) -> void:
 	dia.name = "ExteriorDiorama"
 	dia.position = Vector3(43.5, 0.0, 11.5)
 	level.add_child(dia)
-	var sky := _tex_mat("res://textures/denver_fire_skyline.png", Color.WHITE, 1.0, 0.0, 2.4)
+	var vista := "res://textures/denver-fire-vista.png"
+	var sky := _tex_mat(vista, Color.WHITE, 1.0, 0.0, 2.4)
 	sky.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	sky.emission_texture = load("res://textures/denver_fire_skyline.png")
+	sky.emission_texture = load(vista)
 	_quad(dia, "Backdrop", Vector2(22.0, 10.0), Vector3(4.0, 3.2, 0.0), Vector3(0, -90, 0), sky)
 	# Animated fire / smoke
 	var fire_root := Node3D.new()
@@ -329,6 +426,26 @@ func _diorama(level: Node3D) -> void:
 		_quad(fire_root, "Fire_%d" % i, Vector2(2.4, 2.8), Vector3(2.2, 0.9 + i * 0.15, -4.0 + i * 2.0), Vector3(0, -90, 0), fire_m)
 	for i in 4:
 		_quad(fire_root, "Smoke_%d" % i, Vector2(3.2, 3.6), Vector3(2.6, 2.8 + i * 0.4, -3.5 + i * 2.3), Vector3(0, -90, 0), smoke_m)
+	var smoke_p := CPUParticles3D.new()
+	smoke_p.name = "SmokeParticles"
+	smoke_p.amount = 56
+	smoke_p.lifetime = 5.5
+	smoke_p.preprocess = 2.0
+	smoke_p.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	smoke_p.emission_box_extents = Vector3(0.35, 0.2, 6.2)
+	smoke_p.direction = Vector3(0, 1, 0)
+	smoke_p.spread = 22.0
+	smoke_p.gravity = Vector3(0.05, 0.12, 0)
+	smoke_p.initial_velocity_min = 0.35
+	smoke_p.initial_velocity_max = 1.05
+	smoke_p.scale_amount_min = 0.7
+	smoke_p.scale_amount_max = 2.1
+	var pq := QuadMesh.new()
+	pq.size = Vector2(1.35, 1.35)
+	smoke_p.mesh = pq
+	smoke_p.material_override = smoke_m
+	smoke_p.position = Vector3(2.4, 1.1, 0.0)
+	fire_root.add_child(smoke_p)
 	# Drifting people silhouettes
 	var sil_tex: Texture2D = load("res://textures/silhouette_person.png")
 	var sil_m := StandardMaterial3D.new()
@@ -345,7 +462,6 @@ func _diorama(level: Node3D) -> void:
 
 
 func _ammo(level: Node3D) -> void:
-	_spawn_ammo(level, Vector3(3.85, 0.82, 3.55), "Ammo_Break")
 	_spawn_ammo(level, Vector3(8.55, 0.82, 8.55), "Ammo_Cubicle")
 
 
@@ -371,6 +487,65 @@ func _spawn_ammo(level: Node3D, pos: Vector3, name: String) -> void:
 	lab.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	lab.modulate = Color(0.92, 0.82, 0.55)
 	area.add_child(lab)
+
+
+func _toilet(parent: Node, name: String, pos: Vector3, porcelain: Material, metal: Material) -> void:
+	var root := Node3D.new()
+	root.name = name
+	root.position = pos
+	parent.add_child(root)
+	_box(root, "Tank", Vector3(0.38, 0.42, 0.16), Vector3(-0.14, 0.62, 0.0), porcelain)
+	_box(root, "Bowl", Vector3(0.36, 0.34, 0.48), Vector3(0.10, 0.22, 0.0), porcelain)
+	_box(root, "Seat", Vector3(0.34, 0.04, 0.42), Vector3(0.10, 0.40, 0.0), porcelain, Vector3.ZERO, false)
+	_box(root, "Lid", Vector3(0.34, 0.36, 0.04), Vector3(-0.12, 0.62, 0.0), porcelain, Vector3.ZERO, false)
+	_box(root, "Flush", Vector3(0.06, 0.04, 0.08), Vector3(-0.14, 0.86, 0.0), metal, Vector3.ZERO, false)
+
+
+func _instance_glb(parent: Node, path: String, name: String, pos: Vector3, rot: Vector3, scl: Vector3) -> Node3D:
+	var packed: PackedScene = load(path)
+	var inst: Node3D
+	if packed:
+		inst = packed.instantiate() as Node3D
+	else:
+		inst = Node3D.new()
+	inst.name = name
+	inst.position = pos
+	inst.rotation_degrees = rot
+	inst.scale = scl
+	parent.add_child(inst)
+	return inst
+
+
+func _apply_mesh_mats(root: Node, wood_path: String, metal_path: String) -> void:
+	var wood := _mat(wood_path)
+	var metal := _mat(metal_path)
+	_apply_mesh_mats_walk(root, wood, metal)
+
+
+func _apply_mesh_mats_walk(n: Node, wood: Material, metal: Material) -> void:
+	if n is MeshInstance3D:
+		var nm := String(n.name)
+		(n as MeshInstance3D).material_override = metal if (nm.contains("Metal") or nm.contains("Handle") or nm.contains("Dark") or nm.contains("Hardware")) else wood
+	for c in n.get_children():
+		_apply_mesh_mats_walk(c, wood, metal)
+
+
+func _desk_collision(desk: Node3D) -> void:
+	_box_collision(desk, Vector3(1.12, 0.08, 2.48), Vector3(0.0, 0.735, 0.0))
+	_box_collision(desk, Vector3(0.70, 0.70, 0.52), Vector3(-0.18, 0.35, -0.92))
+	_box_collision(desk, Vector3(0.70, 0.70, 0.52), Vector3(-0.18, 0.35, 0.92))
+
+
+func _box_collision(parent: Node3D, size: Vector3, pos: Vector3) -> void:
+	var sb := StaticBody3D.new()
+	sb.collision_layer = 1
+	sb.position = pos
+	var cs := CollisionShape3D.new()
+	var sh := BoxShape3D.new()
+	sh.size = size
+	cs.shape = sh
+	sb.add_child(cs)
+	parent.add_child(sb)
 
 
 func _emergency(level: Node3D) -> void:

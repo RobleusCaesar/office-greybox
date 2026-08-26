@@ -21,11 +21,11 @@ Luxury office. Denver is on fire. Nolan dread. Title `res://scenes/title.tscn` i
 
 L-shaped circulation. No line of sight from spawn, north hall, or east hall to the money-shot window. Reception back wall blocks it. Enter the CEO from the side, turn east.
 
-- **Break room** — parted/textured kitchen, TV looping EAS PLEASE STAND BY / DENVER METRO / snow.
-- **Bathroom** — ajar MEN door, real fixtures. WOMEN plaque on the locked hall door (no second bathroom).
-- **East hall** — papers, fallen door, glass shards, blood, pulsing red emergency lights. One bipedal demon in the cubicle choke (`DemonSpot_01`). 3–5 shotgun shells.
-- **CEO** — leather chair, liquor + warm glow left of the window, plant right, dark stone floor, dead executive north of the desk (off the window walk), framed mountain painting, certificate, short shelf + fallen books.
-- **Window** — three **clear glass** panes. Unreachable `ExteriorDiorama` beyond: burning Denver backdrop, animated fire/smoke, drifting people silhouettes.
+- **Break room** — textured kitchen, TV looping PLEASE STAND BY / THIS IS NOT A TEST / DENVER METRO / analog snow.
+- **Bathroom** — real men's room (stalls, toilets, urinals, sinks, mirror). MEN decal on the ajar door. WOMEN on the locked hall door. No second walkable bathroom.
+- **East hall** — papers, fallen door, glass shards, blood, pulsing red emergency lights. One bipedal demon in the cubicle choke (`DemonSpot_01`). 3–5 shotgun shells. One ammo crate (E to take).
+- **CEO** — walnut executive desk on the window (knee well, drawers, handles), liquor + warm glow left, plant/frame right, dark polished floor, dead executive north of the desk (off the window walk).
+- **Window** — three **clear glass** panes. Unreachable `ExteriorDiorama` east of the glass: single `denver-fire-vista.png` backdrop, animated fire planes, CPU smoke particles, drifting people silhouettes.
 
 Soft win after standing at the glass. Death: You died / Retry / Menu.
 

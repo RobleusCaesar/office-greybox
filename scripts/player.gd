@@ -340,15 +340,16 @@ func _update_hud() -> void:
 		_hud_ammo.text = "%d / %d%s" % [mag, res, suffix]
 
 
-func _box(parent: Node3D, size: Vector3, pos: Vector3, color: Color) -> void:
+func _box(parent: Node3D, size: Vector3, pos: Vector3, color: Color, wood: bool = false) -> void:
 	var mi := MeshInstance3D.new()
 	var mesh := BoxMesh.new()
 	mesh.size = size
 	mi.mesh = mesh
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = color
-	mat.roughness = 0.45
-	mat.metallic = 0.35
+	mat.albedo_texture = load("res://textures/tex_wood.png" if wood else "res://textures/tex_gun.png")
+	mat.roughness = 0.42 if wood else 0.32
+	mat.metallic = 0.08 if wood else 0.72
 	mi.material_override = mat
 	mi.position = pos
 	parent.add_child(mi)
@@ -363,19 +364,19 @@ func _build_weapons() -> void:
 	_shotgun_mesh = Node3D.new()
 	_shotgun_mesh.name = "Shotgun"
 	_weapon_root.add_child(_shotgun_mesh)
-	_box(_shotgun_mesh, Vector3(0.07, 0.08, 0.22), Vector3(0.0, 0.0, 0.02), Color(0.12, 0.10, 0.08))
-	_box(_shotgun_mesh, Vector3(0.045, 0.045, 0.42), Vector3(0.0, 0.02, -0.26), Color(0.18, 0.18, 0.20))
-	_box(_shotgun_mesh, Vector3(0.038, 0.038, 0.38), Vector3(0.0, -0.02, -0.24), Color(0.16, 0.16, 0.18))
-	_box(_shotgun_mesh, Vector3(0.05, 0.12, 0.16), Vector3(0.0, -0.08, 0.10), Color(0.10, 0.08, 0.06))
-	_box(_shotgun_mesh, Vector3(0.06, 0.04, 0.10), Vector3(0.0, -0.04, -0.06), Color(0.08, 0.08, 0.09))
+	_box(_shotgun_mesh, Vector3(0.07, 0.08, 0.22), Vector3(0.0, 0.0, 0.02), Color(0.42, 0.28, 0.16), true)
+	_box(_shotgun_mesh, Vector3(0.045, 0.045, 0.42), Vector3(0.0, 0.02, -0.26), Color(0.55, 0.56, 0.58))
+	_box(_shotgun_mesh, Vector3(0.038, 0.038, 0.38), Vector3(0.0, -0.02, -0.24), Color(0.48, 0.48, 0.50))
+	_box(_shotgun_mesh, Vector3(0.05, 0.12, 0.16), Vector3(0.0, -0.08, 0.10), Color(0.36, 0.22, 0.12), true)
+	_box(_shotgun_mesh, Vector3(0.06, 0.04, 0.10), Vector3(0.0, -0.04, -0.06), Color(0.28, 0.28, 0.30))
 
 	_pistol_mesh = Node3D.new()
 	_pistol_mesh.name = "Pistol"
 	_pistol_mesh.visible = false
 	_weapon_root.add_child(_pistol_mesh)
-	_box(_pistol_mesh, Vector3(0.045, 0.055, 0.16), Vector3(0.0, 0.02, -0.04), Color(0.14, 0.14, 0.15))
-	_box(_pistol_mesh, Vector3(0.035, 0.11, 0.055), Vector3(0.0, -0.06, 0.04), Color(0.10, 0.08, 0.06))
-	_box(_pistol_mesh, Vector3(0.03, 0.03, 0.10), Vector3(0.0, 0.03, -0.14), Color(0.20, 0.20, 0.22))
+	_box(_pistol_mesh, Vector3(0.045, 0.055, 0.16), Vector3(0.0, 0.02, -0.04), Color(0.50, 0.50, 0.52))
+	_box(_pistol_mesh, Vector3(0.035, 0.11, 0.055), Vector3(0.0, -0.06, 0.04), Color(0.38, 0.24, 0.14), true)
+	_box(_pistol_mesh, Vector3(0.03, 0.03, 0.10), Vector3(0.0, 0.03, -0.14), Color(0.58, 0.58, 0.60))
 
 
 func _dock(parent: Control, lab: Label, left: bool, top_off: float, font_size: int) -> void:

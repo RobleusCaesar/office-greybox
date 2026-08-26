@@ -1,8 +1,12 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://textures/tex_plaster.png" id="1"]
 
 [resource]
 resource_name = "WallWarmPlaster"
-albedo_color = Color(0.78, 0.71, 0.61, 1)
+albedo_color = Color(0.86, 0.80, 0.70, 1)
+albedo_texture = ExtResource("1")
 metallic = 0.0
 roughness = 0.88
-uv1_scale = Vector3(1, 1, 1)
+uv1_scale = Vector3(0.35, 0.35, 0.35)
+uv1_triplanar = true
