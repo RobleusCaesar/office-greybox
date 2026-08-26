@@ -63,8 +63,22 @@ func _run() -> void:
 		errors.append("executive desk mesh missing")
 	elif desk_n.position.z > 9.15 and desk_n.position.z < 13.85:
 		errors.append("desk is on the first window sightline")
-	if level.get_node_or_null("WallDressing") == null:
+	var walls := level.get_node_or_null("WallDressing")
+	if walls == null:
 		errors.append("wall dressing missing")
+	else:
+		var boards := 0
+		var frames := 0
+		for c in walls.get_children():
+			var nm := String(c.name)
+			if nm.begins_with("Baseboard"):
+				boards += 1
+			elif nm.ends_with("Art") or nm.ends_with("Frame"):
+				frames += 1
+		if boards < 10:
+			errors.append("too few baseboards (%d)" % boards)
+		if frames < 10:
+			errors.append("too little wall art (%d)" % frames)
 	if level.get_node_or_null("FutureAssetSlots/Bathroom/Toilet_1") == null:
 		errors.append("bathroom toilets missing")
 	if level.get_node_or_null("FutureAssetSlots/Bathroom/Urinal_0") == null:

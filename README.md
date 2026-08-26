@@ -24,7 +24,7 @@ L-shaped circulation. No line of sight from spawn, north hall, or east hall to t
 - **Break room** — textured kitchen, TV looping PLEASE STAND BY / THIS IS NOT A TEST / DENVER METRO / analog snow.
 - **Bathroom** — real men's room (stalls, toilets, urinals, sinks, mirror). MEN decal on the ajar door. WOMEN on the locked hall door. No second walkable bathroom.
 - **East hall** — papers, fallen door, glass shards, blood, pulsing red emergency lights. One bipedal demon in the cubicle choke (`DemonSpot_01`). 3–5 shotgun shells. One ammo crate (E to take).
-- **CEO** — quiet walnut desk (knee well, drawers, handles) off the first window sightline. Liquor + warm glow left, plant/frame right, dark polished floor, dead executive off the window walk. Walls carry plaster, baseboards, scuffs, and framed maps/certificates.
+- **CEO** — quiet walnut desk (knee well, drawers) off the first window sightline. Liquor + warm glow left, plant/frame right, dark polished floor. Walls carry the room: painted plaster, baseboards, chair rails, scuffs, maps and certificates. Furniture recedes.
 - **Window** — three **clear glass** panes. Unreachable `ExteriorDiorama` east of the glass: single `denver-fire-vista.png` backdrop, animated fire planes, CPU smoke particles, drifting people silhouettes.
 
 Soft win after standing at the glass. Death: You died / Retry / Menu.

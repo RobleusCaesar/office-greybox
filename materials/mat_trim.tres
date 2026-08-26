@@ -1,0 +1,12 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://textures/tex_wood.png" id="1"]
+
+[resource]
+resource_name = "PaintedTrim"
+albedo_color = Color(0.18, 0.14, 0.11, 1)
+albedo_texture = ExtResource("1")
+metallic = 0.0
+roughness = 0.48
+uv1_scale = Vector3(2.2, 2.2, 2.2)
+uv1_triplanar = true

@@ -366,9 +366,9 @@ func _ceo(level: Node3D) -> void:
 	var paint := _tex_mat("res://textures/painting_mountains.png")
 	var cert := _tex_mat("res://textures/painting_certificate.png")
 	_box(ceo, "FrameMountain", Vector3(1.15, 0.8, 0.04), Vector3(32.2, 1.75, 6.62), wood, Vector3.ZERO, false)
-	_quad(ceo, "PaintingMountain", Vector2(1.05, 0.7), Vector3(32.2, 1.75, 6.65), Vector3(0, 180, 0), paint)
+	_quad(ceo, "PaintingMountain", Vector2(1.05, 0.7), Vector3(32.2, 1.75, 6.65), Vector3.ZERO, paint)
 	_box(ceo, "FramePlant", Vector3(0.70, 0.88, 0.04), Vector3(35.15, 1.70, 6.62), wood, Vector3.ZERO, false)
-	_quad(ceo, "PaintingPlant", Vector2(0.62, 0.78), Vector3(35.15, 1.70, 6.65), Vector3(0, 180, 0), cert)
+	_quad(ceo, "PaintingPlant", Vector2(0.62, 0.78), Vector3(35.15, 1.70, 6.65), Vector3.ZERO, cert)
 	_box(ceo, "FrameCert", Vector3(0.55, 0.7, 0.04), Vector3(27.2, 1.7, 14.2), wood, Vector3(0, 90, 0), false)
 	_quad(ceo, "PaintingCert", Vector2(0.48, 0.62), Vector3(27.23, 1.7, 14.2), Vector3(0, 90, 0), paint)
 	# Dead executive — north of desk, off the window walk (Z~14.3, X~33.4)
@@ -542,35 +542,46 @@ func _walls(level: Node3D) -> void:
 	var root := Node3D.new()
 	root.name = "WallDressing"
 	level.add_child(root)
-	var trim := _tex_mat("res://textures/tex_walnut.png", Color(0.22, 0.14, 0.10), 0.45, 0.05)
-	var scuff := _tex_mat("res://textures/tex_scuff.png", Color(0.55, 0.48, 0.40, 0.55), 0.9)
+	var trim := _mat("res://materials/mat_trim.tres")
+	var scuff := _tex_mat("res://textures/tex_scuff.png", Color(0.50, 0.44, 0.36, 0.62), 0.92)
 	scuff.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	# Baseboards along the main L — interior faces, quiet dark trim
-	var boards := [
-		[Vector3(7.00, 0.06, 0.10), Vector3(7.00, 0.12, 0.04)],
-		[Vector3(0.10, 0.06, 3.25), Vector3(0.04, 0.12, 6.30)],
-		[Vector3(6.90, 0.06, 3.25), Vector3(0.04, 0.12, 6.30)],
-		[Vector3(3.50, 0.06, 11.00), Vector3(0.04, 0.12, 8.80)],
-		[Vector3(3.50, 0.06, 6.40), Vector3(4.80, 0.12, 0.04)],
-		[Vector3(12.50, 0.06, 10.55), Vector3(14.00, 0.12, 0.04)],
-		[Vector3(12.50, 0.06, 13.45), Vector3(14.00, 0.12, 0.04)],
-		[Vector3(22.00, 0.06, 6.70), Vector3(8.00, 0.12, 0.04)],
-		[Vector3(22.00, 0.06, 16.30), Vector3(8.00, 0.12, 0.04)],
-		[Vector3(32.00, 0.06, 6.70), Vector3(11.50, 0.12, 0.04)],
-		[Vector3(32.00, 0.06, 16.30), Vector3(11.50, 0.12, 0.04)],
-		[Vector3(26.18, 0.06, 11.50), Vector3(0.04, 0.12, 5.80)],
+	# Interior-face baseboards + chair rails. Walls are the read, not the desk.
+	var runs := [
+		# pos, size  (baseboard footprint)
+		[Vector3(3.50, 0.0, 0.12), Vector3(6.80, 0.0, 0.04)],
+		[Vector3(0.12, 0.0, 3.25), Vector3(0.04, 0.0, 6.20)],
+		[Vector3(6.88, 0.0, 3.25), Vector3(0.04, 0.0, 6.20)],
+		[Vector3(2.62, 0.0, 8.75), Vector3(0.04, 0.0, 4.20)],
+		[Vector3(4.38, 0.0, 8.75), Vector3(0.04, 0.0, 4.20)],
+		[Vector3(13.80, 0.0, 11.12), Vector3(8.40, 0.0, 0.04)],
+		[Vector3(14.40, 0.0, 12.88), Vector3(7.20, 0.0, 0.04)],
+		[Vector3(22.00, 0.0, 6.62), Vector3(7.60, 0.0, 0.04)],
+		[Vector3(22.00, 0.0, 16.38), Vector3(7.60, 0.0, 0.04)],
+		[Vector3(32.20, 0.0, 6.62), Vector3(10.80, 0.0, 0.04)],
+		[Vector3(32.20, 0.0, 16.38), Vector3(10.80, 0.0, 0.04)],
+		[Vector3(26.16, 0.0, 11.50), Vector3(0.04, 0.0, 5.60)],
+		[Vector3(25.84, 0.0, 7.55), Vector3(0.04, 0.0, 1.70)],
+		[Vector3(25.84, 0.0, 15.45), Vector3(0.04, 0.0, 1.70)],
 	]
 	var i := 0
-	for b in boards:
-		_box(root, "Baseboard_%d" % i, b[1], b[0], trim, Vector3.ZERO, false)
+	for r in runs:
+		var p := r[0] as Vector3
+		var s := r[1] as Vector3
+		_box(root, "Baseboard_%d" % i, Vector3(s.x if s.x > 0.01 else 0.04, 0.10, s.z if s.z > 0.01 else 0.04), Vector3(p.x, 0.05, p.z), trim, Vector3.ZERO, false)
+		_box(root, "ChairRail_%d" % i, Vector3(s.x if s.x > 0.01 else 0.03, 0.035, s.z if s.z > 0.01 else 0.03), Vector3(p.x, 1.04, p.z), trim, Vector3.ZERO, false)
 		i += 1
-	# Lower-wall scuffs — lived-in, not gore
 	var scuffs := [
-		[Vector3(3.2, 0.22, 0.12), Vector2(1.4, 0.28), Vector3(0, 0, 0)],
-		[Vector3(8.8, 0.24, 10.62), Vector2(1.1, 0.26), Vector3(0, 0, 0)],
-		[Vector3(16.4, 0.22, 13.38), Vector2(1.2, 0.24), Vector3(0, 180, 0)],
-		[Vector3(26.22, 0.28, 11.2), Vector2(1.0, 0.32), Vector3(0, 90, 0)],
-		[Vector3(31.0, 0.26, 6.72), Vector2(1.3, 0.28), Vector3(0, 0, 0)],
+		[Vector3(3.40, 0.22, 0.14), Vector2(1.50, 0.30), Vector3(0, 0, 0)],
+		[Vector3(5.80, 0.20, 0.14), Vector2(0.90, 0.22), Vector3(0, 0, 0)],
+		[Vector3(0.14, 0.24, 2.40), Vector2(1.10, 0.26), Vector3(0, 90, 0)],
+		[Vector3(8.90, 0.24, 11.14), Vector2(1.20, 0.28), Vector3(0, 0, 0)],
+		[Vector3(13.20, 0.22, 11.14), Vector2(1.00, 0.24), Vector3(0, 0, 0)],
+		[Vector3(16.60, 0.22, 12.86), Vector2(1.30, 0.26), Vector3(0, 180, 0)],
+		[Vector3(21.20, 0.26, 6.64), Vector2(1.10, 0.28), Vector3(0, 0, 0)],
+		[Vector3(26.18, 0.28, 10.40), Vector2(1.20, 0.34), Vector3(0, 90, 0)],
+		[Vector3(29.80, 0.24, 6.64), Vector2(1.40, 0.28), Vector3(0, 0, 0)],
+		[Vector3(33.40, 0.22, 16.36), Vector2(1.10, 0.24), Vector3(0, 180, 0)],
+		[Vector3(36.20, 0.26, 6.64), Vector2(0.85, 0.22), Vector3(0, 0, 0)],
 	]
 	var j := 0
 	for s in scuffs:
@@ -580,13 +591,19 @@ func _walls(level: Node3D) -> void:
 	var mountains := _tex_mat("res://textures/painting_mountains.png")
 	var cert := _tex_mat("res://textures/painting_certificate.png")
 	var city := _tex_mat("res://textures/painting_map.png")
-	# Extra wall paper — rooms stay dressed, desk does not become the hero
-	_frame(root, "HallMap", Vector3(14.8, 1.65, 10.62), Vector2(0.85, 0.62), Vector3(0, 0, 0), wood, city)
-	_frame(root, "HallCert", Vector3(18.4, 1.70, 13.38), Vector2(0.48, 0.62), Vector3(0, 180, 0), wood, cert)
-	_frame(root, "ReceptionMap", Vector3(20.6, 1.72, 16.28), Vector2(0.95, 0.68), Vector3(0, 180, 0), wood, city)
-	_frame(root, "ReceptionMountains", Vector3(22.4, 1.70, 6.72), Vector2(1.05, 0.70), Vector3(0, 0, 0), wood, mountains)
-	_frame(root, "CEONorthMap", Vector3(30.4, 1.72, 16.28), Vector2(0.90, 0.64), Vector3(0, 180, 0), wood, city)
-	_frame(root, "BreakCert", Vector3(0.12, 1.60, 4.4), Vector2(0.42, 0.55), Vector3(0, 90, 0), wood, cert)
+	# Paper on walls — lived-in office, not a furniture catalog
+	_frame(root, "HallMap", Vector3(14.60, 1.68, 11.14), Vector2(0.88, 0.62), Vector3(0, 0, 0), wood, city)
+	_frame(root, "HallCert", Vector3(16.90, 1.70, 11.14), Vector2(0.46, 0.60), Vector3(0, 0, 0), wood, cert)
+	_frame(root, "HallMountains", Vector3(17.20, 1.68, 12.86), Vector2(0.92, 0.64), Vector3(0, 180, 0), wood, mountains)
+	_frame(root, "ReceptionMap", Vector3(20.40, 1.72, 16.36), Vector2(0.95, 0.66), Vector3(0, 180, 0), wood, city)
+	_frame(root, "ReceptionCertA", Vector3(22.80, 1.70, 16.36), Vector2(0.44, 0.58), Vector3(0, 180, 0), wood, cert)
+	_frame(root, "ReceptionMountains", Vector3(21.80, 1.70, 6.64), Vector2(1.02, 0.68), Vector3(0, 0, 0), wood, mountains)
+	_frame(root, "DividerCert", Vector3(26.16, 1.68, 10.20), Vector2(0.46, 0.58), Vector3(0, 90, 0), wood, cert)
+	_frame(root, "DividerMap", Vector3(26.16, 1.72, 12.55), Vector2(0.80, 0.58), Vector3(0, 90, 0), wood, city)
+	_frame(root, "CEONorthMap", Vector3(30.20, 1.72, 16.36), Vector2(0.90, 0.64), Vector3(0, 180, 0), wood, city)
+	_frame(root, "CEONorthCert", Vector3(33.10, 1.68, 16.36), Vector2(0.44, 0.56), Vector3(0, 180, 0), wood, cert)
+	_frame(root, "BreakCert", Vector3(0.14, 1.58, 4.20), Vector2(0.42, 0.54), Vector3(0, 90, 0), wood, cert)
+	_frame(root, "BreakMap", Vector3(6.86, 1.62, 4.80), Vector2(0.70, 0.50), Vector3(0, -90, 0), wood, city)
 
 
 func _frame(parent: Node, name: String, pos: Vector3, size: Vector2, rot: Vector3, wood: Material, art: Material) -> void:
@@ -598,6 +615,8 @@ func _frame(parent: Node, name: String, pos: Vector3, size: Vector2, rot: Vector
 		face.z -= 0.022
 	elif abs(rot.y - 90.0) < 1.0:
 		face.x += 0.022
+	elif abs(rot.y + 90.0) < 1.0:
+		face.x -= 0.022
 	_quad(parent, name + "Art", size, face, rot, art)
 
 

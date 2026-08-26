@@ -4,9 +4,10 @@
 
 [resource]
 resource_name = "WallWarmPlaster"
-albedo_color = Color(0.86, 0.80, 0.70, 1)
+albedo_color = Color(0.94, 0.90, 0.82, 1)
 albedo_texture = ExtResource("1")
 metallic = 0.0
-roughness = 0.88
-uv1_scale = Vector3(0.35, 0.35, 0.35)
+roughness = 0.86
+uv1_scale = Vector3(1.7, 1.7, 1.7)
 uv1_triplanar = true
+uv1_triplanar_sharpness = 4.0
