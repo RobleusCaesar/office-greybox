@@ -18,9 +18,10 @@ const SHOTGUN_SPREAD := 0.085
 const SHOTGUN_RANGE := 14.0
 const SHOTGUN_DAMAGE := 16.0
 const SHOTGUN_FALLOFF := 6.0
-const SHOTGUN_COOLDOWN := 0.78
+const SHOTGUN_COOLDOWN := 0.94
 const SHOTGUN_MAG := 4
 const SHOTGUN_RESERVE := 12
+const SHOTGUN_SHELL_TIME := 0.48
 
 const PISTOL_RANGE := 40.0
 const PISTOL_DAMAGE := 28.0
@@ -55,6 +56,7 @@ var _ps_res: int = PISTOL_RESERVE
 var _weapon_root: Node3D
 var _shotgun_mesh: Node3D
 var _pistol_mesh: Node3D
+var _hero_shotgun: Node3D
 var crouched: bool = false
 var _hud_health: Label
 var _hud_ammo: Label
@@ -164,18 +166,18 @@ func _physics_process(delta: float) -> void:
 	if _reloading:
 		_reload_left -= delta
 		if _reload_left <= 0.0:
-			_finish_reload()
+			_tick_reload()
 
 	if not dead and not input_locked and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		if Input.is_action_just_pressed("fire"):
 			_try_fire()
 
-	_kick = _kick.lerp(Vector3.ZERO, clampf(delta * 9.0, 0.0, 1.0))
+	_kick = _kick.lerp(Vector3.ZERO, clampf(delta * 7.2, 0.0, 1.0))
 	_camera.rotation_degrees.x = _kick.x * 57.3
 	_camera.rotation_degrees.y = _kick.y * 57.3
 	if _weapon_root:
-		_weapon_root.position = Vector3(0.22, -0.18, -0.38) + Vector3(0.0, _kick.x * 0.15, _kick.x * 0.25)
-		_weapon_root.rotation_degrees.x = -8.0 - _kick.x * 40.0
+		_weapon_root.position = Vector3(0.18, -0.16, -0.34) + Vector3(0.0, _kick.x * 0.22, _kick.x * 0.38)
+		_weapon_root.rotation_degrees.x = -10.0 - _kick.x * 58.0
 	_update_prompt()
 
 
@@ -221,17 +223,24 @@ func _update_prompt() -> void:
 
 
 func _try_fire() -> void:
-	if _reloading or _cool > 0.0:
+	if _cool > 0.0:
 		return
+	if _reloading:
+		if _weapon == SHOTGUN and _sg_mag > 0:
+			_reloading = false
+		else:
+			return
 	if _weapon == SHOTGUN:
 		if _sg_mag <= 0:
 			_click_empty()
 			return
 		_sg_mag -= 1
 		_cool = SHOTGUN_COOLDOWN
-		_kick.x += 0.085
-		_kick.y += randf_range(-0.025, 0.025)
+		_kick.x += 0.175
+		_kick.y += randf_range(-0.04, 0.04)
 		_fire_hitscan(SHOTGUN_PELLETS, SHOTGUN_SPREAD, SHOTGUN_RANGE, SHOTGUN_DAMAGE, SHOTGUN_FALLOFF)
+		if _hero_shotgun and _hero_shotgun.has_method("fire"):
+			_hero_shotgun.fire()
 		if _snd_fire:
 			_snd_fire.stream = load("res://audio/shotgun_fire.wav")
 			_snd_fire.play()
@@ -273,7 +282,7 @@ func _fire_hitscan(pellets: int, spread: float, max_range: float, damage: float,
 		var scale := 1.0 if dist <= falloff else clampf(1.0 - (dist - falloff) / maxf(0.01, max_range - falloff), 0.2, 1.0)
 		var collider: Object = hit.collider
 		if collider and collider.has_method("take_damage"):
-			collider.take_damage(damage * scale)
+			collider.take_damage(damage * scale, hit.position, hit.normal)
 
 
 func _set_weapon(which: int) -> void:
@@ -292,9 +301,9 @@ func _start_reload() -> void:
 	if _reloading or dead:
 		return
 	if _weapon == SHOTGUN:
-		if _sg_mag >= SHOTGUN_MAG or _sg_res <= 0:
+		if _sg_mag >= SHOTGUN_MAG or _sg_res <= 0 or _cool > 0.0:
 			return
-		_reload_left = 1.15
+		_reload_left = SHOTGUN_SHELL_TIME
 	else:
 		if _ps_mag >= PISTOL_MAG or _ps_res <= 0:
 			return
@@ -304,14 +313,24 @@ func _start_reload() -> void:
 		_snd_reload.play()
 
 
-func _finish_reload() -> void:
-	_reloading = false
+func _tick_reload() -> void:
 	if _weapon == SHOTGUN:
-		var need := SHOTGUN_MAG - _sg_mag
-		var take: int = mini(need, _sg_res)
-		_sg_mag += take
-		_sg_res -= take
+		if _sg_res <= 0 or _sg_mag >= SHOTGUN_MAG:
+			_reloading = false
+			_emit_hud()
+			return
+		_sg_mag += 1
+		_sg_res -= 1
+		if _hero_shotgun and _hero_shotgun.has_method("insert_shell"):
+			_hero_shotgun.insert_shell()
+		if _sg_mag < SHOTGUN_MAG and _sg_res > 0:
+			_reload_left = SHOTGUN_SHELL_TIME
+			if _snd_reload:
+				_snd_reload.play()
+		else:
+			_reloading = false
 	else:
+		_reloading = false
 		var need := PISTOL_MAG - _ps_mag
 		var take: int = mini(need, _ps_res)
 		_ps_mag += take
@@ -358,17 +377,12 @@ func _box(parent: Node3D, size: Vector3, pos: Vector3, color: Color, wood: bool 
 func _build_weapons() -> void:
 	_weapon_root = Node3D.new()
 	_weapon_root.name = "WeaponRoot"
-	_weapon_root.position = Vector3(0.22, -0.18, -0.38)
+	_weapon_root.position = Vector3(0.18, -0.16, -0.34)
 	_camera.add_child(_weapon_root)
 
-	_shotgun_mesh = Node3D.new()
-	_shotgun_mesh.name = "Shotgun"
-	_weapon_root.add_child(_shotgun_mesh)
-	_box(_shotgun_mesh, Vector3(0.07, 0.08, 0.22), Vector3(0.0, 0.0, 0.02), Color(0.42, 0.28, 0.16), true)
-	_box(_shotgun_mesh, Vector3(0.045, 0.045, 0.42), Vector3(0.0, 0.02, -0.26), Color(0.55, 0.56, 0.58))
-	_box(_shotgun_mesh, Vector3(0.038, 0.038, 0.38), Vector3(0.0, -0.02, -0.24), Color(0.48, 0.48, 0.50))
-	_box(_shotgun_mesh, Vector3(0.05, 0.12, 0.16), Vector3(0.0, -0.08, 0.10), Color(0.36, 0.22, 0.12), true)
-	_box(_shotgun_mesh, Vector3(0.06, 0.04, 0.10), Vector3(0.0, -0.04, -0.06), Color(0.28, 0.28, 0.30))
+	_hero_shotgun = (load("res://scripts/hero_shotgun.gd") as GDScript).new()
+	_shotgun_mesh = _hero_shotgun
+	_weapon_root.add_child(_hero_shotgun)
 
 	_pistol_mesh = Node3D.new()
 	_pistol_mesh.name = "Pistol"

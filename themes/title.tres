@@ -1,0 +1,119 @@
+[gd_resource type="Theme" load_steps=9 format=3]
+
+[ext_resource type="FontFile" path="res://fonts/SourceSans3-Regular.ttf" id="1_sans"]
+
+[sub_resource type="StyleBoxFlat" id="TitlePlayNormal"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+bg_color = Color(0.055, 0.038, 0.026, 0.86)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.68, 0.38, 0.16, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="TitlePlayHover"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+bg_color = Color(0.09, 0.055, 0.032, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.82, 0.48, 0.2, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="TitlePlayPressed"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+bg_color = Color(0.04, 0.026, 0.018, 0.94)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.58, 0.3, 0.12, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="TitleQuitNormal"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+bg_color = Color(0.055, 0.038, 0.026, 0.12)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.68, 0.38, 0.16, 0.3)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="TitleQuitHover"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+bg_color = Color(0.07, 0.046, 0.03, 0.22)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.68, 0.38, 0.16, 0.5)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxEmpty" id="TitleEmpty"]
+
+[sub_resource type="FontVariation" id="PlayLetters"]
+base_font = ExtResource("1_sans")
+spacing_glyph = 5
+
+[resource]
+default_font = ExtResource("1_sans")
+Button/colors/font_color = Color(0.93, 0.88, 0.78, 1)
+Button/colors/font_focus_color = Color(0.96, 0.91, 0.82, 1)
+Button/colors/font_hover_color = Color(0.97, 0.93, 0.86, 1)
+Button/colors/font_pressed_color = Color(0.86, 0.8, 0.7, 1)
+Button/font_sizes/font_size = 16
+Button/fonts/font = SubResource("PlayLetters")
+TitlePlay/base_type = "Button"
+TitlePlay/colors/font_color = Color(0.93, 0.88, 0.78, 1)
+TitlePlay/colors/font_focus_color = Color(0.97, 0.93, 0.84, 1)
+TitlePlay/colors/font_hover_color = Color(0.97, 0.93, 0.84, 1)
+TitlePlay/colors/font_pressed_color = Color(0.86, 0.78, 0.68, 1)
+TitlePlay/styles/disabled = SubResource("TitlePlayNormal")
+TitlePlay/styles/focus = SubResource("TitlePlayHover")
+TitlePlay/styles/hover = SubResource("TitlePlayHover")
+TitlePlay/styles/normal = SubResource("TitlePlayNormal")
+TitlePlay/styles/pressed = SubResource("TitlePlayPressed")
+TitleQuit/base_type = "Button"
+TitleQuit/colors/font_color = Color(0.86, 0.8, 0.72, 0.78)
+TitleQuit/colors/font_focus_color = Color(0.93, 0.88, 0.78, 0.92)
+TitleQuit/colors/font_hover_color = Color(0.93, 0.88, 0.78, 0.92)
+TitleQuit/colors/font_pressed_color = Color(0.78, 0.72, 0.64, 0.86)
+TitleQuit/styles/disabled = SubResource("TitleQuitNormal")
+TitleQuit/styles/focus = SubResource("TitleQuitHover")
+TitleQuit/styles/hover = SubResource("TitleQuitHover")
+TitleQuit/styles/normal = SubResource("TitleQuitNormal")
+TitleQuit/styles/pressed = SubResource("TitleQuitNormal")
+TitleQuit/styles/empty = SubResource("TitleEmpty")

@@ -20,6 +20,26 @@ func _run() -> void:
 		errors.append("jump action still present")
 	if not InputMap.has_action("interact"):
 		errors.append("missing interact action")
+	if not FileAccess.file_exists("res://textures/hero/title-street-fire.png"):
+		errors.append("title-street-fire.png missing")
+	if not FileAccess.file_exists("res://textures/hero/shotgun-walnut-steel.png"):
+		errors.append("shotgun-walnut-steel.png missing")
+	var title_src := FileAccess.get_file_as_string("res://scripts/title.gd")
+	if title_src.contains("denver-fire-vista"):
+		errors.append("title must not use denver-fire-vista")
+	var title_ps: PackedScene = load("res://scenes/title.tscn")
+	if title_ps == null:
+		errors.append("could not load title.tscn")
+	else:
+		var title_n: Node = title_ps.instantiate()
+		root.add_child(title_n)
+		await process_frame
+		if title_n.get_node_or_null("%Backdrop") == null:
+			errors.append("title backdrop missing")
+		if title_n.get_node_or_null("%Play") == null or title_n.get_node_or_null("%Quit") == null:
+			errors.append("title Play/Quit unique names missing")
+		title_n.queue_free()
+		await process_frame
 
 	var packed: PackedScene = load("res://scenes/level.tscn")
 	if packed == null:
@@ -112,6 +132,12 @@ func _run() -> void:
 	var player := level.get_node_or_null("Player")
 	if d1 == null:
 		errors.append("Demon_01 missing")
+	if d1 and d1.get_node_or_null("Rig/Pelvis/Spine/Chest/ShoulderL") == null:
+		errors.append("Ashwight missing named bones")
+	if d1 and d1.get_node_or_null("Rig/Pelvis/Spine/Chest/Neck/Head/JawL") == null:
+		errors.append("Ashwight missing vertical split jaw")
+	if d1 == null:
+		errors.append("Demon_01 missing for combat QA")
 	elif player == null:
 		errors.append("player missing")
 	else:
@@ -146,7 +172,7 @@ func _run() -> void:
 
 func _finish(errors: PackedStringArray) -> void:
 	if errors.is_empty():
-		print("QA_OK title, crouch, one demon 3-5 shells, diorama, LOS, death")
+		print("QA_OK title, crouch, hero shotgun, one Ashwight 3-5 shells, diorama, LOS, death")
 		quit(0)
 	else:
 		for e in errors:
