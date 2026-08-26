@@ -1,0 +1,13 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
+[ext_resource type="Material" path="res://materials/mat_floor.tres" id="1_floor"]
+[ext_resource type="Material" path="res://materials/mat_wall.tres" id="2_wall"]
+[ext_resource type="Material" path="res://materials/mat_ceiling.tres" id="3_ceil"]
+[ext_resource type="Material" path="res://materials/mat_kitchen.tres" id="4_kit"]
+[ext_resource type="Material" path="res://materials/mat_furniture.tres" id="5_furn"]
+[ext_resource type="Material" path="res://materials/mat_locked_door.tres" id="6_door"]
+[ext_resource type="Material" path="res://materials/mat_door_frame.tres" id="7_frame"]
+[ext_resource type="Material" path="res://materials/mat_window.tres" id="8_win"]
+[ext_resource type="Material" path="res://materials/mat_dim_glass.tres" id="9_dim"]
+[ext_resource type="Material" path="res://materials/mat_demon.tres" id="10_demon"]
