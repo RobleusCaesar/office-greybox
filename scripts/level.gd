@@ -20,8 +20,9 @@ var _sting_player: AudioStreamPlayer
 
 
 func _ready() -> void:
-	_dress_window()
-	_spawn_demons()
+	var dressing = load("res://scripts/dressing.gd").new()
+	dressing.apply(self)
+	_spawn_demon()
 	_build_overlays()
 	_sting_player = AudioStreamPlayer.new()
 	_sting_player.stream = load("res://audio/window_sting.wav")
@@ -101,61 +102,20 @@ func _keep_walking() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
-func _dress_window() -> void:
-	var win := get_node_or_null("FutureAssetSlots/CEOOffice/MoneyShotWindow")
-	if win == null:
-		return
-	var pane_mats := [
-		load("res://materials/mat_window_p1.tres"),
-		load("res://materials/mat_window_p2.tres"),
-		load("res://materials/mat_window_p3.tres"),
-	]
-	var names := ["Pane_01", "Pane_02", "Pane_03"]
-	for i in 3:
-		var pane := win.get_node_or_null(names[i]) as CSGBox3D
-		if pane:
-			pane.material = pane_mats[i]
-	var metal: Material = load("res://materials/mat_mullion.tres")
-	for n in ["Mullion_Left", "Mullion_01", "Mullion_02", "Mullion_Right", "Sill", "Head"]:
-		var node := win.get_node_or_null(n) as CSGBox3D
-		if node:
-			node.material = metal
-	var glass_m := get_node_or_null("FutureAssetSlots/EastHall/DeadOfficeGlassMullion") as CSGBox3D
-	if glass_m:
-		glass_m.material = metal
-	var sill := get_node_or_null("FutureAssetSlots/EastHall/DeadOfficeGlassSill") as CSGBox3D
-	if sill:
-		sill.material = metal
-
-
-func _spawn_demons() -> void:
+func _spawn_demon() -> void:
 	var packed: PackedScene = load("res://scenes/demon.tscn")
 	var s1 := get_node_or_null("DemonSpots/DemonSpot_01") as Node3D
-	var s2 := get_node_or_null("DemonSpots/DemonSpot_02") as Node3D
-	if s1:
-		var d1: CharacterBody3D = packed.instantiate()
-		d1.name = "Demon_01"
-		d1.max_hp = 80.0
-		d1.move_speed = 3.45
-		d1.attack_damage = 16.0
-		d1.attack_range = 1.5
-		d1.aggro_range = 6.5
-		d1.telegraph_time = 0.48
-		d1.body_scale = 0.95
-		d1.position = s1.global_position
-		add_child(d1)
-	if s2:
-		var d2: CharacterBody3D = packed.instantiate()
-		d2.name = "Demon_02"
-		d2.max_hp = 140.0
-		d2.move_speed = 2.7
-		d2.attack_damage = 26.0
-		d2.attack_range = 1.75
-		d2.aggro_range = 9.5
-		d2.telegraph_time = 0.62
-		d2.body_scale = 1.35
-		d2.position = s2.global_position
-		add_child(d2)
+	if s1 == null:
+		return
+	var d1: CharacterBody3D = packed.instantiate()
+	d1.name = "Demon_01"
+	d1.max_hp = 100.0
+	d1.move_speed = 3.15
+	d1.attack_damage = 18.0
+	d1.attack_range = 1.5
+	d1.aggro_range = 6.8
+	d1.position = s1.global_position
+	add_child(d1)
 
 
 func _style_title(lab: Label, size: int, color: Color) -> void:

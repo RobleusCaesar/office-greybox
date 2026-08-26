@@ -2,9 +2,13 @@ extends CharacterBody3D
 ## First-person walker: shotgun primary, pistol secondary, hitscan, health.
 
 const SPEED := 4.5
-const JUMP_VELOCITY := 4.2
+const CROUCH_SPEED := 2.2
 const MOUSE_SENS := 0.0024
 const MAX_HP := 100.0
+const STAND_EYE := 1.7
+const CROUCH_EYE := 1.05
+const STAND_CAP := 1.8
+const CROUCH_CAP := 1.15
 
 const SHOTGUN := 0
 const PISTOL := 1
@@ -30,6 +34,7 @@ signal ammo_changed(weapon_name: String, mag: int, reserve: int)
 
 @onready var _head: Node3D = $Head
 @onready var _camera: Camera3D = $Head/Camera3D
+@onready var _col: CollisionShape3D = $CollisionShape3D
 
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var hp: float = MAX_HP
@@ -50,9 +55,11 @@ var _ps_res: int = PISTOL_RESERVE
 var _weapon_root: Node3D
 var _shotgun_mesh: Node3D
 var _pistol_mesh: Node3D
+var crouched: bool = false
 var _hud_health: Label
 var _hud_ammo: Label
 var _hud_weapon: Label
+var _hud_prompt: Label
 var _snd_fire: AudioStreamPlayer
 var _snd_reload: AudioStreamPlayer
 var _snd_empty: AudioStreamPlayer
@@ -62,6 +69,8 @@ var _snd_hurt: AudioStreamPlayer
 func _ready() -> void:
 	add_to_group("player")
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	if _col and _col.shape:
+		_col.shape = _col.shape.duplicate()
 	_build_weapons()
 	_build_hud()
 	_build_audio()
@@ -120,25 +129,34 @@ func _unhandled_input(event: InputEvent) -> void:
 		_set_weapon(PISTOL)
 	elif event.is_action_pressed("reload"):
 		_start_reload()
+	elif event.is_action_pressed("interact"):
+		_try_interact()
 
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
 
-	if not dead and not input_locked and Input.is_action_just_pressed("jump") and is_on_floor():
-		velocity.y = JUMP_VELOCITY
+	crouched = (not dead and not input_locked and Input.is_action_pressed("crouch"))
+	var eye := CROUCH_EYE if crouched else STAND_EYE
+	_head.position.y = lerpf(_head.position.y, eye, clampf(delta * 10.0, 0.0, 1.0))
+	if _col and _col.shape is CapsuleShape3D:
+		var cap := _col.shape as CapsuleShape3D
+		var h := CROUCH_CAP if crouched else STAND_CAP
+		cap.height = h
+		_col.position.y = h * 0.5
+	var speed := CROUCH_SPEED if crouched else SPEED
 
 	var input_dir := Vector2.ZERO
 	if not dead and not input_locked:
 		input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var direction := (transform.basis * Vector3(input_dir.x, 0.0, input_dir.y)).normalized()
 	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
+		velocity.x = direction.x * speed
+		velocity.z = direction.z * speed
 	else:
-		velocity.x = move_toward(velocity.x, 0.0, SPEED)
-		velocity.z = move_toward(velocity.z, 0.0, SPEED)
+		velocity.x = move_toward(velocity.x, 0.0, speed)
+		velocity.z = move_toward(velocity.z, 0.0, speed)
 
 	move_and_slide()
 
@@ -158,6 +176,48 @@ func _physics_process(delta: float) -> void:
 	if _weapon_root:
 		_weapon_root.position = Vector3(0.22, -0.18, -0.38) + Vector3(0.0, _kick.x * 0.15, _kick.x * 0.25)
 		_weapon_root.rotation_degrees.x = -8.0 - _kick.x * 40.0
+	_update_prompt()
+
+
+func add_ammo(shotgun_shells: int, pistol_rounds: int) -> void:
+	_sg_res += shotgun_shells
+	_ps_res += pistol_rounds
+	_emit_hud()
+
+
+func _try_interact() -> void:
+	if dead or input_locked:
+		return
+	var pickup := _aimed_ammo()
+	if pickup and pickup.has_method("try_pickup"):
+		pickup.try_pickup(self)
+
+
+func _aimed_ammo() -> Node:
+	var space := get_world_3d().direct_space_state
+	var origin := _camera.global_position
+	var dest := origin + (-_camera.global_transform.basis.z) * 2.3
+	var q := PhysicsRayQueryParameters3D.create(origin, dest)
+	q.collide_with_areas = true
+	q.collide_with_bodies = true
+	q.collision_mask = 1 | 4
+	q.exclude = [get_rid()]
+	var hit := space.intersect_ray(q)
+	if hit.is_empty():
+		return null
+	var n: Object = hit.collider
+	if n is Node:
+		var node := n as Node
+		if node.is_in_group("ammo_pickup"):
+			return node
+		if node.get_parent() and node.get_parent().is_in_group("ammo_pickup"):
+			return node.get_parent()
+	return null
+
+
+func _update_prompt() -> void:
+	if _hud_prompt:
+		_hud_prompt.visible = _aimed_ammo() != null
 
 
 func _try_fire() -> void:
@@ -318,6 +378,26 @@ func _build_weapons() -> void:
 	_box(_pistol_mesh, Vector3(0.03, 0.03, 0.10), Vector3(0.0, 0.03, -0.14), Color(0.20, 0.20, 0.22))
 
 
+func _dock(parent: Control, lab: Label, left: bool, top_off: float, font_size: int) -> void:
+	lab.set_anchors_preset(Control.PRESET_BOTTOM_LEFT if left else Control.PRESET_BOTTOM_RIGHT)
+	lab.anchor_top = 1.0
+	lab.anchor_bottom = 1.0
+	if left:
+		lab.anchor_left = 0.0
+		lab.anchor_right = 0.0
+		lab.offset_left = 24
+		lab.offset_right = 360
+	else:
+		lab.anchor_left = 1.0
+		lab.anchor_right = 1.0
+		lab.offset_left = -360
+		lab.offset_right = -24
+	lab.offset_top = top_off
+	lab.offset_bottom = top_off + 40
+	lab.add_theme_font_size_override("font_size", font_size)
+	parent.move_child(lab, -1)
+
+
 func _label(parent: Control, text: String, pos: Vector2, size: Vector2, font_size: int, align: HorizontalAlignment) -> Label:
 	var lab := Label.new()
 	lab.text = text
@@ -354,17 +434,25 @@ func _build_hud() -> void:
 	root.add_child(cross)
 
 	_hud_health = _label(root, "HP  100", Vector2(24, 660), Vector2(280, 40), 22, HORIZONTAL_ALIGNMENT_LEFT)
-	_hud_health.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	_hud_health.position = Vector2(24, -56)
+	_dock(root, _hud_health, true, -64, 22)
 	_hud_ammo = _label(root, "4 / 12", Vector2(0, 0), Vector2(280, 40), 22, HORIZONTAL_ALIGNMENT_RIGHT)
-	_hud_ammo.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	_hud_ammo.position = Vector2(-304, -56)
+	_dock(root, _hud_ammo, false, -64, 22)
 	_hud_weapon = _label(root, "SHOTGUN", Vector2(0, 0), Vector2(280, 28), 16, HORIZONTAL_ALIGNMENT_RIGHT)
-	_hud_weapon.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	_hud_weapon.position = Vector2(-304, -84)
+	_dock(root, _hud_weapon, false, -96, 16)
 
-	var hint := _label(root, "LMB fire   R reload   1/2 or scroll weapons   Esc release mouse", Vector2(24, 16), Vector2(900, 28), 14, HORIZONTAL_ALIGNMENT_LEFT)
+	var hint := _label(root, "LMB fire   R reload   E ammo   Space crouch   1/2 weapons   Esc release", Vector2(24, 16), Vector2(980, 28), 14, HORIZONTAL_ALIGNMENT_LEFT)
 	hint.modulate = Color(1, 1, 1, 0.7)
+	_hud_prompt = _label(root, "E  take ammo", Vector2(0, 0), Vector2(240, 32), 18, HORIZONTAL_ALIGNMENT_CENTER)
+	_hud_prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	_hud_prompt.anchor_left = 0.5
+	_hud_prompt.anchor_right = 0.5
+	_hud_prompt.anchor_top = 1.0
+	_hud_prompt.anchor_bottom = 1.0
+	_hud_prompt.offset_left = -120
+	_hud_prompt.offset_right = 120
+	_hud_prompt.offset_top = -120
+	_hud_prompt.offset_bottom = -80
+	_hud_prompt.visible = false
 
 
 func _build_audio() -> void:

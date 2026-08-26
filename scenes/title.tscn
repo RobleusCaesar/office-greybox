@@ -55,7 +55,8 @@ color = Color(0.72, 0.42, 0.18, 0.85)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.70, 0.48, 0.30, 0.92)
 theme_override_font_sizes/font_size = 16
-text = "A luxury office. Denver is on fire."
+text = "A luxury office. Denver is on fire.
+Click Play  ·  Enter also starts"
 horizontal_alignment = 1
 
 [node name="Spacer" type="Control" parent="VBox"]
