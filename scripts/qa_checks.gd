@@ -118,6 +118,37 @@ func _run() -> void:
 		errors.append("hardcover_book.glb missing")
 	if not FileAccess.file_exists("res://models/office_copier.glb"):
 		errors.append("office_copier.glb missing")
+	if not FileAccess.file_exists("res://models/abyssal_stalker.glb"):
+		errors.append("BLOCKED: missing abyssal_stalker.glb")
+	var enemy_src := FileAccess.get_file_as_string("res://scripts/enemy.gd")
+	if enemy_src.is_empty():
+		errors.append("scripts/enemy.gd missing")
+	else:
+		if not enemy_src.contains("Idle_8"):
+			errors.append("idle clip must be Idle_8")
+		if not enemy_src.contains("Walking"):
+			errors.append("chase clip must be Walking")
+		if enemy_src.contains("CLIP_CHASE := \"Running\""):
+			errors.append("chase must not be Running")
+		if not enemy_src.contains("Axe_Spin_Attack"):
+			errors.append("attack clip must be Axe_Spin_Attack")
+		if not enemy_src.contains("Shot_and_Fall_Forward"):
+			errors.append("death clip must be Shot_and_Fall_Forward")
+		if enemy_src.contains("_build_ashwight") or enemy_src.contains("_build_biped") or enemy_src.contains("_build_anims"):
+			errors.append("capsule Ashwight builder must be gone")
+		if enemy_src.contains("look_at("):
+			errors.append("stalker must face with atan2, not look_at")
+		if not enemy_src.contains("atan2"):
+			errors.append("stalker must face with atan2(+dir.x, +dir.z)")
+		var die_at := enemy_src.find("func _die")
+		if die_at >= 0:
+			var die_chunk := enemy_src.substr(die_at, 420)
+			if die_chunk.contains("queue_free("):
+				errors.append("death must not queue_free the stalker")
+		if FileAccess.file_exists("res://scripts/demon.gd"):
+			var demon_src := FileAccess.get_file_as_string("res://scripts/demon.gd")
+			if demon_src.contains("_build_ashwight") or demon_src.contains("CapsuleMesh"):
+				errors.append("scripts/demon.gd still builds a capsule Ashwight")
 
 	var space: PhysicsDirectSpaceState3D = level.get_world_3d().direct_space_state
 	var window := Vector3(38.1, 1.7, 11.5)
@@ -132,12 +163,10 @@ func _run() -> void:
 	var player := level.get_node_or_null("Player")
 	if d1 == null:
 		errors.append("Demon_01 missing")
-	if d1 and d1.get_node_or_null("Rig/Pelvis/Spine/Chest/ShoulderL") == null:
-		errors.append("Ashwight missing named bones")
-	if d1 and d1.get_node_or_null("Rig/Pelvis/Spine/Chest/Neck/Head/JawL") == null:
-		errors.append("Ashwight missing vertical split jaw")
+	if d1 and d1.get_node_or_null("Rig/Pelvis") != null:
+		errors.append("capsule Ashwight Rig/Pelvis still present")
 	if d1:
-		_check_ashwight_arms(d1, errors)
+		_check_stalker(d1, errors)
 	if d1 == null:
 		errors.append("Demon_01 missing for combat QA")
 	elif player == null:
@@ -160,6 +189,12 @@ func _run() -> void:
 			errors.append("demon died in %d shells, expected 3–5" % shots)
 		if is_instance_valid(d1) and d1.hp > 0.0:
 			errors.append("demon 1 survived expected shells")
+		for _w in 24:
+			await process_frame
+		if not is_instance_valid(d1):
+			errors.append("death must not queue_free the stalker")
+		elif d1.hp > 0.0:
+			errors.append("stalker did not die")
 		var glass_q := PhysicsRayQueryParameters3D.create(Vector3(37.2, 1.2, 11.5), Vector3(40.0, 1.2, 11.5))
 		glass_q.collision_mask = 1
 		var glass_hit := space.intersect_ray(glass_q)
@@ -172,73 +207,67 @@ func _run() -> void:
 	_finish(errors)
 
 
-func _check_ashwight_arms(d1: Node, errors: PackedStringArray) -> void:
-	var names := [
-		"UpperArmL", "UpperArmLFlesh", "ForeArmL", "ForeArmLFlesh", "HandLMesh", "HandLClaws",
-		"UpperArmR", "UpperArmRFlesh", "ForeArmR", "ForeArmRFlesh", "HandRMesh", "HandRClaws",
-	]
-	var meshes: Dictionary = {}
-	for mi in _collect_meshes(d1):
-		meshes[mi.name] = mi
-	var rib: MeshInstance3D = meshes.get("Ribcage", null)
-	if rib == null:
-		errors.append("Ashwight Ribcage missing")
-		return
-	var hide := rib.material_override
-	if hide == null:
-		errors.append("Ribcage Hide missing")
-		return
-	if hide is StandardMaterial3D:
-		var hm := hide as StandardMaterial3D
-		if hm.uv1_triplanar:
-			errors.append("Hide must not be triplanar")
-		if hm.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED:
-			errors.append("Hide must not be unlit")
-		if hm.albedo_color.r > 0.35:
-			errors.append("Hide albedo too light (white-arm risk)")
-	var found := 0
-	for nm in names:
-		var mi: MeshInstance3D = meshes.get(nm, null)
-		if mi == null:
-			errors.append("Ashwight arm mesh missing: %s" % nm)
-			continue
-		found += 1
-		if mi.material_override != hide:
-			errors.append("%s is not the shared Hide material" % nm)
-		if mi.material_override is StandardMaterial3D:
-			var sm := mi.material_override as StandardMaterial3D
-			if sm.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED:
-				errors.append("%s is unlit (white-arm bug)" % nm)
-			if sm.albedo_color.r > 0.45 and sm.albedo_color.g > 0.45:
-				errors.append("%s albedo is near-white" % nm)
-	if found != 12:
-		errors.append("expected 12 arm hide meshes, found %d" % found)
-	var vein: MeshInstance3D = meshes.get("ArmVeinL", null)
-	if vein and vein.material_override is StandardMaterial3D:
-		var em := vein.material_override as StandardMaterial3D
-		if em.emission_energy_multiplier > 0.55:
-			errors.append("arm ember energy %.2f > 0.55" % em.emission_energy_multiplier)
-	var core: MeshInstance3D = meshes.get("EmberCore", null)
-	if core == null:
-		errors.append("EmberCore missing")
-	elif core.material_override is StandardMaterial3D:
-		var cm := core.material_override as StandardMaterial3D
-		if cm.emission_energy_multiplier <= 0.55:
-			errors.append("EmberCore is not hotter than arm ember")
+func _check_stalker(d1: Node, errors: PackedStringArray) -> void:
+	var col := d1.get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if col and col.shape is CapsuleShape3D:
+		var cap := col.shape as CapsuleShape3D
+		if absf(cap.height - 1.92) > 0.06:
+			errors.append("stalker capsule height %.2f, expected ~1.92" % cap.height)
+		if absf(cap.radius - 0.40) > 0.04:
+			errors.append("stalker capsule radius %.2f, expected ~0.40" % cap.radius)
+	var visual := d1.get_node_or_null("AbyssalStalker") as Node3D
+	if FileAccess.file_exists("res://models/abyssal_stalker.glb"):
+		if visual == null:
+			errors.append("AbyssalStalker GLB instance missing")
+		elif visual.scale.x > 1.05 or visual.scale.x < 0.95:
+			errors.append("visual scale %.3f — do not 100x Mixamo bind" % visual.scale.x)
+		if d1.has_method("imported_clip_names"):
+			var clips: PackedStringArray = d1.imported_clip_names()
+			print("STALKER_CLIPS ", ", ".join(clips))
+			for need in ["Idle_8", "Walking", "Axe_Spin_Attack", "Shot_and_Fall_Forward"]:
+				if not _clip_listed(clips, need):
+					errors.append("imported clip missing: %s" % need)
+			if _clip_listed(clips, "Running") and d1.get("CLIP_CHASE") == "Running":
+				errors.append("chase mapped to Running")
+		_check_material_1(d1, errors)
+	if d1.get_node_or_null("Rig") != null:
+		errors.append("Ashwight Rig still attached")
 
 
-func _collect_meshes(n: Node) -> Array[MeshInstance3D]:
-	var out: Array[MeshInstance3D] = []
-	if n is MeshInstance3D:
-		out.append(n as MeshInstance3D)
-	for c in n.get_children():
-		out.append_array(_collect_meshes(c))
-	return out
+func _clip_listed(clips: PackedStringArray, want: String) -> bool:
+	for n in clips:
+		var s := String(n)
+		if s == want or s.ends_with("/" + want) or s.ends_with("|" + want) or s.get_file() == want:
+			return true
+	return false
+
+
+func _check_material_1(n: Node, errors: PackedStringArray) -> void:
+	var found := false
+	var stack: Array[Node] = [n]
+	while not stack.is_empty():
+		var cur: Node = stack.pop_back()
+		if cur is MeshInstance3D:
+			var mi := cur as MeshInstance3D
+			var mesh := mi.mesh
+			var surfaces := mesh.get_surface_count() if mesh else 0
+			for i in maxi(surfaces, mi.get_surface_override_material_count()):
+				var mat := mi.get_active_material(i)
+				if mat is StandardMaterial3D:
+					var sm := mat as StandardMaterial3D
+					if sm.resource_name == "Material_1" or sm.resource_name.ends_with("Material_1"):
+						found = true
+						if absf(sm.emission_energy_multiplier - 0.32) > 0.06:
+							errors.append("Material_1 emission %.2f, expected ~0.32" % sm.emission_energy_multiplier)
+		for c in cur.get_children():
+			stack.append(c)
+	if FileAccess.file_exists("res://models/abyssal_stalker.glb") and not found:
+		errors.append("Material_1 not found on stalker")
 
 
 func _finish(errors: PackedStringArray) -> void:
 	if errors.is_empty():
-		print("QA_OK title, crouch, hero shotgun, one Ashwight 3-5 shells, diorama, LOS, death")
+		print("QA_OK title, crouch, hero shotgun, one Abyssal Stalker 3-5 shells, diorama, LOS, death")
 		quit(0)
 	else:
 		for e in errors:
