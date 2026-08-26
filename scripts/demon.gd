@@ -22,8 +22,19 @@ var _ap: AnimationPlayer
 var _snd: AudioStreamPlayer3D
 var _dead: bool = false
 var _shot_gate: float = 0.0
-var _ember_mat: StandardMaterial3D
+var _hide_mat: StandardMaterial3D
+var _ember_leg: StandardMaterial3D
+var _ember_arm: StandardMaterial3D
+var _ember_core: StandardMaterial3D
 var _growls: Dictionary = {}
+
+## Local Three.js export left these 12 arm meshes as unnamed unlit white
+## because hide/ember were read from empty torso.userData. Override them
+## with the same Hide as Ribcage/legs after build (or after instancing a GLB).
+const ARM_HIDE_MESHES := [
+	"UpperArmL", "UpperArmLFlesh", "ForeArmL", "ForeArmLFlesh", "HandLMesh", "HandLClaws",
+	"UpperArmR", "UpperArmRFlesh", "ForeArmR", "ForeArmRFlesh", "HandRMesh", "HandRClaws",
+]
 
 
 func _ready() -> void:
@@ -80,8 +91,8 @@ func _die() -> void:
 
 func _physics_process(delta: float) -> void:
 	_shot_gate = maxf(0.0, _shot_gate - delta)
-	if _ember_mat:
-		_ember_mat.emission_energy_multiplier = 1.55 + 0.45 * sin(Time.get_ticks_msec() * 0.004)
+	if _ember_core:
+		_ember_core.emission_energy_multiplier = 2.15 + 0.35 * sin(Time.get_ticks_msec() * 0.004)
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
 	if _dead:
@@ -203,18 +214,36 @@ func _blood(pos: Vector3, nrm: Vector3) -> void:
 	tw.tween_callback(p.queue_free)
 
 
-func _mat_ember() -> StandardMaterial3D:
+func _mat_hide() -> StandardMaterial3D:
+	# Shared Hide for Ribcage / legs / the 12 arm meshes. Mesh UVs only.
+	# Do not use a triplanar .tres — Compatibility saturates that orange.
 	var m := StandardMaterial3D.new()
-	m.albedo_color = Color(0.12, 0.08, 0.07)
+	m.resource_name = "Hide"
+	m.albedo_color = Color(0.10, 0.07, 0.055)
+	m.albedo_texture = load("res://textures/hero/tex-ashwight-ember.png")
+	m.roughness = 0.88
+	m.metallic = 0.02
+	m.emission_enabled = false
+	m.uv1_triplanar = false
+	m.uv1_scale = Vector3(2.2, 2.2, 2.2)
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
+	return m
+
+
+func _mat_ember(energy: float, res_name: String) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.resource_name = res_name
+	m.albedo_color = Color(0.08, 0.04, 0.03)
 	m.albedo_texture = load("res://textures/hero/tex-ashwight-ember.png")
 	m.emission_enabled = true
-	m.emission = Color(0.85, 0.22, 0.05)
+	m.emission = Color(0.72, 0.16, 0.04)
 	m.emission_texture = load("res://textures/hero/tex-ashwight-emit.png")
-	m.emission_energy_multiplier = 1.7
-	m.roughness = 0.82
-	m.metallic = 0.04
-	m.uv1_scale = Vector3(2.2, 2.2, 2.2)
-	_ember_mat = m
+	m.emission_energy_multiplier = energy
+	m.roughness = 0.78
+	m.metallic = 0.02
+	m.uv1_triplanar = false
+	m.uv1_scale = Vector3(2.4, 2.4, 2.4)
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
 	return m
 
 
@@ -303,7 +332,15 @@ func _build_ashwight() -> void:
 	_rig = Node3D.new()
 	_rig.name = "Rig"
 	add_child(_rig)
-	var hide := _mat_ember()
+	# Materials live on the root. Never read hide/ember from torso.userData —
+	# that path is empty on the Three.js export and ships white unlit arms.
+	_hide_mat = _mat_hide()
+	_ember_leg = _mat_ember(0.85, "Ember")
+	_ember_arm = _mat_ember(0.50, "EmberArm")
+	_ember_core = _mat_ember(2.20, "EmberCore")
+	var hide: Material = _hide_mat
+	var ember: Material = _ember_leg
+	var ember_arm: Material = _ember_arm
 	var bone := _mat_bone()
 	var eye := _mat_eye()
 	var maw := _mat_maw()
@@ -316,7 +353,8 @@ func _build_ashwight() -> void:
 	_cap(spine, "Mesh", 0.09, 0.28, Vector3(0, 0.08, 0), hide)
 
 	var chest := _bone(spine, "Chest", Vector3(0, 0.26, 0.02))
-	_sph(chest, "Cage", 0.20, Vector3(0, 0.06, 0.02), hide)
+	_sph(chest, "Ribcage", 0.20, Vector3(0, 0.06, 0.02), hide)
+	_sph(chest, "EmberCore", 0.07, Vector3(0, 0.05, 0.03), _ember_core)
 	for i in 5:
 		var ang := deg_to_rad(-30 + i * 14)
 		_cyl(chest, "Rib_%d" % i, 0.012, 0.01, 0.22, Vector3(0.0, 0.08 - i * 0.04, 0.08), hide, Vector3(0, 0, 90))
@@ -324,7 +362,6 @@ func _build_ashwight() -> void:
 	_cyl(chest, "Sternum", 0.02, 0.016, 0.22, Vector3(0, 0.02, 0.12), hide)
 
 	# Swollen LEFT shoulder (creature's left = -X in Godot after look_at).
-	# Concept: viewer's right = creature left. Keep it visually dominant.
 	var shoulder_l := _bone(chest, "ShoulderL", Vector3(-0.22, 0.18, 0.02))
 	_sph(shoulder_l, "MassA", 0.16, Vector3(-0.04, 0.08, 0.0), hide)
 	_sph(shoulder_l, "MassB", 0.12, Vector3(-0.08, 0.16, 0.04), hide)
@@ -334,23 +371,10 @@ func _build_ashwight() -> void:
 	var shoulder_r := _bone(chest, "ShoulderR", Vector3(0.18, 0.10, 0.0))
 	_sph(shoulder_r, "Mesh", 0.07, Vector3.ZERO, hide)
 
-	var uarm_l := _bone(shoulder_l, "UpperArmL", Vector3(-0.10, -0.06, 0.0))
-	_cap(uarm_l, "Mesh", 0.045, 0.42, Vector3(0, -0.16, 0), hide)
-	var farm_l := _bone(uarm_l, "ForeArmL", Vector3(0, -0.34, 0))
-	_cap(farm_l, "Mesh", 0.035, 0.38, Vector3(0, -0.16, 0), hide)
-	var hand_l := _bone(farm_l, "HandL", Vector3(0, -0.34, 0))
-	_sph(hand_l, "Palm", 0.045, Vector3.ZERO, hide)
-	for i in 3:
-		_cyl(hand_l, "Claw_%d" % i, 0.01, 0.004, 0.12, Vector3(-0.03 + i * 0.03, -0.08, 0.02), bone, Vector3(20, 0, 0))
-
-	var uarm_r := _bone(shoulder_r, "UpperArmR", Vector3(0.08, -0.04, 0))
-	_cap(uarm_r, "Mesh", 0.038, 0.40, Vector3(0, -0.16, 0), hide)
-	var farm_r := _bone(uarm_r, "ForeArmR", Vector3(0, -0.32, 0))
-	_cap(farm_r, "Mesh", 0.032, 0.36, Vector3(0, -0.16, 0), hide)
-	var hand_r := _bone(farm_r, "HandR", Vector3(0, -0.32, 0))
-	_sph(hand_r, "Palm", 0.04, Vector3.ZERO, hide)
-	for i in 3:
-		_cyl(hand_r, "Claw_%d" % i, 0.01, 0.004, 0.12, Vector3(-0.03 + i * 0.03, -0.08, 0.02), bone, Vector3(20, 0, 0))
+	_build_arm(shoulder_l, "L", Vector3(-0.10, -0.06, 0.0), hide, ember_arm, bone)
+	_build_arm(shoulder_r, "R", Vector3(0.08, -0.04, 0.0), hide, ember_arm, bone)
+	# Same pass used after instancing a GLB: force the 12 arm meshes onto Hide.
+	_override_arm_hide(hide)
 
 	var neck := _bone(chest, "Neck", Vector3(0.04, 0.22, 0.06))
 	_cap(neck, "Mesh", 0.05, 0.14, Vector3(0, 0.04, 0.02), hide, Vector3(18, 0, 0))
@@ -371,14 +395,68 @@ func _build_ashwight() -> void:
 	_cyl(jaw_r, "Mandible", 0.03, 0.018, 0.16, Vector3(0.02, -0.05, 0.06), hide, Vector3(70, 18, 0))
 	_cyl(jaw_r, "Flesh", 0.02, 0.012, 0.10, Vector3(0.01, -0.03, 0.05), maw, Vector3(70, 18, 0))
 
-	# Digitigrade legs.
-	_digit_leg(pelvis, "L", Vector3(-0.11, -0.06, 0.02), hide, bone)
-	_digit_leg(pelvis, "R", Vector3(0.11, -0.06, 0.02), hide, bone)
+	_digit_leg(pelvis, "L", Vector3(-0.11, -0.06, 0.02), hide, ember, bone)
+	_digit_leg(pelvis, "R", Vector3(0.11, -0.06, 0.02), hide, ember, bone)
 
 
-func _digit_leg(pelvis: Node3D, side: String, pos: Vector3, hide: Material, bone: Material) -> void:
+func _build_arm(shoulder: Node3D, side: String, origin: Vector3, hide: Material, ember: Material, bone: Material) -> void:
+	# hide / ember / bone come from the root. Do not pull them off the torso.
+	var sign := -1.0 if side == "L" else 1.0
+	var uarm := _bone(shoulder, "UpperArm" + side, origin)
+	_cap(uarm, "UpperArm" + side, 0.045, 0.42, Vector3(0, -0.16, 0), hide)
+	_cap(uarm, "UpperArm" + side + "Flesh", 0.038, 0.28, Vector3(sign * 0.012, -0.14, 0.01), hide)
+	_cyl(uarm, "ArmVein" + side, 0.008, 0.005, 0.26, Vector3(sign * 0.02, -0.14, 0.018), ember, Vector3(8, 0, 0))
+	var farm := _bone(uarm, "ForeArm" + side, Vector3(0, -0.34, 0))
+	_cap(farm, "ForeArm" + side, 0.035, 0.38, Vector3(0, -0.16, 0), hide)
+	_cap(farm, "ForeArm" + side + "Flesh", 0.028, 0.24, Vector3(sign * 0.01, -0.14, 0.01), hide)
+	_cyl(farm, "ForeVein" + side, 0.006, 0.004, 0.20, Vector3(sign * 0.016, -0.14, 0.016), ember, Vector3(6, 0, 0))
+	var hand := _bone(farm, "Hand" + side, Vector3(0, -0.34, 0))
+	_sph(hand, "Hand" + side + "Mesh", 0.045, Vector3.ZERO, hide)
+	var claws := Node3D.new()
+	claws.name = "Hand" + side + "Claws"
+	hand.add_child(claws)
+	# One mesh so the 12-name override can retarget the whole claw set.
+	var claw_host := MeshInstance3D.new()
+	claw_host.name = "Hand" + side + "Claws"
+	var claw_mesh := CylinderMesh.new()
+	claw_mesh.top_radius = 0.01
+	claw_mesh.bottom_radius = 0.004
+	claw_mesh.height = 0.12
+	claw_mesh.radial_segments = 8
+	claw_host.mesh = claw_mesh
+	claw_host.position = Vector3(0, -0.08, 0.02)
+	claw_host.rotation_degrees = Vector3(20, 0, 0)
+	claw_host.material_override = hide
+	claws.add_child(claw_host)
+	for i in 3:
+		if i == 1:
+			continue
+		_cyl(claws, "Claw_%d" % i, 0.01, 0.004, 0.12, Vector3(-0.03 + i * 0.03, -0.08, 0.02), hide, Vector3(20, 0, 0))
+	_cyl(hand, "Talon" + side, 0.008, 0.003, 0.07, Vector3(sign * -0.02, -0.02, 0.01), bone, Vector3(30, 0, 0))
+
+
+func _override_arm_hide(hide: Material) -> void:
+	# Runtime retarget after a GLB instance (or this builder). Same Hide as Ribcage.
+	for mi in _collect_meshes(self):
+		if mi.name in ARM_HIDE_MESHES:
+			mi.material_override = hide
+			for i in mi.get_surface_override_material_count():
+				mi.set_surface_override_material(i, hide)
+
+
+func _collect_meshes(n: Node) -> Array[MeshInstance3D]:
+	var out: Array[MeshInstance3D] = []
+	if n is MeshInstance3D:
+		out.append(n as MeshInstance3D)
+	for c in n.get_children():
+		out.append_array(_collect_meshes(c))
+	return out
+
+
+func _digit_leg(pelvis: Node3D, side: String, pos: Vector3, hide: Material, ember: Material, bone: Material) -> void:
 	var thigh := _bone(pelvis, "Thigh" + side, pos)
 	_cap(thigh, "Mesh", 0.055, 0.36, Vector3(0, -0.14, 0.02), hide, Vector3(12, 0, 0))
+	_cyl(thigh, "LegVein" + side, 0.008, 0.005, 0.22, Vector3(0.018, -0.12, 0.03), ember, Vector3(12, 0, 0))
 	var shin := _bone(thigh, "Shin" + side, Vector3(0, -0.30, 0.04))
 	_cap(shin, "Mesh", 0.042, 0.32, Vector3(0, -0.12, -0.02), hide, Vector3(-18, 0, 0))
 	var tarsus := _bone(shin, "Tarsus" + side, Vector3(0, -0.26, -0.04))

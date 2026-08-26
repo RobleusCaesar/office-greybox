@@ -136,6 +136,8 @@ func _run() -> void:
 		errors.append("Ashwight missing named bones")
 	if d1 and d1.get_node_or_null("Rig/Pelvis/Spine/Chest/Neck/Head/JawL") == null:
 		errors.append("Ashwight missing vertical split jaw")
+	if d1:
+		_check_ashwight_arms(d1, errors)
 	if d1 == null:
 		errors.append("Demon_01 missing for combat QA")
 	elif player == null:
@@ -168,6 +170,70 @@ func _run() -> void:
 			errors.append("player did not die")
 
 	_finish(errors)
+
+
+func _check_ashwight_arms(d1: Node, errors: PackedStringArray) -> void:
+	var names := [
+		"UpperArmL", "UpperArmLFlesh", "ForeArmL", "ForeArmLFlesh", "HandLMesh", "HandLClaws",
+		"UpperArmR", "UpperArmRFlesh", "ForeArmR", "ForeArmRFlesh", "HandRMesh", "HandRClaws",
+	]
+	var meshes: Dictionary = {}
+	for mi in _collect_meshes(d1):
+		meshes[mi.name] = mi
+	var rib: MeshInstance3D = meshes.get("Ribcage", null)
+	if rib == null:
+		errors.append("Ashwight Ribcage missing")
+		return
+	var hide := rib.material_override
+	if hide == null:
+		errors.append("Ribcage Hide missing")
+		return
+	if hide is StandardMaterial3D:
+		var hm := hide as StandardMaterial3D
+		if hm.uv1_triplanar:
+			errors.append("Hide must not be triplanar")
+		if hm.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED:
+			errors.append("Hide must not be unlit")
+		if hm.albedo_color.r > 0.35:
+			errors.append("Hide albedo too light (white-arm risk)")
+	var found := 0
+	for nm in names:
+		var mi: MeshInstance3D = meshes.get(nm, null)
+		if mi == null:
+			errors.append("Ashwight arm mesh missing: %s" % nm)
+			continue
+		found += 1
+		if mi.material_override != hide:
+			errors.append("%s is not the shared Hide material" % nm)
+		if mi.material_override is StandardMaterial3D:
+			var sm := mi.material_override as StandardMaterial3D
+			if sm.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED:
+				errors.append("%s is unlit (white-arm bug)" % nm)
+			if sm.albedo_color.r > 0.45 and sm.albedo_color.g > 0.45:
+				errors.append("%s albedo is near-white" % nm)
+	if found != 12:
+		errors.append("expected 12 arm hide meshes, found %d" % found)
+	var vein: MeshInstance3D = meshes.get("ArmVeinL", null)
+	if vein and vein.material_override is StandardMaterial3D:
+		var em := vein.material_override as StandardMaterial3D
+		if em.emission_energy_multiplier > 0.55:
+			errors.append("arm ember energy %.2f > 0.55" % em.emission_energy_multiplier)
+	var core: MeshInstance3D = meshes.get("EmberCore", null)
+	if core == null:
+		errors.append("EmberCore missing")
+	elif core.material_override is StandardMaterial3D:
+		var cm := core.material_override as StandardMaterial3D
+		if cm.emission_energy_multiplier <= 0.55:
+			errors.append("EmberCore is not hotter than arm ember")
+
+
+func _collect_meshes(n: Node) -> Array[MeshInstance3D]:
+	var out: Array[MeshInstance3D] = []
+	if n is MeshInstance3D:
+		out.append(n as MeshInstance3D)
+	for c in n.get_children():
+		out.append_array(_collect_meshes(c))
+	return out
 
 
 func _finish(errors: PackedStringArray) -> void:
