@@ -1,4 +1,10 @@
-[gd_scene load_steps=13 format=3]
+; GATE 1 v2 — complete L-shaped office greybox.
+; 1 unit = 1 m. Ceilings 3.0. Player eye 1.7. Text CSG scene.
+; CIRCULATION: no LOS from spawn / north hall / east hall to MoneyShotWindow.
+; ReceptionCEODivider is a SOLID wall behind the desk covering window Z 8.8–14.2.
+; Player enters CEO from the SIDE (south or north opening at X=26), then turns east.
+
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
 [ext_resource type="Material" path="res://materials/mat_floor.tres" id="1_floor"]
@@ -89,143 +95,2000 @@ editor_description = "Omni lights. WindowLight is strongest. Liquor cabinet has 
 
 [node name="BreakRoomFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, -0.1000, 3.2500)
-size = Vector3(7.200, 0.200, 6.700)
+size = Vector3(7.2000, 0.2000, 6.7000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("1_floor")
 editor_description = "ARCHITECTURE — break room floor 7.0 x 6.5 m"
 
 [node name="NorthHallFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, -0.1000, 8.7500)
-size = Vector3(2.200, 0.200, 4.700)
+size = Vector3(2.2000, 0.2000, 4.7000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("1_floor")
 editor_description = "ARCHITECTURE — north hall floor 2.0 x 4.5 m (short)"
 
 [node name="BathroomFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5000, -0.1000, 9.0000)
-size = Vector3(4.200, 0.200, 3.800)
+size = Vector3(4.2000, 0.2000, 3.8000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("1_floor")
 editor_description = "ARCHITECTURE — bathroom floor 4.0 x 3.6 m"
 
 [node name="SupplyClosetFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7500, -0.1000, 8.5000)
-size = Vector3(2.700, 0.200, 2.800)
+size = Vector3(2.7000, 0.2000, 2.8000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("1_floor")
 editor_description = "ARCHITECTURE — supply closet floor 2.5 x 2.6 m (closed)"
 
 [node name="CornerFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, -0.1000, 12.0000)
-size = Vector3(2.200, 0.200, 2.200)
+size = Vector3(2.2000, 0.2000, 2.2000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("1_floor")
 editor_description = "ARCHITECTURE — blind corner floor 2.0 x 2.0 m. Hall turns east."
 
 [node name="EastHallFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2500, -0.1000, 12.0000)
-size = Vector3(13.700, 0.200, 2.200)
+size = Vector3(13.7000, 0.2000, 2.2000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("1_floor")
 editor_description = "ARCHITECTURE — east hall floor 13.5 x 2.0 m"
 
 [node name="CubicleFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2500, -0.1000, 9.4000)
-size = Vector3(3.700, 0.200, 3.400)
+size = Vector3(3.7000, 0.2000, 3.4000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("1_floor")
 editor_description = "ARCHITECTURE — cubicle stub floor 3.5 x 3.2 m. DemonSpot_01."
 
 [node name="CopyAlcoveFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.7500, -0.1000, 14.7500)
-size = Vector3(4.700, 0.200, 3.700)
+size = Vector3(4.7000, 0.2000, 3.7000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("1_floor")
 editor_description = "ARCHITECTURE — copy/mail alcove floor 4.5 x 3.5 m"
 
 [node name="DeadOfficeFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.2000, -0.1000, 9.3000)
-size = Vector3(4.200, 0.200, 3.600)
+size = Vector3(4.2000, 0.2000, 3.6000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("1_floor")
 editor_description = "ARCHITECTURE — dead-end office floor 4.0 x 3.4 m (locked, cannot enter)"
 
 [node name="ReceptionFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.0000, -0.1000, 11.5000)
-size = Vector3(8.200, 0.200, 10.200)
+size = Vector3(8.2000, 0.2000, 10.2000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("1_floor")
 editor_description = "ARCHITECTURE — reception floor 8.0 x 10.0 m"
 
 [node name="CEOOfficeFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.0000, -0.1000, 11.5000)
-size = Vector3(12.200, 0.200, 10.200)
+size = Vector3(12.2000, 0.2000, 10.2000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("1_floor")
 editor_description = "ARCHITECTURE — CEO office floor 12.0 x 10.0 m"
 
 [node name="BreakRoomCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 3.1000, 3.2500)
-size = Vector3(7.400, 0.200, 6.900)
+size = Vector3(7.4000, 0.2000, 6.9000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("3_ceil")
 
 [node name="NorthHallCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 3.1000, 8.7500)
-size = Vector3(2.400, 0.200, 4.900)
+size = Vector3(2.4000, 0.2000, 4.9000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("3_ceil")
 
 [node name="BathroomCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5000, 3.1000, 9.0000)
-size = Vector3(4.400, 0.200, 4.000)
+size = Vector3(4.4000, 0.2000, 4.0000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("3_ceil")
 
 [node name="SupplyClosetCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7500, 3.1000, 8.5000)
-size = Vector3(2.900, 0.200, 3.000)
+size = Vector3(2.9000, 0.2000, 3.0000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("3_ceil")
 
 [node name="CornerCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 3.1000, 12.0000)
-size = Vector3(2.400, 0.200, 2.400)
+size = Vector3(2.4000, 0.2000, 2.4000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("3_ceil")
 
 [node name="EastHallCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2500, 3.1000, 12.0000)
-size = Vector3(13.900, 0.200, 2.400)
+size = Vector3(13.9000, 0.2000, 2.4000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("3_ceil")
 
 [node name="CubicleCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2500, 3.1000, 9.4000)
-size = Vector3(3.900, 0.200, 3.600)
+size = Vector3(3.9000, 0.2000, 3.6000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("3_ceil")
 
 [node name="CopyAlcoveCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.7500, 3.1000, 14.7500)
-size = Vector3(4.900, 0.200, 3.900)
+size = Vector3(4.9000, 0.2000, 3.9000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("3_ceil")
 
 [node name="DeadOfficeCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.2000, 3.1000, 9.3000)
-size = Vector3(4.400, 0.200, 3.800)
+size = Vector3(4.4000, 0.2000, 3.8000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("3_ceil")
 
 [node name="ReceptionCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.0000, 3.1000, 11.5000)
-size = Vector3(8.400, 0.200, 10.400)
+size = Vector3(8.4000, 0.2000, 10.4000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("3_ceil")
 
 [node name="CEOOfficeCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.0000, 3.1000, 11.5000)
-size = Vector3(12.400, 0.200, 10.400)
+size = Vector3(12.4000, 0.2000, 10.4000)
 use_collision = true
+collision_layer = 1
+collision_mask = 1
 material = ExtResource("3_ceil")
+
+[node name="BreakRoomSouth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 1.5000, 0.0000)
+size = Vector3(7.1600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — break room south wall. Kitchenette against this face."
+
+[node name="BreakRoomWest" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, 3.2500)
+size = Vector3(0.1600, 3.0000, 6.6600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — break room west wall. Small dim window cut. NOT the money shot."
+
+[node name="WindowCut" type="CSGBox3D" parent="Architecture/Walls/BreakRoomWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0500, -0.0500)
+operation = 2
+size = Vector3(0.4000, 1.1000, 1.3000)
+use_collision = false
+editor_description = "Small west window opening."
+
+[node name="BreakRoomEast" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0000, 1.5000, 3.2500)
+size = Vector3(0.1600, 3.0000, 6.6600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — break room east wall. Vending against this face. Blocks spawn LOS east."
+
+[node name="BreakRoomNorth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 1.5000, 6.5000)
+size = Vector3(7.1600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — break room north wall. Open doorway X 3.0–4.0 into the short north hall."
+
+[node name="DoorCut" type="CSGBox3D" parent="Architecture/Walls/BreakRoomNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, -0.4500, 0.0000)
+operation = 2
+size = Vector3(1.0500, 2.1500, 0.4000)
+use_collision = false
+editor_description = "Open doorway 1.0 x 2.1 m."
+
+[node name="NorthHallWest" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5000, 1.5000, 8.7500)
+size = Vector3(0.1600, 3.0000, 4.5000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — north hall west. Bathroom door cut Z 8.55–9.45."
+
+[node name="BathroomDoorCut" type="CSGBox3D" parent="Architecture/Walls/NorthHallWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, -0.4500, 0.2500)
+operation = 2
+size = Vector3(0.4000, 2.1500, 0.9500)
+use_collision = false
+editor_description = "Bathroom door 0.9 x 2.1 m."
+
+[node name="NorthHallEast" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5000, 1.5000, 8.7500)
+size = Vector3(0.1600, 3.0000, 4.5000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — north hall east. Supply door cut Z 8.05–8.95, plugged by locked slab."
+
+[node name="SupplyDoorCut" type="CSGBox3D" parent="Architecture/Walls/NorthHallEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, -0.4500, -0.2500)
+operation = 2
+size = Vector3(0.4000, 2.1500, 0.9500)
+use_collision = false
+editor_description = "Supply closet door cut, plugged by LockedDoor_Supply slab."
+
+[node name="BathroomSouth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5000, 1.5000, 7.2000)
+size = Vector3(4.1600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — bathroom south."
+
+[node name="BathroomWest" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5000, 1.5000, 9.0000)
+size = Vector3(0.1600, 3.0000, 3.7600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — bathroom west."
+
+[node name="BathroomNorth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5000, 1.5000, 10.8000)
+size = Vector3(4.1600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — bathroom north."
+
+[node name="SupplySouth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7500, 1.5000, 7.2000)
+size = Vector3(2.6600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — supply closet south."
+
+[node name="SupplyEast" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0000, 1.5000, 8.5000)
+size = Vector3(0.1600, 3.0000, 2.7600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — supply closet east."
+
+[node name="SupplyNorth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7500, 1.5000, 9.8000)
+size = Vector3(2.6600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — supply closet north."
+
+[node name="CornerWest" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5000, 1.5000, 12.0000)
+size = Vector3(0.1600, 3.0000, 2.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — blind corner west. Hall cannot see east until the turn."
+
+[node name="CornerNorth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 1.5000, 13.0000)
+size = Vector3(2.1600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — blind corner north. Forces the east turn."
+
+[node name="EastHallSouth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2500, 1.5000, 11.0000)
+size = Vector3(13.6600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — east hall south. Cubicle opening + dead-office door/glass cuts."
+
+[node name="CubicleOpeningCut" type="CSGBox3D" parent="Architecture/Walls/EastHallSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0000, 0.0000, 0.0000)
+operation = 2
+size = Vector3(3.5500, 3.1000, 0.4000)
+use_collision = false
+editor_description = "Open alcove into cubicle stub X 7.5–11.0."
+
+[node name="DeadOfficeDoorCut" type="CSGBox3D" parent="Architecture/Walls/EastHallSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3000, -0.4500, 0.0000)
+operation = 2
+size = Vector3(0.9500, 2.1500, 0.4000)
+use_collision = false
+editor_description = "Dead-end office door 0.9 x 2.1. Plugged by locked slab."
+
+[node name="DeadOfficeGlassCut" type="CSGBox3D" parent="Architecture/Walls/EastHallSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.9500, 0.0000, 0.0000)
+operation = 2
+size = Vector3(2.2000, 2.7000, 0.4000)
+use_collision = false
+editor_description = "Dark glass pane. Plugged by DeadOfficeGlass."
+
+[node name="EastHallNorth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2500, 1.5000, 13.0000)
+size = Vector3(13.6600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — east hall north. Copy/mail alcove opening."
+
+[node name="CopyOpeningCut" type="CSGBox3D" parent="Architecture/Walls/EastHallNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5000, 0.0000, 0.0000)
+operation = 2
+size = Vector3(4.5500, 3.1000, 0.4000)
+use_collision = false
+editor_description = "Enterable copy/mail alcove X 7.5–12.0."
+
+[node name="CubicleWest" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5000, 1.5000, 9.4000)
+size = Vector3(0.1600, 3.0000, 3.3600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — cubicle west."
+
+[node name="CubicleSouth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2500, 1.5000, 7.8000)
+size = Vector3(3.6600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — cubicle south."
+
+[node name="CubicleEast" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.0000, 1.5000, 9.4000)
+size = Vector3(0.1600, 3.0000, 3.3600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — cubicle east."
+
+[node name="CopyWest" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5000, 1.5000, 14.7500)
+size = Vector3(0.1600, 3.0000, 3.6600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — copy alcove west."
+
+[node name="CopyNorth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.7500, 1.5000, 16.5000)
+size = Vector3(4.6600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — copy alcove north."
+
+[node name="CopyEast" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.0000, 1.5000, 14.7500)
+size = Vector3(0.1600, 3.0000, 3.6600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — copy alcove east."
+
+[node name="DeadOfficeWest" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.2000, 1.5000, 9.3000)
+size = Vector3(0.1600, 3.0000, 3.5600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — dead-end office west."
+
+[node name="DeadOfficeSouth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.2000, 1.5000, 7.6000)
+size = Vector3(4.1600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — dead-end office south."
+
+[node name="DeadOfficeEast" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.2000, 1.5000, 9.3000)
+size = Vector3(0.1600, 3.0000, 3.5600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — dead-end office east."
+
+[node name="ReceptionWest" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.0000, 1.5000, 11.5000)
+size = Vector3(0.1600, 3.0000, 10.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — reception west. Hall mouth cut Z 11.0–13.0."
+
+[node name="HallMouthCut" type="CSGBox3D" parent="Architecture/Walls/ReceptionWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.5000)
+operation = 2
+size = Vector3(0.4000, 3.1000, 2.1000)
+use_collision = false
+editor_description = "East hall opens into reception."
+
+[node name="ReceptionSouth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.0000, 1.5000, 6.5000)
+size = Vector3(8.1600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — reception south."
+
+[node name="ReceptionNorth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.0000, 1.5000, 16.5000)
+size = Vector3(8.1600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — reception north."
+
+[node name="ReceptionCEODivider" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.0000, 1.5000, 11.5000)
+size = Vector3(0.2200, 3.0000, 6.1000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — SOLID wall behind the reception desk. Covers MoneyShotWindow Z 8.8–14.2. Blocks LOS from the east hall (and spawn / north hall). Walk around south (Z 6.6–8.5) or north (Z 14.5–16.4)."
+
+[node name="CEOSouth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.0000, 1.5000, 6.5000)
+size = Vector3(12.1600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — CEO south."
+
+[node name="CEONorth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.0000, 1.5000, 16.5000)
+size = Vector3(12.1600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — CEO north."
+
+[node name="CEOEast" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.0000, 1.5000, 11.5000)
+size = Vector3(0.1600, 3.0000, 10.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — CEO east. Floor-to-ceiling 3-pane window cut Z 8.8–14.2, Y 0.05–2.95."
+
+[node name="WindowCut" type="CSGBox3D" parent="Architecture/Walls/CEOEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+operation = 2
+size = Vector3(0.4000, 2.9200, 5.4500)
+use_collision = false
+editor_description = "Money-shot opening 5.4 x 2.90 m."
+
+[node name="ReceptionCEO_SouthLip" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.0000, 1.5000, 6.5500)
+size = Vector3(0.2200, 3.0000, 0.1200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — south lip at X=26. Opening starts Z 6.6."
+
+[node name="ReceptionCEO_NorthLip" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.0000, 1.5000, 16.4500)
+size = Vector3(0.2200, 3.0000, 0.1200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — north lip at X=26. Opening ends Z 16.4."
+
+[node name="OpenDoorway_BreakToNorthHall" type="Node3D" parent="Architecture/Openings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 0.0000, 6.5000)
+editor_description = "Open doorway 1.0 x 2.1 m. Frame only. X 3.0–4.0, Z=6.5."
+
+[node name="Jamb_L" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_BreakToNorthHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5400, 1.0500, 0.0000)
+size = Vector3(0.0800, 2.1000, 0.1800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Jamb_R" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_BreakToNorthHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5400, 1.0500, 0.0000)
+size = Vector3(0.0800, 2.1000, 0.1800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Head" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_BreakToNorthHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.1400, 0.0000)
+size = Vector3(1.1600, 0.1000, 0.1800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="OpenDoorway_NorthHallToBathroom" type="Node3D" parent="Architecture/Openings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5000, 0.0000, 9.0000)
+editor_description = "Bathroom door 0.9 x 2.1 m. Frame only. X=2.5, Z 8.55–9.45."
+
+[node name="Jamb_L" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_NorthHallToBathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.0500, -0.4800)
+size = Vector3(0.1800, 2.1000, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Jamb_R" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_NorthHallToBathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.0500, 0.4800)
+size = Vector3(0.1800, 2.1000, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Head" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_NorthHallToBathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.1400, 0.0000)
+size = Vector3(0.1800, 0.1000, 1.0400)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="OpenDoorway_EastHallToCubicle" type="Node3D" parent="Architecture/Openings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2500, 0.0000, 11.0000)
+editor_description = "Cubicle alcove opening. South of east hall. DemonSpot_01 choke just inside."
+
+[node name="Jamb_L" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_EastHallToCubicle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8000, 1.5000, 0.0000)
+size = Vector3(0.1000, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Jamb_R" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_EastHallToCubicle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8000, 1.5000, 0.0000)
+size = Vector3(0.1000, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Head" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_EastHallToCubicle"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.9200, 0.0000)
+size = Vector3(3.7000, 0.1000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="OpenDoorway_EastHallToCopy" type="Node3D" parent="Architecture/Openings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.7500, 0.0000, 13.0000)
+editor_description = "Copy/mail alcove opening. North of east hall. Enterable."
+
+[node name="Jamb_L" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_EastHallToCopy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3000, 1.5000, 0.0000)
+size = Vector3(0.1000, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Jamb_R" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_EastHallToCopy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3000, 1.5000, 0.0000)
+size = Vector3(0.1000, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Head" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_EastHallToCopy"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.9200, 0.0000)
+size = Vector3(4.7000, 0.1000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Opening_HallToReception" type="Node3D" parent="Architecture/Openings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.0000, 0.0000, 12.0000)
+editor_description = "East hall mouth into reception at X=18, Z 11.0–13.0."
+
+[node name="Jamb_L" type="CSGBox3D" parent="Architecture/Openings/Opening_HallToReception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, -1.0800)
+size = Vector3(0.1600, 3.0000, 0.1000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Jamb_R" type="CSGBox3D" parent="Architecture/Openings/Opening_HallToReception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, 1.0800)
+size = Vector3(0.1600, 3.0000, 0.1000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Head" type="CSGBox3D" parent="Architecture/Openings/Opening_HallToReception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.9200, 0.0000)
+size = Vector3(0.1600, 0.1000, 2.2600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Opening_ReceptionToCEO_South" type="Node3D" parent="Architecture/Openings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.0000, 0.0000, 7.5500)
+editor_description = "Side opening into CEO. X=26, Z 6.6–8.5, floor-to-ceiling. Enter from the side, then turn east."
+
+[node name="Jamb_L" type="CSGBox3D" parent="Architecture/Openings/Opening_ReceptionToCEO_South"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, -0.9800)
+size = Vector3(0.1800, 3.0000, 0.1000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Jamb_R" type="CSGBox3D" parent="Architecture/Openings/Opening_ReceptionToCEO_South"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, 0.9800)
+size = Vector3(0.1800, 3.0000, 0.1000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Head" type="CSGBox3D" parent="Architecture/Openings/Opening_ReceptionToCEO_South"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.9400, 0.0000)
+size = Vector3(0.1800, 0.1000, 2.0600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Opening_ReceptionToCEO_North" type="Node3D" parent="Architecture/Openings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.0000, 0.0000, 15.4500)
+editor_description = "Side opening into CEO. X=26, Z 14.5–16.4, floor-to-ceiling."
+
+[node name="Jamb_L" type="CSGBox3D" parent="Architecture/Openings/Opening_ReceptionToCEO_North"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, -0.9800)
+size = Vector3(0.1800, 3.0000, 0.1000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Jamb_R" type="CSGBox3D" parent="Architecture/Openings/Opening_ReceptionToCEO_North"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, 0.9800)
+size = Vector3(0.1800, 3.0000, 0.1000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Head" type="CSGBox3D" parent="Architecture/Openings/Opening_ReceptionToCEO_North"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.9400, 0.0000)
+size = Vector3(0.1800, 0.1000, 2.0600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="KitchenetteCounter" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.1000, 0.4500, 0.4200)
+size = Vector3(5.2000, 0.9000, 0.6400)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+editor_description = "FUTURE-ASSET — kitchenette counter along the south wall."
+
+[node name="KitchenetteCabinets" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.1000, 2.4200, 0.2600)
+size = Vector3(5.2000, 0.7200, 0.4000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+editor_description = "FUTURE-ASSET — upper cabinets over the kitchenette."
+
+[node name="Fridge" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4000, 0.9000, 0.4800)
+size = Vector3(0.7200, 1.8000, 0.7200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — fridge at the east end of the kitchenette."
+
+[node name="FridgeHandle" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.0200, 0.9500, 0.4800)
+size = Vector3(0.0400, 0.3600, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="CoffeePot" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7000, 0.9800, 0.4200)
+size = Vector3(0.1800, 0.2400, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — coffee pot on the counter."
+
+[node name="CoffeePotCarafe" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.7000, 1.1400, 0.4200)
+size = Vector3(0.1200, 0.1000, 0.1000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("9_dim")
+
+[node name="CounterClutter_01" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3500, 0.9800, 0.4000)
+size = Vector3(0.3000, 0.1600, 0.2200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — counter clutter box."
+
+[node name="CounterClutter_02" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0500, 0.9800, 0.3800)
+size = Vector3(0.2200, 0.1400, 0.1800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+editor_description = "FUTURE-ASSET — counter clutter box."
+
+[node name="Microwave" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7000, 0.9800, 0.4000)
+size = Vector3(0.4600, 0.2800, 0.3200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="VendingMachine" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5800, 0.9500, 4.1500)
+size = Vector3(0.7800, 1.9000, 0.8800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — vending machine on the east wall."
+
+[node name="VendingGlass" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.2000, 1.0500, 4.1500)
+size = Vector3(0.0400, 1.2000, 0.7000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("9_dim")
+
+[node name="BreakRoomTable" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 0.3800, 3.7000)
+size = Vector3(1.5000, 0.7600, 0.9000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+editor_description = "FUTURE-ASSET — table in the middle. Walk around it to the north doorway."
+
+[node name="TablePedestal" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 0.1800, 3.7000)
+size = Vector3(0.3600, 0.3600, 0.3600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="BreakRoomChair_01" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5500, 0.4600, 3.7000)
+size = Vector3(0.4200, 0.9200, 0.4200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — break room chair 1 of 4."
+
+[node name="BreakRoomChair_01_Back" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5500, 0.7800, 3.8600)
+size = Vector3(0.4000, 0.3600, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="BreakRoomChair_02" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4500, 0.4600, 3.7000)
+size = Vector3(0.4200, 0.9200, 0.4200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — break room chair 2 of 4."
+
+[node name="BreakRoomChair_02_Back" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4500, 0.7800, 3.8600)
+size = Vector3(0.4000, 0.3600, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="BreakRoomChair_03" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 0.4600, 2.9500)
+size = Vector3(0.4200, 0.9200, 0.4200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — break room chair 3 of 4."
+
+[node name="BreakRoomChair_03_Back" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 0.7800, 2.9500)
+size = Vector3(0.4000, 0.3600, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="BreakRoomChair_04" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 0.4600, 4.4500)
+size = Vector3(0.4200, 0.9200, 0.4200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — break room chair 4 of 4."
+
+[node name="BreakRoomChair_04_Back" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 0.7800, 4.4500)
+size = Vector3(0.4000, 0.3600, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="BreakRoomWindow" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0200, 1.5500, 3.2000)
+size = Vector3(0.0600, 1.0000, 1.2200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("9_dim")
+editor_description = "FUTURE-ASSET — small dim west window. Not the money shot. Not emissive ember."
+
+[node name="BreakRoomWindowSill" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0800, 1.0200, 3.2000)
+size = Vector3(0.1400, 0.0600, 1.3000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="BreakRoomWindowHead" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0800, 2.0800, 3.2000)
+size = Vector3(0.1400, 0.0600, 1.3000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="TrashBin" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4000, 0.3200, 5.7000)
+size = Vector3(0.3600, 0.6400, 0.3600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="StallWall_South" type="CSGBox3D" parent="FutureAssetSlots/Bathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3500, 1.0000, 8.1500)
+size = Vector3(2.1000, 2.0000, 0.0600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "FUTURE-ASSET — south stall wall."
+
+[node name="StallPartition" type="CSGBox3D" parent="FutureAssetSlots/Bathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3500, 1.0000, 9.0000)
+size = Vector3(2.1000, 2.0000, 0.0600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "FUTURE-ASSET — partition between two stalls."
+
+[node name="StallWall_North" type="CSGBox3D" parent="FutureAssetSlots/Bathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3500, 1.0000, 9.8500)
+size = Vector3(2.1000, 2.0000, 0.0600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "FUTURE-ASSET — north stall wall."
+
+[node name="StallVolume_01" type="CSGBox3D" parent="FutureAssetSlots/Bathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.4000, 8.5700)
+size = Vector3(0.4800, 0.8000, 0.5200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — stall 1 toilet volume."
+
+[node name="StallVolume_02" type="CSGBox3D" parent="FutureAssetSlots/Bathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9500, 0.4000, 9.4300)
+size = Vector3(0.4800, 0.8000, 0.5200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — stall 2 toilet volume."
+
+[node name="StallDoor_01" type="CSGBox3D" parent="FutureAssetSlots/Bathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6200, 1.0000, 8.5700)
+size = Vector3(0.0600, 1.9000, 0.7200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="StallDoor_02" type="CSGBox3D" parent="FutureAssetSlots/Bathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6200, 1.0000, 9.4300)
+size = Vector3(0.0600, 1.9000, 0.7200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Sink" type="CSGBox3D" parent="FutureAssetSlots/Bathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6500, 0.4600, 10.4800)
+size = Vector3(0.5600, 0.1800, 0.4400)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — bathroom sink."
+
+[node name="SinkBacksplash" type="CSGBox3D" parent="FutureAssetSlots/Bathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6500, 0.8800, 10.7000)
+size = Vector3(0.7200, 0.5000, 0.0600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "FUTURE-ASSET — sink backsplash."
+
+[node name="SinkPedestal" type="CSGBox3D" parent="FutureAssetSlots/Bathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6500, 0.2200, 10.4800)
+size = Vector3(0.2800, 0.4400, 0.2800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="Mirror" type="CSGBox3D" parent="FutureAssetSlots/Bathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6500, 1.5500, 10.7200)
+size = Vector3(0.6000, 0.7000, 0.0400)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("9_dim")
+
+[node name="PaperTowel" type="CSGBox3D" parent="FutureAssetSlots/Bathroom"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7000, 1.3000, 10.6800)
+size = Vector3(0.2200, 0.2800, 0.1000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="LockedDoor_Supply" type="Node3D" parent="FutureAssetSlots/SupplyCloset"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5000, 0.0000, 8.5000)
+editor_description = "Locked supply door. Slab plugs the north-hall cut. Cannot enter."
+
+[node name="Frame_L" type="CSGBox3D" parent="FutureAssetSlots/SupplyCloset/LockedDoor_Supply"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.0500, -0.4600)
+size = Vector3(0.1800, 2.1000, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Frame_R" type="CSGBox3D" parent="FutureAssetSlots/SupplyCloset/LockedDoor_Supply"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.0500, 0.4600)
+size = Vector3(0.1800, 2.1000, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Frame_Head" type="CSGBox3D" parent="FutureAssetSlots/SupplyCloset/LockedDoor_Supply"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.1400, 0.0000)
+size = Vector3(0.1800, 0.1000, 1.0000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Slab" type="CSGBox3D" parent="FutureAssetSlots/SupplyCloset/LockedDoor_Supply"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.0500, 0.0000)
+size = Vector3(0.1000, 2.0400, 0.8600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("6_door")
+editor_description = "Locked charcoal slab. Collision ON. Cannot enter the supply closet."
+
+[node name="Handle" type="CSGBox3D" parent="FutureAssetSlots/SupplyCloset/LockedDoor_Supply"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0800, 1.0000, 0.2800)
+size = Vector3(0.0400, 0.0800, 0.1000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Shelf_01" type="CSGBox3D" parent="FutureAssetSlots/SupplyCloset"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3500, 1.1000, 8.5000)
+size = Vector3(0.4000, 2.2000, 1.8000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — supply shelf (behind locked door)."
+
+[node name="ShelfBoard_01" type="CSGBox3D" parent="FutureAssetSlots/SupplyCloset"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3500, 0.5500, 8.5000)
+size = Vector3(0.3800, 0.0400, 1.7600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+
+[node name="ShelfBoard_02" type="CSGBox3D" parent="FutureAssetSlots/SupplyCloset"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3500, 1.1500, 8.5000)
+size = Vector3(0.3800, 0.0400, 1.7600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+
+[node name="ShelfBoard_03" type="CSGBox3D" parent="FutureAssetSlots/SupplyCloset"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3500, 1.7500, 8.5000)
+size = Vector3(0.3800, 0.0400, 1.7600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+
+[node name="ShelfBox_01" type="CSGBox3D" parent="FutureAssetSlots/SupplyCloset"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3000, 0.7200, 8.1000)
+size = Vector3(0.2800, 0.2800, 0.3400)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+editor_description = "FUTURE-ASSET — box on the supply shelf."
+
+[node name="ShelfBox_02" type="CSGBox3D" parent="FutureAssetSlots/SupplyCloset"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3000, 1.3200, 8.7000)
+size = Vector3(0.2600, 0.2400, 0.3000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="CubiclePartition" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2500, 0.7500, 9.1500)
+size = Vector3(2.5000, 1.5000, 0.0600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — cubicle partition. Tightens DemonSpot_01 into a choke."
+
+[node name="CubicleDesk" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.1500, 0.3800, 8.5000)
+size = Vector3(1.2000, 0.7600, 0.6400)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — cubicle desk."
+
+[node name="CubicleMonitor" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.1500, 0.9200, 8.2800)
+size = Vector3(0.4600, 0.3200, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("9_dim")
+
+[node name="CubicleChair" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.1500, 0.4600, 9.1000)
+size = Vector3(0.4400, 0.9200, 0.4400)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — cubicle chair."
+
+[node name="CubicleChairBack" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.1500, 0.8000, 9.2800)
+size = Vector3(0.4200, 0.4000, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="CubicleBin" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.4000, 0.2200, 8.2000)
+size = Vector3(0.2800, 0.4400, 0.2800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("6_door")
+
+[node name="Copier" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.3500, 0.5500, 15.1500)
+size = Vector3(0.7200, 1.1000, 0.6600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — copier in the mail alcove."
+
+[node name="CopierLid" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.3500, 1.1400, 15.1500)
+size = Vector3(0.6800, 0.0600, 0.6200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="CopierTray" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.3500, 0.7200, 14.7800)
+size = Vector3(0.5000, 0.0800, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="MailSlotBank" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.7000, 0.9000, 16.1800)
+size = Vector3(1.9000, 1.8000, 0.3600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — mail-slot bank on the north wall."
+
+[node name="MailSlot_01" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.1000, 1.1500, 15.9800)
+size = Vector3(0.4200, 0.2200, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("6_door")
+editor_description = "FUTURE-ASSET — mail slot 1."
+
+[node name="MailSlot_02" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.7000, 1.1500, 15.9800)
+size = Vector3(0.4200, 0.2200, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("6_door")
+editor_description = "FUTURE-ASSET — mail slot 2."
+
+[node name="MailSlot_03" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.3000, 1.1500, 15.9800)
+size = Vector3(0.4200, 0.2200, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("6_door")
+editor_description = "FUTURE-ASSET — mail slot 3."
+
+[node name="MailSlot_04" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.1000, 0.8000, 15.9800)
+size = Vector3(0.4200, 0.2200, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+
+[node name="MailSlot_05" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.7000, 0.8000, 15.9800)
+size = Vector3(0.4200, 0.2200, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+
+[node name="MailSlot_06" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.3000, 0.8000, 15.9800)
+size = Vector3(0.4200, 0.2200, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+
+[node name="CopyTable" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.5000, 0.4000, 14.0500)
+size = Vector3(1.2000, 0.8000, 0.6000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — copy alcove work table."
+
+[node name="CopyPaperStack" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.2000, 0.8600, 14.0500)
+size = Vector3(0.2800, 0.0800, 0.3600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("3_ceil")
+
+[node name="LockedDoor_DeadOffice" type="Node3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5500, 0.0000, 11.0000)
+editor_description = "Locked dead-end office door. Slab plugs the east-hall cut. Cannot enter."
+
+[node name="Frame_L" type="CSGBox3D" parent="FutureAssetSlots/EastHall/LockedDoor_DeadOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4800, 1.0500, 0.0000)
+size = Vector3(0.0800, 2.1000, 0.1800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Frame_R" type="CSGBox3D" parent="FutureAssetSlots/EastHall/LockedDoor_DeadOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4800, 1.0500, 0.0000)
+size = Vector3(0.0800, 2.1000, 0.1800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Frame_Head" type="CSGBox3D" parent="FutureAssetSlots/EastHall/LockedDoor_DeadOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.1400, 0.0000)
+size = Vector3(1.0400, 0.1000, 0.1800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Slab" type="CSGBox3D" parent="FutureAssetSlots/EastHall/LockedDoor_DeadOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.0500, 0.0000)
+size = Vector3(0.8600, 2.0400, 0.1000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("6_door")
+editor_description = "Locked charcoal slab. Collision ON. Cannot enter the dead-end office."
+
+[node name="Handle" type="CSGBox3D" parent="FutureAssetSlots/EastHall/LockedDoor_DeadOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2800, 1.0000, 0.0800)
+size = Vector3(0.1000, 0.0800, 0.0400)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="DeadOfficeGlass" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.2000, 1.4500, 11.0000)
+size = Vector3(2.0500, 2.5000, 0.0600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("9_dim")
+editor_description = "FUTURE-ASSET — darker glass pane. Collision ON. Cannot walk through."
+
+[node name="DeadOfficeGlassMullion" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.2000, 1.4500, 11.0000)
+size = Vector3(0.0600, 2.5000, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="DeadOfficeGlassSill" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.2000, 0.1800, 11.0000)
+size = Vector3(2.1000, 0.1000, 0.1200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="DeadOfficeDesk" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.2000, 0.3800, 8.7000)
+size = Vector3(1.4000, 0.7600, 0.7000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — desk inside the locked dead-end office."
+
+[node name="DeadOfficeChair" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.2000, 0.4600, 9.4500)
+size = Vector3(0.4400, 0.9200, 0.4400)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — chair inside the locked dead-end office."
+
+[node name="ReceptionDesk" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.9000, 0.5200, 11.5000)
+size = Vector3(1.5500, 1.0400, 2.8500)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — reception desk. Solid ReceptionCEODivider stands behind it (east), covering the window Z-span. Player walks around both sides."
+
+[node name="ReceptionDeskTop" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.8000, 1.0700, 11.5000)
+size = Vector3(1.8000, 0.0600, 3.0500)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+editor_description = "FUTURE-ASSET — reception desk top."
+
+[node name="ReceptionMonitor" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.4000, 1.2800, 11.2000)
+size = Vector3(0.0800, 0.3400, 0.4800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("9_dim")
+
+[node name="BadgeNiche" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.2000, 1.2200, 12.5500)
+size = Vector3(0.2800, 0.1600, 0.3200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+editor_description = "FUTURE-ASSET — badge niche on the desk."
+
+[node name="BadgeCard" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.1000, 1.2400, 12.5500)
+size = Vector3(0.0200, 0.0800, 0.1200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("8_win")
+
+[node name="WaitingChair_01" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.1500, 0.4600, 8.3500)
+size = Vector3(0.4600, 0.9200, 0.4600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — waiting chair 1."
+
+[node name="WaitingChair_02" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.0500, 0.4600, 8.3500)
+size = Vector3(0.4600, 0.9200, 0.4600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — waiting chair 2."
+
+[node name="WaitingChair_03" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.1500, 0.4600, 9.2000)
+size = Vector3(0.4600, 0.9200, 0.4600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — waiting chair 3."
+
+[node name="WaitingChair_01_Back" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.1500, 0.8200, 8.1600)
+size = Vector3(0.4400, 0.3800, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="WaitingChair_02_Back" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.0500, 0.8200, 8.1600)
+size = Vector3(0.4400, 0.3800, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="WaitingChair_03_Back" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.1500, 0.8200, 9.3900)
+size = Vector3(0.4400, 0.3800, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="PlantPot" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.1500, 0.2200, 15.5500)
+size = Vector3(0.4200, 0.4400, 0.4200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+editor_description = "FUTURE-ASSET — reception plant pot."
+
+[node name="PlantFoliage" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.1500, 0.9500, 15.5500)
+size = Vector3(0.7000, 1.0500, 0.7000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+editor_description = "FUTURE-ASSET — reception plant foliage."
+
+[node name="MagazineTable" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.6000, 0.2200, 8.8500)
+size = Vector3(0.7000, 0.4400, 0.5000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+
+[node name="ReceptionSideboard" type="CSGBox3D" parent="FutureAssetSlots/Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.2000, 0.4500, 16.1500)
+size = Vector3(1.8000, 0.9000, 0.4000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="CEODesk" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.3500, 0.3800, 11.5000)
+size = Vector3(2.2000, 0.7600, 1.1000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — CEO desk centered in front of the money-shot window."
+
+[node name="CEODeskPedestal_L" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.5500, 0.1800, 11.5000)
+size = Vector3(0.4000, 0.3600, 0.9000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="CEODeskPedestal_R" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.1500, 0.1800, 11.5000)
+size = Vector3(0.4000, 0.3600, 0.9000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="CEOBlotter" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.3500, 0.7800, 11.5000)
+size = Vector3(1.4000, 0.0200, 0.7000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("6_door")
+
+[node name="CEOLamp" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.5000, 1.0500, 11.1000)
+size = Vector3(0.1200, 0.4800, 0.1200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="CEOLampShade" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.5000, 1.3200, 11.1000)
+size = Vector3(0.2200, 0.1000, 0.2200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+
+[node name="LiquorCabinet" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.4500, 0.9000, 15.4500)
+size = Vector3(0.5200, 1.8000, 1.2000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+editor_description = "FUTURE-ASSET — liquor cabinet on the LEFT as you face the window (north)."
+
+[node name="LiquorBottles" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.4500, 1.5500, 15.4500)
+size = Vector3(0.3600, 0.2800, 1.0000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — liquor bottles group."
+
+[node name="Bottle_01" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.4500, 1.7200, 15.0500)
+size = Vector3(0.0800, 0.2800, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("8_win")
+
+[node name="Bottle_02" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.4500, 1.6800, 15.3000)
+size = Vector3(0.0700, 0.2400, 0.0700)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("9_dim")
+
+[node name="Bottle_03" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.4500, 1.7400, 15.5500)
+size = Vector3(0.0800, 0.3000, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+
+[node name="Bottle_04" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.4500, 1.6600, 15.8000)
+size = Vector3(0.0700, 0.2200, 0.0700)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="LiquorGlassDoor" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.1600, 1.1000, 15.4500)
+size = Vector3(0.0400, 1.4000, 1.1000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("9_dim")
+
+[node name="PlantPot" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.5500, 0.2200, 7.7500)
+size = Vector3(0.4400, 0.4400, 0.4400)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+editor_description = "FUTURE-ASSET — plant pot on the RIGHT as you face the window (south)."
+
+[node name="PlantFoliage" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.5500, 1.0000, 7.7500)
+size = Vector3(0.7200, 1.1000, 0.7200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+editor_description = "FUTURE-ASSET — plant foliage, right of the window."
+
+[node name="Bookshelf_01" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.4000, 1.2000, 6.8200)
+size = Vector3(1.4000, 2.4000, 0.3200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — bookshelf off the window wall (south)."
+
+[node name="Bookshelf_02" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.2000, 1.2000, 6.8200)
+size = Vector3(1.4000, 2.4000, 0.3200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — bookshelf off the window wall (south)."
+
+[node name="Bookshelf_03" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.2000, 1.2000, 16.1800)
+size = Vector3(1.6000, 2.4000, 0.3200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "FUTURE-ASSET — bookshelf off the window wall (north)."
+
+[node name="Books_01" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.4000, 1.5500, 6.9200)
+size = Vector3(1.2000, 0.2200, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+
+[node name="Books_02" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.2000, 0.9500, 6.9200)
+size = Vector3(1.2000, 0.2200, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("6_door")
+
+[node name="Books_03" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.2000, 1.8500, 16.0800)
+size = Vector3(1.4000, 0.2200, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("4_kit")
+
+[node name="CEOSideChair" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.7000, 0.4600, 10.5500)
+size = Vector3(0.4600, 0.9200, 0.4600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="CEOGuestChair_01" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.4000, 0.4600, 12.3500)
+size = Vector3(0.4600, 0.9200, 0.4600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="CEOGuestChair_02" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.2000, 0.4600, 12.3500)
+size = Vector3(0.4600, 0.9200, 0.4600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+
+[node name="MoneyShotWindow" type="Node3D" parent="FutureAssetSlots/CEOOffice"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.1000, 0.0000, 11.5000)
+editor_description = "MONEY SHOT — floor-to-ceiling 3-pane emissive ember. Placeholder glass; burning Denver comes later. Visible only after walking around the reception back wall and turning east."
+
+[node name="Pane_01" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice/MoneyShotWindow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, -1.7734)
+size = Vector3(0.0400, 2.9000, 1.6933)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("8_win")
+editor_description = "Emissive ember pane 1 (south)."
+
+[node name="Pane_02" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice/MoneyShotWindow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, 0.0000)
+size = Vector3(0.0400, 2.9000, 1.6933)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("8_win")
+editor_description = "Emissive ember pane 2 (center)."
+
+[node name="Pane_03" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice/MoneyShotWindow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, 1.7734)
+size = Vector3(0.0400, 2.9000, 1.6933)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("8_win")
+editor_description = "Emissive ember pane 3 (north)."
+
+[node name="Mullion_Left" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice/MoneyShotWindow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, -2.6600)
+size = Vector3(0.0800, 2.9000, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Mullion_01" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice/MoneyShotWindow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, -0.8867)
+size = Vector3(0.0800, 2.9000, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Mullion_02" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice/MoneyShotWindow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, 0.8866)
+size = Vector3(0.0800, 2.9000, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Mullion_Right" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice/MoneyShotWindow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, 2.6600)
+size = Vector3(0.0800, 2.9000, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Sill" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice/MoneyShotWindow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0200, 0.0500, 0.0000)
+size = Vector3(0.1600, 0.0800, 5.4200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+editor_description = "Window sill at Y=0.05."
+
+[node name="Head" type="CSGBox3D" parent="FutureAssetSlots/CEOOffice/MoneyShotWindow"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0200, 2.9500, 0.0000)
+size = Vector3(0.1600, 0.0800, 5.4200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+editor_description = "Window head at Y=2.95."
+
+[node name="DemonSpot_01" type="Node3D" parent="DemonSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2500, 0.0000, 10.3500)
+editor_description = "FIRST demon — attack + interest. Tight choke in the cubicle stub south of the east hall. You must pass it. Close range, no room to kite."
+
+[node name="Decal" type="CSGBox3D" parent="DemonSpots/DemonSpot_01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0150, 0.0000)
+size = Vector3(1.2500, 0.0300, 1.2500)
+use_collision = false
+material = ExtResource("10_demon")
+editor_description = "Dull-red floor decal. Collision OFF."
+
+[node name="Marker" type="CSGBox3D" parent="DemonSpots/DemonSpot_01"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.1600, 0.0000)
+size = Vector3(0.3600, 0.3200, 0.3600)
+use_collision = false
+material = ExtResource("10_demon")
+editor_description = "Low marker. Collision OFF. Walk through."
+
+[node name="DemonSpot_02" type="Node3D" parent="DemonSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.5500, 0.0000, 7.5500)
+editor_description = "SECOND demon — attack + interest. Arena at the CEO south threshold, beside the side opening. After the corner, as the window hits. Punishes the turn into the money shot."
+
+[node name="Decal" type="CSGBox3D" parent="DemonSpots/DemonSpot_02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0150, 0.0000)
+size = Vector3(1.4000, 0.0300, 1.4000)
+use_collision = false
+material = ExtResource("10_demon")
+editor_description = "Dull-red floor decal. Collision OFF."
+
+[node name="Marker" type="CSGBox3D" parent="DemonSpots/DemonSpot_02"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.1600, 0.0000)
+size = Vector3(0.4000, 0.3200, 0.4000)
+use_collision = false
+material = ExtResource("10_demon")
+editor_description = "Low marker. Collision OFF. Walk through."
+
+[node name="BreakRoomLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 2.6500, 3.2500)
+editor_description = "Read the break room. Dimmer than the money shot."
+light_color = Color(1, 0.92, 0.80, 1)
+light_energy = 1.550
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 7.500
+omni_attenuation = 1.150
+
+[node name="KitchenLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.1000, 2.2000, 0.9000)
+editor_description = "Kitchenette work light."
+light_color = Color(1, 0.88, 0.70, 1)
+light_energy = 0.850
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 4.000
+omni_attenuation = 1.150
+
+[node name="NorthHallLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 2.6000, 8.8000)
+editor_description = "Short north hall."
+light_color = Color(0.90, 0.90, 0.95, 1)
+light_energy = 1.100
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 5.500
+omni_attenuation = 1.150
+
+[node name="BathroomLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5000, 2.5500, 9.0000)
+editor_description = "Bathroom."
+light_color = Color(0.85, 0.90, 1.00, 1)
+light_energy = 0.900
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 4.500
+omni_attenuation = 1.150
+
+[node name="CornerLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 2.6000, 12.0000)
+editor_description = "Blind corner. No window glow leaks here."
+light_color = Color(0.88, 0.88, 0.92, 1)
+light_energy = 0.950
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 4.000
+omni_attenuation = 1.150
+
+[node name="EastHallLight_01" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5000, 2.6000, 12.0000)
+editor_description = "East hall west stretch / cubicle mouth."
+light_color = Color(0.90, 0.90, 0.94, 1)
+light_energy = 1.200
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 6.000
+omni_attenuation = 1.150
+
+[node name="EastHallLight_02" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5000, 2.6000, 12.0000)
+editor_description = "East hall east stretch toward reception."
+light_color = Color(0.90, 0.90, 0.94, 1)
+light_energy = 1.200
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 6.000
+omni_attenuation = 1.150
+
+[node name="CubicleLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2500, 2.5000, 9.2000)
+editor_description = "Cubicle stub / DemonSpot_01."
+light_color = Color(0.95, 0.90, 0.80, 1)
+light_energy = 0.800
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 4.000
+omni_attenuation = 1.150
+
+[node name="CopyAlcoveLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.7500, 2.5500, 14.7500)
+editor_description = "Copy/mail alcove."
+light_color = Color(0.92, 0.92, 0.88, 1)
+light_energy = 0.950
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 4.500
+omni_attenuation = 1.150
+
+[node name="ReceptionLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.0000, 2.7000, 11.5000)
+editor_description = "Reception staging. Not the reveal."
+light_color = Color(0.95, 0.92, 0.85, 1)
+light_energy = 1.700
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 8.500
+omni_attenuation = 1.150
+
+[node name="ReceptionDeskLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.8000, 2.2000, 11.5000)
+editor_description = "Desk lamp-ish."
+light_color = Color(1.00, 0.90, 0.75, 1)
+light_energy = 0.700
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 3.500
+omni_attenuation = 1.150
+
+[node name="CEOLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.5000, 2.7000, 11.5000)
+editor_description = "Modest CEO fill. WindowLight still wins."
+light_color = Color(0.95, 0.88, 0.78, 1)
+light_energy = 1.400
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 8.000
+omni_attenuation = 1.150
+
+[node name="WindowLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.3500, 1.8500, 11.5000)
+editor_description = "STRONGEST light in the level. Money-shot plane is the brightest thing."
+light_color = Color(1.00, 0.48, 0.16, 1)
+light_energy = 8.800
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 16.000
+omni_attenuation = 1.150
+
+[node name="LiquorCabinetLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.2000, 1.5500, 15.2000)
+editor_description = "Warm extra light on the left as you face the window."
+light_color = Color(1.00, 0.70, 0.38, 1)
+light_energy = 2.700
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 5.000
+omni_attenuation = 1.150
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 0.0000, 2.1000)
+editor_description = "Spawn (3.50, 0, 2.10) facing +Z (north) toward the open north-hall doorway. Eye 1.70 m."
