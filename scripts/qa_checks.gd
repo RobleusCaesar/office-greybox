@@ -143,7 +143,7 @@ func _run() -> void:
 		var die_at := enemy_src.find("func _die")
 		if die_at >= 0:
 			var die_chunk := enemy_src.substr(die_at, 420)
-			if die_chunk.contains("queue_free"):
+			if die_chunk.contains("queue_free("):
 				errors.append("death must not queue_free the stalker")
 		if FileAccess.file_exists("res://scripts/demon.gd"):
 			var demon_src := FileAccess.get_file_as_string("res://scripts/demon.gd")

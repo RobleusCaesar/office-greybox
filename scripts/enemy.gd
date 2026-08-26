@@ -89,7 +89,7 @@ func _die() -> void:
 	velocity = Vector3.ZERO
 	_play_growl("death")
 	_play_clip(CLIP_DEATH)
-	# Corpse stays. Do not queue_free.
+	# Corpse stays in the cubicle.
 
 
 func _physics_process(delta: float) -> void:
