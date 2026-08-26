@@ -1,0 +1,75 @@
+name: Deploy Web to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Godot 4.7.2 official Linux + export templates
+        run: |
+          set -euo pipefail
+          GODOT_VER=4.7.2
+          BASE="https://github.com/godotengine/godot/releases/download/${GODOT_VER}-stable"
+          curl -fL --retry 5 --retry-delay 4 -o godot.zip \
+            "${BASE}/Godot_v${GODOT_VER}-stable_linux.x86_64.zip"
+          curl -fL --retry 5 --retry-delay 4 -o export_templates.tpz \
+            "${BASE}/Godot_v${GODOT_VER}-stable_export_templates.tpz"
+          unzip -q godot.zip
+          GODOT_BIN="$(find "$PWD" -maxdepth 1 -type f -name 'Godot_v*-linux.x86_64' | head -n1)"
+          chmod +x "$GODOT_BIN"
+          echo "GODOT_BIN=$GODOT_BIN" >> "$GITHUB_ENV"
+          DEST="${HOME}/.local/share/godot/export_templates/${GODOT_VER}.stable"
+          mkdir -p "$DEST"
+          unzip -q export_templates.tpz -d /tmp/godot_templates
+          if [ -d /tmp/godot_templates/templates ]; then
+            cp -a /tmp/godot_templates/templates/. "$DEST/"
+          else
+            cp -a /tmp/godot_templates/. "$DEST/"
+          fi
+
+      - name: Ensure Web export has threads off
+        run: |
+          if [ -f export_presets.cfg ]; then
+            sed -i 's/^variant\/thread_support=.*/variant\/thread_support=false/' export_presets.cfg
+          fi
+
+      - name: Export release Web
+        run: |
+          set -euo pipefail
+          mkdir -p export/web
+          "$GODOT_BIN" --headless --path . --import || true
+          "$GODOT_BIN" --headless --path . --export-release "Web" export/web/index.html
+          touch export/web/.nojekyll
+          test -f export/web/index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: export/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
