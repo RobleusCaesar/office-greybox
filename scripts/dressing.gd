@@ -199,7 +199,7 @@ func _paint_remaining(n: Node) -> void:
 	if n is CSGPrimitive3D:
 		var c := n as CSGPrimitive3D
 		if c.operation == 0 and c.visible:
-			var m := c.material
+			var m: Material = c.material
 			var needs := m == null
 			if m is StandardMaterial3D:
 				needs = (m as StandardMaterial3D).albedo_texture == null and (m as StandardMaterial3D).transparency == BaseMaterial3D.TRANSPARENCY_DISABLED
