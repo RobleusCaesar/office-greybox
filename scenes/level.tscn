@@ -27,3 +27,62 @@ glow_hdr_threshold = 0.8
 
 [node name="Level" type="Node3D"]
 editor_description = "GATE 1 v2 office greybox. L-shaped circulation. Architecture / FutureAssetSlots / DemonSpots."
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_main")
+
+[node name="Architecture" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "ARCHITECTURE — floors, walls, ceilings, openings. Permanent playable volume."
+
+[node name="Floors" type="Node3D" parent="Architecture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "Room floors. Top surface at Y=0. Collision on."
+
+[node name="Ceilings" type="Node3D" parent="Architecture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "Ceilings at Y=3.0 so the player cannot jump out."
+
+[node name="Walls" type="Node3D" parent="Architecture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "Exterior + interior walls. CSG cuts for openings."
+
+[node name="Openings" type="Node3D" parent="Architecture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "Door frames and opening markers. No slab = walk through."
+
+[node name="FutureAssetSlots" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "FUTURE-ASSET SLOTS — primitive stand-ins. Replace with real meshes later."
+
+[node name="BreakRoom" type="Node3D" parent="FutureAssetSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "Break room furniture + small dim window. Not the money shot."
+
+[node name="Bathroom" type="Node3D" parent="FutureAssetSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "Enterable bathroom. Two stall volumes + sink."
+
+[node name="SupplyCloset" type="Node3D" parent="FutureAssetSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "Closed supply closet. Locked slab. Cannot enter."
+
+[node name="EastHall" type="Node3D" parent="FutureAssetSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "Cubicle stub, copy/mail alcove, dead-end office glass + locked door."
+
+[node name="Reception" type="Node3D" parent="FutureAssetSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "Staging space. Desk, waiting chairs, plant, badge niche. Not the reveal."
+
+[node name="CEOOffice" type="Node3D" parent="FutureAssetSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "CEO office furniture + MoneyShotWindow. Enter from the side, then turn east."
+
+[node name="DemonSpots" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "DEMON SPOTS — encounter block-outs. Markers have collision OFF. No enemies in this gate."
+
+[node name="Lights" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "Omni lights. WindowLight is strongest. Liquor cabinet has a warm extra light."
