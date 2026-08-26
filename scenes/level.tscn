@@ -11,3 +11,19 @@
 [ext_resource type="Material" path="res://materials/mat_window.tres" id="8_win"]
 [ext_resource type="Material" path="res://materials/mat_dim_glass.tres" id="9_dim"]
 [ext_resource type="Material" path="res://materials/mat_demon.tres" id="10_demon"]
+
+; Environment: dim interior. Money-shot window is the only bright ember.
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 1
+background_color = Color(0.04, 0.04, 0.05, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.40, 0.40, 0.44, 1)
+ambient_light_energy = 0.32
+tonemap_mode = 3
+glow_enabled = true
+glow_intensity = 0.45
+glow_bloom = 0.12
+glow_hdr_threshold = 0.8
+
+[node name="Level" type="Node3D"]
+editor_description = "GATE 1 v2 office greybox. L-shaped circulation. Architecture / FutureAssetSlots / DemonSpots."
