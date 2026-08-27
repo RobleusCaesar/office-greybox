@@ -292,8 +292,10 @@ func _breakroom(level: Node3D) -> void:
 	# Fallen guard — NW corner (doorway wall × crawl-hole wall). Lie as authored so
 	# the back is on the carpet (a 90° roll arched the torso and read as floating).
 	# Yaw tucks the shoulder into the north plaster; X keeps him on the west wall.
-	var guard := _instance_glb(br, "res://models/fallen_security_guard.glb", "FallenSecurityGuard", Vector3(0.52, 0.48, 5.58), Vector3(0, 16, 0), Vector3.ONE)
+	var guard := _instance_glb(br, "res://models/fallen_security_guard.glb", "FallenSecurityGuard", Vector3(0.44, 0.48, 5.66), Vector3(0, 14, 0), Vector3.ONE)
 	_seat_on_floor(guard)
+	# Authored sit/slump leaves a visible air gap once AABB-seated — plant him.
+	guard.position.y -= 0.14
 	_box_collision(guard, Vector3(0.70, 0.36, 1.70), Vector3(0.0, 0.0, 0.0))
 	# Cubicle keyboard + reception desk parts
 	var hall := _find(level, "FutureAssetSlots/EastHall")
@@ -583,9 +585,9 @@ func _bathroom(level: Node3D) -> void:
 	_box(bath, "Soap", Vector3(0.08, 0.12, 0.06), Vector3(-0.2, 0.92, 6.90), _tex_mat("res://textures/tex_porcelain.png", Color(0.7, 0.75, 0.6)), Vector3.ZERO, false)
 	# Silver glass + wood frame. Compat has no IBL — skip the dark metal texture,
 	# keep metallic at the QA floor, and emit enough silver that the pane cannot crush to black.
-	var silver := _tex_mat("", Color(0.88, 0.91, 0.95), 0.44, 0.55, 0.78)
-	silver.metallic_specular = 0.28
-	silver.emission = Color(0.70, 0.75, 0.82)
+	var silver := _tex_mat("", Color(0.74, 0.78, 0.84), 0.38, 0.55, 0.40)
+	silver.metallic_specular = 0.30
+	silver.emission = Color(0.58, 0.62, 0.70)
 	_box(bath, "MirrorWide", Vector3(2.85, 1.15, 0.018), Vector3(0.15, 1.72, 6.695), silver, Vector3.ZERO, false)
 	var frame := _mat("res://materials/mat_walnut.tres")
 	if frame == null:
@@ -1230,7 +1232,7 @@ func _fix_floors(level: Node3D) -> void:
 		eh.size = Vector3(13.00, 0.2000, 3.00)
 	var carpet := _office_carpet()
 	# Carpet doormat in the 1.2 m opening. Covers the hall/bath edge and the wall-foot z-fight.
-	_box(level, "BathDoorThreshold", Vector3(0.52, 0.034, 1.24), Vector3(2.00, 0.018, 9.00), carpet)
+	_box(level, "BathDoorThreshold", Vector3(0.62, 0.036, 1.28), Vector3(1.92, 0.019, 9.00), carpet)
 	var sf := _find(level, "Architecture/Floors/SupplyClosetFloor") as CSGBox3D
 	if sf:
 		var se := sf.position.x + sf.size.x * 0.5

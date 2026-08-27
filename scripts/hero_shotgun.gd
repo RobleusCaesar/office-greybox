@@ -164,13 +164,13 @@ func _steel() -> StandardMaterial3D:
 
 func _skin() -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
-	m.albedo_color = Color(0.78, 0.56, 0.40)
+	m.albedo_color = Color(0.72, 0.50, 0.36)
 	m.albedo_texture = load("res://textures/hero/tex-hand-tan.png")
 	m.roughness = 0.58
 	m.metallic = 0.0
 	m.emission_enabled = true
-	m.emission = Color(0.55, 0.38, 0.24)
-	m.emission_energy_multiplier = 0.22
+	m.emission = Color(0.48, 0.32, 0.20)
+	m.emission_energy_multiplier = 0.10
 	m.render_priority = 2
 	return m
 
@@ -333,8 +333,8 @@ func _hand(parent: Node3D, name: String, pos: Vector3, skin: Material, left: boo
 			var band := MeshInstance3D.new()
 			band.name = "WeddingBand"
 			var torus := TorusMesh.new()
-			torus.inner_radius = 0.0036
-			torus.outer_radius = 0.0052
+			torus.inner_radius = 0.0048
+			torus.outer_radius = 0.0074
 			torus.rings = 10
 			torus.ring_segments = 8
 			band.mesh = torus
