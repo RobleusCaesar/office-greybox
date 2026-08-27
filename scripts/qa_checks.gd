@@ -20,13 +20,41 @@ func _run() -> void:
 		errors.append("jump action still present")
 	if not InputMap.has_action("interact"):
 		errors.append("missing interact action")
-	if not FileAccess.file_exists("res://textures/hero/title-street-fire.png"):
-		errors.append("title-street-fire.png missing")
+	var app_name := str(ProjectSettings.get_setting("application/config/name"))
+	if app_name != "HELLFALL":
+		errors.append("project name is %s, expected HELLFALL" % app_name)
+	var stretch_mode := str(ProjectSettings.get_setting("display/window/stretch/mode"))
+	if stretch_mode != "canvas_items":
+		errors.append("stretch mode is %s" % stretch_mode)
+	var stretch_aspect := str(ProjectSettings.get_setting("display/window/stretch/aspect"))
+	if stretch_aspect != "expand":
+		errors.append("stretch aspect is %s, expected expand" % stretch_aspect)
+	if not FileAccess.file_exists("res://textures/hero/title-17th-street.png"):
+		errors.append("title-17th-street.png missing")
+	if not FileAccess.file_exists("res://textures/hero/denver-fire-capitol-demon.png"):
+		errors.append("denver-fire-capitol-demon.png missing")
+	if not FileAccess.file_exists("res://textures/hero/aurum-logo.png"):
+		errors.append("aurum-logo.png missing")
 	if not FileAccess.file_exists("res://textures/hero/shotgun-walnut-steel.png"):
 		errors.append("shotgun-walnut-steel.png missing")
+	if not FileAccess.file_exists("res://audio/haunt_bed.wav"):
+		errors.append("haunt_bed.wav missing")
+	if not FileAccess.file_exists("res://audio/shotgun_fire.wav"):
+		errors.append("shotgun_fire.wav missing")
 	var title_src := FileAccess.get_file_as_string("res://scripts/title.gd")
 	if title_src.contains("denver-fire-vista"):
 		errors.append("title must not use denver-fire-vista")
+	if title_src.contains("backdrop.scale") or title_src.contains("func _process"):
+		errors.append("title Ken Burns / _process scale must be gone")
+	var title_scn := FileAccess.get_file_as_string("res://scenes/title.tscn")
+	if not title_scn.contains("title-17th-street.png"):
+		errors.append("title.tscn must use title-17th-street.png")
+	if not title_scn.contains("stretch_mode = 6"):
+		errors.append("title backdrop must be COVER (6)")
+	if not title_scn.contains("HELLFALL"):
+		errors.append("title wordmark must be HELLFALL")
+	if not title_scn.contains("Chapter 1: The Fall"):
+		errors.append("title tag missing")
 	var title_ps: PackedScene = load("res://scenes/title.tscn")
 	if title_ps == null:
 		errors.append("could not load title.tscn")
@@ -55,10 +83,41 @@ func _run() -> void:
 		errors.append("ExteriorDiorama missing")
 	if level.get_node_or_null("Demon_02") != null:
 		errors.append("second demon must not exist")
+	var ember := level.get_node_or_null("Ember_01") as Node3D
+	if ember == null:
+		errors.append("Ember_01 missing at DemonSpot_Reception")
+	else:
+		var ep := ember.global_position
+		if absf(ep.x - 21.55) > 0.40 or absf(ep.z - 11.55) > 0.40:
+			errors.append("Ember_01 at %s, expected ~21.55, 0, 11.55" % ep)
+		var yaw := ember.rotation_degrees.y
+		if absf(yaw + 90.0) > 8.0 and absf(absf(yaw) - 270.0) > 8.0:
+			errors.append("Ember_01 yaw %s, expected -90" % yaw)
+		if absf(ember.scale.x - 1.0) > 0.05:
+			errors.append("Ember_01 scale %s, expected 1.0" % ember.scale)
+		if ember.get_node_or_null("EmberDemon") == null and ember.get_node_or_null("EmberPlaceholder") == null:
+			errors.append("Ember_01 has no mesh")
+	if level.get_node_or_null("DemonSpots/DemonSpot_Reception") == null:
+		errors.append("DemonSpot_Reception missing")
 	if level.get_node_or_null("FutureAssetSlots/BreakRoom/BreakRoomTV") == null:
 		errors.append("break room TV missing")
-	if level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive") == null:
+	var dead_ex := level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive")
+	if dead_ex == null:
 		errors.append("dead executive missing")
+	elif dead_ex is Node3D:
+		var dn := dead_ex as Node3D
+		var dp := dn.position
+		if absf(dp.x - 32.05) > 0.20 or absf(dp.y - 0.27) > 0.12 or absf(dp.z - 11.45) > 0.20:
+			errors.append("dead executive at %s, expected (32.05, 0.27, 11.45)" % dp)
+		var dr := dn.rotation_degrees
+		if absf(dr.x - 180.0) > 2.0 or absf(dr.y - 18.0) > 2.0:
+			errors.append("dead executive rot %s, expected (180, 18, 0)" % dr)
+		if absf(dn.scale.x - 1.0) > 0.05:
+			errors.append("dead executive scale %s, expected 1.0" % dn.scale)
+		if dp.z < 9.0:
+			errors.append("dead executive blocks the south-entry path")
+	if level.get_node_or_null("FutureAssetSlots/CEOOffice/CeoBloodPool") == null:
+		errors.append("CEO blood pool missing")
 	var tv_src := FileAccess.get_file_as_string("res://scripts/tv.gd")
 	if not tv_src.contains("tv_not_a_test.png"):
 		errors.append("TV missing THIS IS NOT A TEST card")
@@ -74,8 +133,14 @@ func _run() -> void:
 			var tp := ""
 			if bm.albedo_texture:
 				tp = bm.albedo_texture.resource_path
-			if not tp.contains("denver-fire-vista"):
-				errors.append("diorama backdrop is %s, expected denver-fire-vista" % tp)
+			if not tp.contains("denver-fire-capitol-demon") and not tp.contains("denver-fire-vista"):
+				errors.append("diorama backdrop is %s, expected denver-fire-capitol-demon" % tp)
+		var faces := 0
+		for fn in ["Backdrop", "FaceN", "FaceS", "FaceFloor", "FaceRoof"]:
+			if dia.get_node_or_null(fn) != null:
+				faces += 1
+		if faces < 5:
+			errors.append("diorama missing city faces (%d/5)" % faces)
 		if dia.find_child("SmokeParticles", true, false) == null:
 			errors.append("diorama smoke particles missing")
 	var desk_n := level.get_node_or_null("FutureAssetSlots/CEOOffice/ExecutiveDesk")
@@ -106,6 +171,45 @@ func _run() -> void:
 	var env_node := level.get_node_or_null("WorldEnvironment") as WorldEnvironment
 	if env_node and env_node.environment and env_node.environment.sdfgi_enabled:
 		errors.append("SDFGI must stay off")
+	var nh := level.get_node_or_null("Architecture/Floors/NorthHallFloor") as CSGBox3D
+	if nh == null or nh.size.x < 2.95:
+		errors.append("north hall is not 3.0 m wide")
+	var eh := level.get_node_or_null("Architecture/Floors/EastHallFloor") as CSGBox3D
+	if eh == null or eh.size.z < 2.95:
+		errors.append("east hall is not 3.0 m wide")
+	var div := level.get_node_or_null("Architecture/Walls/ReceptionCEODivider") as CSGBox3D
+	if div == null:
+		errors.append("ReceptionCEODivider missing")
+	else:
+		if absf(div.position.x - 26.0) > 0.05:
+			errors.append("divider X is %s, expected 26" % div.position.x)
+		var z0 := div.position.z - div.size.z * 0.5
+		var z1 := div.position.z + div.size.z * 0.5
+		if z0 > 8.60 or z1 < 14.40:
+			errors.append("divider Z span %s–%s, expected 8.53–14.48" % [z0, z1])
+	var rec_desk := level.get_node_or_null("FutureAssetSlots/Reception/ReceptionDesk2") as Node3D
+	if rec_desk == null:
+		errors.append("ReceptionDesk2 missing")
+	else:
+		var ry := rec_desk.rotation_degrees.y
+		if absf(ry - 180.0) > 2.0 and absf(ry + 180.0) > 2.0:
+			errors.append("reception desk yaw %s, expected 180" % ry)
+		var top := rec_desk.get_node_or_null("ReceptionDeskTop") as MeshInstance3D
+		if top and top.mesh is BoxMesh:
+			var top_y := top.position.y + (top.mesh as BoxMesh).size.y * 0.5
+			if absf(top_y - 0.86) > 0.04:
+				errors.append("reception counter height %.2f, expected 0.86" % top_y)
+		if rec_desk.get_node_or_null("LeatherBack") == null:
+			errors.append("reception chair missing on the wall side")
+	if level.get_node_or_null("FutureAssetSlots/Reception/AurumPlate") == null:
+		errors.append("AURUM plate missing")
+	var player_hud := level.get_node_or_null("Player")
+	if player_hud:
+		var mark := player_hud.find_child("TitleMark", true, false) as Label
+		if mark == null or mark.text != "HELLFALL":
+			errors.append("HUD TitleMark must be HELLFALL")
+	if level.get_node_or_null("HauntBed") == null:
+		errors.append("haunt bed loop missing")
 	var pane := level.get_node_or_null("FutureAssetSlots/CEOOffice/MoneyShotWindow/Pane_02") as CSGBox3D
 	if pane and pane.material is StandardMaterial3D:
 		if (pane.material as StandardMaterial3D).albedo_color.a > 0.35:
@@ -149,6 +253,31 @@ func _run() -> void:
 			var demon_src := FileAccess.get_file_as_string("res://scripts/demon.gd")
 			if demon_src.contains("_build_ashwight") or demon_src.contains("CapsuleMesh"):
 				errors.append("scripts/demon.gd still builds a capsule Ashwight")
+	var ember_src := FileAccess.get_file_as_string("res://scripts/ember.gd")
+	if ember_src.is_empty():
+		errors.append("scripts/ember.gd missing")
+	else:
+		if not ember_src.contains("Idle_8"):
+			errors.append("ember idle clip must be Idle_8")
+		if not ember_src.contains("Walking"):
+			errors.append("ember chase clip must be Walking")
+		if not ember_src.contains("CLIP_ATTACK := \"Attack\""):
+			errors.append("ember attack clip must be Attack")
+		if not ember_src.contains("Shot_and_Fall_Backward"):
+			errors.append("ember death clip must be Shot_and_Fall_Backward")
+		if not ember_src.contains("Hit_Reaction"):
+			errors.append("ember hit clip must be Hit_Reaction")
+		if not ember_src.contains("0.55"):
+			errors.append("ember emission cap must be 0.55")
+		if ember_src.contains("look_at("):
+			errors.append("ember must face with atan2, not look_at")
+		if ember_src.contains("Axe_Spin_Attack"):
+			errors.append("ember must not use stalker Axe_Spin_Attack")
+		var ember_die := ember_src.find("func _die")
+		if ember_die >= 0:
+			var ember_chunk := ember_src.substr(ember_die, 360)
+			if ember_chunk.contains("queue_free("):
+				errors.append("death must not queue_free the ember")
 
 	var space: PhysicsDirectSpaceState3D = level.get_world_3d().direct_space_state
 	var window := Vector3(38.1, 1.7, 11.5)

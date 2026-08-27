@@ -36,8 +36,8 @@ func _process(_dt: float) -> bool:
 		return true
 	DirAccess.make_dir_recursive_absolute("/opt/cursor/artifacts")
 	DirAccess.make_dir_recursive_absolute("/workspace/export/previews")
-	img.save_png("/opt/cursor/artifacts/title_menu.png")
-	img.save_png("/workspace/export/previews/title-menu-shot.png")
+	img.save_png("/opt/cursor/artifacts/title_hellfall.png")
+	img.save_png("/workspace/export/previews/title-hellfall.png")
 	print("CAPTURE_OK title_menu.png %dx%d" % [img.get_width(), img.get_height()])
 	quit(0)
 	return true

@@ -106,12 +106,12 @@ editor_description = "ARCHITECTURE — break room floor 7.0 x 6.5 m"
 
 [node name="NorthHallFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, -0.1000, 8.7500)
-size = Vector3(2.2000, 0.2000, 4.7000)
+size = Vector3(3.2000, 0.2000, 4.7000)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("1_floor")
-editor_description = "ARCHITECTURE — north hall floor 2.0 x 4.5 m (short)"
+editor_description = "ARCHITECTURE — north hall floor 3.0 x 4.5 m (X 2.0–5.0)"
 
 [node name="BathroomFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7500, -0.1000, 9.8000)
@@ -133,21 +133,21 @@ editor_description = "ARCHITECTURE — supply closet floor 2.5 x 2.6 m (closed)"
 
 [node name="CornerFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, -0.1000, 12.0000)
-size = Vector3(2.2000, 0.2000, 2.2000)
+size = Vector3(3.2000, 0.2000, 3.2000)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("1_floor")
-editor_description = "ARCHITECTURE — blind corner floor 2.0 x 2.0 m. Hall turns east."
+editor_description = "ARCHITECTURE — blind corner floor 3.0 x 3.0 m. Hall turns east."
 
 [node name="EastHallFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2500, -0.1000, 12.0000)
-size = Vector3(13.7000, 0.2000, 2.2000)
+size = Vector3(13.7000, 0.2000, 3.2000)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("1_floor")
-editor_description = "ARCHITECTURE — east hall floor 13.5 x 2.0 m"
+editor_description = "ARCHITECTURE — east hall floor 13.5 x 3.0 m (Z 10.5–13.5)"
 
 [node name="CubicleFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2500, -0.1000, 9.4000)
@@ -204,7 +204,7 @@ material = ExtResource("3_ceil")
 
 [node name="NorthHallCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 3.1000, 8.7500)
-size = Vector3(2.4000, 0.2000, 4.9000)
+size = Vector3(3.4000, 0.2000, 4.9000)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
@@ -228,7 +228,7 @@ material = ExtResource("3_ceil")
 
 [node name="CornerCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 3.1000, 12.0000)
-size = Vector3(2.4000, 0.2000, 2.4000)
+size = Vector3(3.4000, 0.2000, 3.4000)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
@@ -236,7 +236,7 @@ material = ExtResource("3_ceil")
 
 [node name="EastHallCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2500, 3.1000, 12.0000)
-size = Vector3(13.9000, 0.2000, 2.4000)
+size = Vector3(13.9000, 0.2000, 3.4000)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
@@ -333,13 +333,13 @@ use_collision = false
 editor_description = "Open doorway 1.0 x 2.1 m."
 
 [node name="NorthHallWest" type="CSGBox3D" parent="Architecture/Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5000, 1.5000, 8.7500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0000, 1.5000, 8.7500)
 size = Vector3(0.1600, 3.0000, 4.5000)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("2_wall")
-editor_description = "ARCHITECTURE — north hall west. Bathroom door cut ~1.2 m at Z 8.4–9.6."
+editor_description = "ARCHITECTURE — north hall west at X=2.0. Bathroom door cut Z 8.39–9.61."
 
 [node name="BathroomDoorCut" type="CSGBox3D" parent="Architecture/Walls/NorthHallWest"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, -0.4500, 0.2500)
@@ -349,13 +349,13 @@ use_collision = false
 editor_description = "Bathroom door 1.2 x 2.1 m."
 
 [node name="NorthHallEast" type="CSGBox3D" parent="Architecture/Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5000, 1.5000, 8.7500)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.0000, 1.5000, 8.7500)
 size = Vector3(0.1600, 3.0000, 4.5000)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("2_wall")
-editor_description = "ARCHITECTURE — north hall east. Supply door cut Z 8.05–8.95, plugged by locked slab."
+editor_description = "ARCHITECTURE — north hall east at X=5.0. Supply door cut plugged by locked slab."
 
 [node name="SupplyDoorCut" type="CSGBox3D" parent="Architecture/Walls/NorthHallEast"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, -0.4500, -0.2500)
@@ -419,8 +419,8 @@ material = ExtResource("2_wall")
 editor_description = "ARCHITECTURE — supply closet north."
 
 [node name="CornerWest" type="CSGBox3D" parent="Architecture/Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5000, 1.5000, 12.0000)
-size = Vector3(0.1600, 3.0000, 2.1600)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0000, 1.5000, 12.0000)
+size = Vector3(0.1600, 3.0000, 3.1600)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
@@ -428,8 +428,8 @@ material = ExtResource("2_wall")
 editor_description = "ARCHITECTURE — blind corner west. Hall cannot see east until the turn."
 
 [node name="CornerNorth" type="CSGBox3D" parent="Architecture/Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 1.5000, 13.0000)
-size = Vector3(2.1600, 3.0000, 0.1600)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 1.5000, 13.5000)
+size = Vector3(3.1600, 3.0000, 0.1600)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
@@ -437,13 +437,13 @@ material = ExtResource("2_wall")
 editor_description = "ARCHITECTURE — blind corner north. Forces the east turn."
 
 [node name="EastHallSouth" type="CSGBox3D" parent="Architecture/Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2500, 1.5000, 11.0000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2500, 1.5000, 10.5000)
 size = Vector3(13.6600, 3.0000, 0.1600)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("2_wall")
-editor_description = "ARCHITECTURE — east hall south. Cubicle opening + dead-office door/glass cuts."
+editor_description = "ARCHITECTURE — east hall south at Z=10.5. Cubicle opening + dead-office cuts."
 
 [node name="CubicleOpeningCut" type="CSGBox3D" parent="Architecture/Walls/EastHallSouth"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0000, 0.0000, 0.0000)
@@ -467,13 +467,13 @@ use_collision = false
 editor_description = "Conference glass front. Plugged by DeadOfficeGlass."
 
 [node name="EastHallNorth" type="CSGBox3D" parent="Architecture/Walls"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2500, 1.5000, 13.0000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.2500, 1.5000, 13.5000)
 size = Vector3(13.6600, 3.0000, 0.1600)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("2_wall")
-editor_description = "ARCHITECTURE — east hall north. Copy/mail alcove opening."
+editor_description = "ARCHITECTURE — east hall north at Z=13.5. Copy/mail alcove opening."
 
 [node name="CopyOpeningCut" type="CSGBox3D" parent="Architecture/Walls/EastHallNorth"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5000, 0.0000, 0.0000)
@@ -573,11 +573,11 @@ material = ExtResource("2_wall")
 editor_description = "ARCHITECTURE — reception west. Hall mouth cut Z 11.0–13.0."
 
 [node name="HallMouthCut" type="CSGBox3D" parent="Architecture/Walls/ReceptionWest"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.5000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
 operation = 2
-size = Vector3(0.4000, 3.1000, 2.1000)
+size = Vector3(0.4000, 3.1000, 3.1200)
 use_collision = false
-editor_description = "East hall opens into reception."
+editor_description = "East hall opens into reception. 3.0 m mouth Z 10.5–13.5."
 
 [node name="ReceptionSouth" type="CSGBox3D" parent="Architecture/Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.0000, 1.5000, 6.5000)
@@ -599,12 +599,12 @@ editor_description = "ARCHITECTURE — reception north."
 
 [node name="ReceptionCEODivider" type="CSGBox3D" parent="Architecture/Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.0000, 1.5000, 11.5000)
-size = Vector3(0.2200, 3.0000, 6.1000)
+size = Vector3(0.2200, 3.0000, 5.9500)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("2_wall")
-editor_description = "ARCHITECTURE — SOLID wall behind the reception desk. Covers MoneyShotWindow Z 8.8–14.2. Blocks LOS from the east hall (and spawn / north hall). Walk around south (Z 6.6–8.5) or north (Z 14.5–16.4)."
+editor_description = "ARCHITECTURE — SOLID wall behind the reception desk. X=26, solid Z 8.53–14.48. Side openings only. Blocks LOS from spawn / halls to the window."
 
 [node name="CEOSouth" type="CSGBox3D" parent="Architecture/Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.0000, 1.5000, 6.5000)
@@ -687,8 +687,8 @@ collision_mask = 1
 material = ExtResource("7_frame")
 
 [node name="OpenDoorway_NorthHallToBathroom" type="Node3D" parent="Architecture/Openings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5000, 0.0000, 9.0000)
-editor_description = "Bathroom door 1.2 x 2.1 m. Frame only. X=2.5, Z 8.4–9.6."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0000, 0.0000, 9.0000)
+editor_description = "Bathroom door 1.2 x 2.1 m. Frame only. X=2.0, Z 8.39–9.61."
 
 [node name="Jamb_L" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_NorthHallToBathroom"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.0500, -0.6300)
@@ -715,8 +715,8 @@ collision_mask = 1
 material = ExtResource("7_frame")
 
 [node name="OpenDoorway_EastHallToCubicle" type="Node3D" parent="Architecture/Openings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2500, 0.0000, 11.0000)
-editor_description = "Cubicle alcove opening. South of east hall. DemonSpot_01 choke just inside."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2500, 0.0000, 10.5000)
+editor_description = "Cubicle alcove opening. South of east hall at Z=10.5. DemonSpot_01 choke just inside."
 
 [node name="Jamb_L" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_EastHallToCubicle"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8000, 1.5000, 0.0000)
@@ -743,8 +743,8 @@ collision_mask = 1
 material = ExtResource("7_frame")
 
 [node name="OpenDoorway_EastHallToCopy" type="Node3D" parent="Architecture/Openings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.7500, 0.0000, 13.0000)
-editor_description = "Copy/mail alcove opening. North of east hall. Enterable."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.7500, 0.0000, 13.5000)
+editor_description = "Copy/mail alcove opening. North of east hall at Z=13.5. Enterable."
 
 [node name="Jamb_L" type="CSGBox3D" parent="Architecture/Openings/OpenDoorway_EastHallToCopy"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3000, 1.5000, 0.0000)
@@ -772,10 +772,10 @@ material = ExtResource("7_frame")
 
 [node name="Opening_HallToReception" type="Node3D" parent="Architecture/Openings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.0000, 0.0000, 12.0000)
-editor_description = "East hall mouth into reception at X=18, Z 11.0–13.0."
+editor_description = "East hall mouth into reception at X=18, Z 10.5–13.5."
 
 [node name="Jamb_L" type="CSGBox3D" parent="Architecture/Openings/Opening_HallToReception"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, -1.0800)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, -1.5500)
 size = Vector3(0.1600, 3.0000, 0.1000)
 use_collision = true
 collision_layer = 1
@@ -783,7 +783,7 @@ collision_mask = 1
 material = ExtResource("7_frame")
 
 [node name="Jamb_R" type="CSGBox3D" parent="Architecture/Openings/Opening_HallToReception"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, 1.0800)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.5000, 1.5500)
 size = Vector3(0.1600, 3.0000, 0.1000)
 use_collision = true
 collision_layer = 1
@@ -792,7 +792,7 @@ material = ExtResource("7_frame")
 
 [node name="Head" type="CSGBox3D" parent="Architecture/Openings/Opening_HallToReception"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.9200, 0.0000)
-size = Vector3(0.1600, 0.1000, 2.2600)
+size = Vector3(0.1600, 0.1000, 3.2000)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
@@ -1235,8 +1235,8 @@ collision_mask = 1
 material = ExtResource("5_furn")
 
 [node name="LockedDoor_Supply" type="Node3D" parent="FutureAssetSlots/SupplyCloset"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5000, 0.0000, 8.5000)
-editor_description = "Locked supply door. Slab plugs the north-hall cut. Cannot enter."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.0000, 0.0000, 8.5000)
+editor_description = "Locked supply door. Slab plugs the north-hall cut at X=5.0. Cannot enter."
 
 [node name="Frame_L" type="CSGBox3D" parent="FutureAssetSlots/SupplyCloset/LockedDoor_Supply"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.0500, -0.4600)
@@ -2045,9 +2045,20 @@ use_collision = false
 material = ExtResource("10_demon")
 editor_description = "Low marker. Collision OFF. Walk through."
 
+[node name="DemonSpot_Reception" type="Node3D" parent="DemonSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.5500, 0.0000, 11.5500)
+editor_description = "Ember Demon — west of the AURUM desk. Yaw -90, scale 1.0. Stalker stays at DemonSpot_01."
+
+[node name="Decal" type="CSGBox3D" parent="DemonSpots/DemonSpot_Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0150, 0.0000)
+size = Vector3(1.2500, 0.0300, 1.2500)
+use_collision = false
+material = ExtResource("10_demon")
+editor_description = "Dull-red floor decal. Collision OFF."
+
 [node name="DemonSpot_02" type="Node3D" parent="DemonSpots"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.5500, 0.0000, 7.5500)
-editor_description = "SECOND demon — attack + interest. Arena at the CEO south threshold, beside the side opening. After the corner, as the window hits. Punishes the turn into the money shot."
+editor_description = "UNUSED — CEO south threshold. Do not spawn Demon_02 here. Ember is at DemonSpot_Reception."
 
 [node name="Decal" type="CSGBox3D" parent="DemonSpots/DemonSpot_02"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0150, 0.0000)
@@ -2085,12 +2096,22 @@ omni_attenuation = 1.150
 
 [node name="NorthHallLight" type="OmniLight3D" parent="Lights"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 2.6000, 8.8000)
-editor_description = "Short north hall."
-light_color = Color(0.90, 0.90, 0.95, 1)
-light_energy = 1.100
+editor_description = "North hall. Brighter so the bathroom and turn read."
+light_color = Color(0.96, 0.94, 0.88, 1)
+light_energy = 2.350
 light_specular = 0.30
 shadow_enabled = false
-omni_range = 5.500
+omni_range = 6.800
+omni_attenuation = 1.150
+
+[node name="NorthHallLight_02" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 2.5500, 11.4000)
+editor_description = "Extra hall light at the blind corner."
+light_color = Color(0.96, 0.94, 0.88, 1)
+light_energy = 1.850
+light_specular = 0.30
+shadow_enabled = false
+omni_range = 6.200
 omni_attenuation = 1.150
 
 [node name="BathroomLight" type="OmniLight3D" parent="Lights"]
@@ -2126,8 +2147,8 @@ omni_attenuation = 1.150
 [node name="EastHallLight_01" type="OmniLight3D" parent="Lights"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.5000, 2.6000, 12.0000)
 editor_description = "East hall west stretch / cubicle mouth."
-light_color = Color(0.90, 0.90, 0.94, 1)
-light_energy = 1.200
+light_color = Color(0.94, 0.92, 0.86, 1)
+light_energy = 1.650
 light_specular = 0.30
 shadow_enabled = false
 omni_range = 6.000
@@ -2184,20 +2205,20 @@ omni_range = 8.500
 omni_attenuation = 1.150
 
 [node name="ReceptionDeskLight" type="OmniLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.8000, 2.2000, 11.5000)
-editor_description = "Desk lamp-ish."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.4000, 2.3500, 11.5000)
+editor_description = "Desk lamp-ish. Kept off the AURUM plate so the gold type reads."
 light_color = Color(1.00, 0.90, 0.75, 1)
-light_energy = 0.700
-light_specular = 0.30
+light_energy = 0.420
+light_specular = 0.12
 shadow_enabled = false
-omni_range = 3.500
+omni_range = 3.200
 omni_attenuation = 1.150
 
 [node name="CEOLight" type="OmniLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.5000, 2.7000, 11.5000)
-editor_description = "Modest CEO fill. WindowLight still wins."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.0500, 2.4000, 11.4500)
+editor_description = "Modest CEO fill so the mid-office body reads. WindowLight still wins."
 light_color = Color(0.95, 0.88, 0.78, 1)
-light_energy = 1.400
+light_energy = 2.100
 light_specular = 0.30
 shadow_enabled = false
 omni_range = 8.000

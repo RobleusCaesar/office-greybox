@@ -28,6 +28,7 @@ func _ready() -> void:
 	_sting_player.stream = load("res://audio/window_sting.wav")
 	_sting_player.volume_db = -3.0
 	add_child(_sting_player)
+	_start_haunt()
 	if _player:
 		_player.died.connect(_on_player_died)
 	if _window_light:
@@ -48,6 +49,24 @@ func _process(delta: float) -> void:
 			_show_win()
 	else:
 		_win_time = 0.0
+
+
+func _start_haunt() -> void:
+	if not FileAccess.file_exists("res://audio/haunt_bed.wav"):
+		return
+	var bed := AudioStreamPlayer.new()
+	bed.name = "HauntBed"
+	var stream := load("res://audio/haunt_bed.wav")
+	if stream is AudioStreamWAV:
+		var wav := stream as AudioStreamWAV
+		wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		wav.loop_begin = 0
+		wav.loop_end = wav.data.size() / 2
+	bed.stream = stream
+	bed.volume_db = -24.0
+	bed.autoplay = true
+	add_child(bed)
+	bed.play()
 
 
 func _player_at_window() -> bool:
@@ -105,17 +124,30 @@ func _keep_walking() -> void:
 func _spawn_demon() -> void:
 	var packed: PackedScene = load("res://scenes/demon.tscn")
 	var s1 := get_node_or_null("DemonSpots/DemonSpot_01") as Node3D
-	if s1 == null:
-		return
-	var d1: CharacterBody3D = packed.instantiate()
-	d1.name = "Demon_01"
-	d1.max_hp = 120.0
-	d1.move_speed = 3.15
-	d1.attack_damage = 18.0
-	d1.attack_range = 1.5
-	d1.aggro_range = 6.8
-	d1.position = s1.global_position
-	add_child(d1)
+	if packed and s1:
+		var d1: CharacterBody3D = packed.instantiate()
+		d1.name = "Demon_01"
+		d1.max_hp = 120.0
+		d1.move_speed = 3.15
+		d1.attack_damage = 18.0
+		d1.attack_range = 1.5
+		d1.aggro_range = 6.8
+		d1.position = s1.global_position
+		add_child(d1)
+	# Ember Demon — second live enemy. Do not spawn Demon_02 at the CEO door.
+	var ember_ps: PackedScene = load("res://scenes/ember.tscn")
+	var s_rec := get_node_or_null("DemonSpots/DemonSpot_Reception") as Node3D
+	if ember_ps:
+		var ember: CharacterBody3D = ember_ps.instantiate()
+		ember.name = "Ember_01"
+		ember.max_hp = 120.0
+		ember.scale = Vector3.ONE
+		if s_rec:
+			ember.position = s_rec.global_position
+		else:
+			ember.position = Vector3(21.55, 0.0, 11.55)
+		ember.rotation_degrees = Vector3(0, -90, 0)
+		add_child(ember)
 
 
 func _style_title(lab: Label, size: int, color: Color) -> void:
@@ -148,7 +180,7 @@ func _build_overlays() -> void:
 	menu_d.pressed.connect(_menu)
 	_death_ui.visible = false
 
-	_win_ui = _card(layer, "THE WINDOW")
+	_win_ui = _card(layer, "HELLFALL")
 	var sub := Label.new()
 	sub.text = "Denver is burning."
 	_style_title(sub, 18, Color(0.82, 0.55, 0.32, 0.95))
