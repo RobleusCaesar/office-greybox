@@ -170,15 +170,14 @@ func _headroom_blocked(height: float) -> bool:
 	var space := world.direct_space_state
 	if space == null:
 		return true
-	var radius := 0.30
-	if _col and _col.shape is CapsuleShape3D:
-		radius = minf(0.30, (_col.shape as CapsuleShape3D).radius)
-	var sphere := SphereShape3D.new()
-	sphere.radius = radius
-	var cy := maxf(CRAWL_CAP + radius + 0.02, height - radius)
+	# Test the grown volume above the crawl capsule. A head-only probe
+	# misses the thin VentDuct ceiling (bottom at Y=0.95).
+	var extra := height - CRAWL_CAP
+	var box := BoxShape3D.new()
+	box.size = Vector3(0.40, extra, 0.40)
 	var q := PhysicsShapeQueryParameters3D.new()
-	q.shape = sphere
-	q.transform = Transform3D(Basis(), global_position + Vector3(0.0, cy, 0.0))
+	q.shape = box
+	q.transform = Transform3D(Basis(), global_position + Vector3(0.0, CRAWL_CAP + extra * 0.5, 0.0))
 	q.collision_mask = collision_mask
 	q.exclude = [get_rid()]
 	q.margin = 0.02

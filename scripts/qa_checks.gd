@@ -665,7 +665,9 @@ func _crawl_along(player: Node, from: Vector3, to: Vector3, label: String, error
 	var reached := false
 	var stuck := 0
 	var last := body.global_position
-	for _i in 160:
+	# Tight-loop move_and_slide steps are smaller than 1/60 * speed.
+	# 480 is enough to clear kitchen lip + the 2.6 m duct both ways.
+	for _i in 480:
 		var flat := to - body.global_position
 		flat.y = 0.0
 		if flat.length() < 0.42:
@@ -677,9 +679,9 @@ func _crawl_along(player: Node, from: Vector3, to: Vector3, label: String, error
 		body.velocity.x = dir.x * speed
 		body.velocity.z = dir.z * speed
 		body.move_and_slide()
-		if body.global_position.distance_to(last) < 0.002:
+		if body.global_position.distance_to(last) < 0.001:
 			stuck += 1
-			if stuck >= 12:
+			if stuck >= 24:
 				break
 		else:
 			stuck = 0
