@@ -239,7 +239,7 @@ func _physics_process(delta: float) -> void:
 	_camera.rotation_degrees.x = _kick.x * 57.3
 	_camera.rotation_degrees.y = _kick.y * 57.3
 	if _weapon_root:
-		_weapon_root.position = Vector3(0.20, -0.22, -0.16) + Vector3(0.0, _kick.x * 0.22, _kick.x * 0.38)
+		_weapon_root.position = Vector3(0.22, -0.20, -0.24) + Vector3(0.0, _kick.x * 0.22, _kick.x * 0.38)
 		_weapon_root.rotation_degrees.x = -10.0 - _kick.x * 58.0
 	_update_prompt()
 
@@ -473,7 +473,7 @@ func _box(parent: Node3D, size: Vector3, pos: Vector3, color: Color, wood: bool 
 func _build_weapons() -> void:
 	_weapon_root = Node3D.new()
 	_weapon_root.name = "WeaponRoot"
-	_weapon_root.position = Vector3(0.20, -0.22, -0.16)
+	_weapon_root.position = Vector3(0.22, -0.20, -0.24)
 	_camera.add_child(_weapon_root)
 
 	_hero_shotgun = (load("res://scripts/hero_shotgun.gd") as GDScript).new()

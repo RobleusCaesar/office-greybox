@@ -564,6 +564,8 @@ func _run() -> void:
 	var player_src_vm := FileAccess.get_file_as_string("res://scripts/player.gd")
 	if player_src_vm.contains("Vector3(0.18, -0.16, -0.34)"):
 		errors.append("weapon root still at the old forward pose — pull the shotgun back")
+	if player_src_vm.contains("Vector3(0.20, -0.22, -0.16)"):
+		errors.append("weapon root z=-0.16 clips the Meshy grip behind the near plane")
 	if FileAccess.file_exists("res://scenes/_check_audio.tscn") or FileAccess.file_exists("res://scenes/_ceo_rot_proof.tscn"):
 		errors.append("debug helper scenes must not ship")
 	var pane := level.get_node_or_null("FutureAssetSlots/CEOOffice/MoneyShotWindow/Pane_02") as CSGBox3D
@@ -908,6 +910,17 @@ func _check_playtest_fix2(level: Node, errors: PackedStringArray) -> void:
 		var east := bath_fl.position.x + bath_fl.size.x * 0.5
 		if east > 2.02:
 			errors.append("bathroom floor still overlaps the hall (east X %s)" % east)
+		if bath_fl.material is StandardMaterial3D:
+			var bm := bath_fl.material as StandardMaterial3D
+			if bm.albedo_color.r < 0.55 or bm.albedo_color.g < 0.55:
+				errors.append("bathroom floor still reads as dark stone / void (albedo %s)" % bm.albedo_color)
+	var thresh := level.get_node_or_null("BathDoorThreshold") as MeshInstance3D
+	if thresh == null:
+		errors.append("BathDoorThreshold missing")
+	elif thresh.mesh is BoxMesh:
+		var ts: Vector3 = (thresh.mesh as BoxMesh).size
+		if ts.x < 0.38:
+			errors.append("bathroom threshold too narrow (%.2f) — need a carpet lip across X 1.80–2.20" % ts.x)
 	var bs := level.get_node_or_null("Architecture/Walls/BathroomSouth") as CSGBox3D
 	if bs:
 		var be := bs.position.x + bs.size.x * 0.5
@@ -940,10 +953,12 @@ func _check_playtest_fix2(level: Node, errors: PackedStringArray) -> void:
 			errors.append("mirror was shrunk to %.2f — keep the 2.85 m span" % mw)
 	if mirror and mirror.material_override is StandardMaterial3D:
 		var mm := mirror.material_override as StandardMaterial3D
-		if mm.albedo_color.r < 0.45 and mm.albedo_color.g < 0.45 and mm.albedo_color.b < 0.45:
+		if mm.albedo_color.r < 0.70 or mm.albedo_color.g < 0.70:
 			errors.append("mirror reads black")
 		if mm.metallic < 0.55:
 			errors.append("mirror is not silver / metallic glass")
+		if not mm.emission_enabled or mm.emission_energy_multiplier < 0.12:
+			errors.append("mirror needs a faint silver emission so compat lighting does not crush it to black")
 	if level.get_node_or_null("FutureAssetSlots/Bathroom/MirrorFrame_T") == null:
 		errors.append("mirror frame missing")
 	if level.get_node_or_null("FutureAssetSlots/Bathroom/Bench") is GeometryInstance3D:
@@ -975,8 +990,10 @@ func _check_playtest_fix2(level: Node, errors: PackedStringArray) -> void:
 		if band == null:
 			errors.append("wedding band missing on the left ring finger")
 		var smesh := player.find_child("ShotgunMesh", true, false) as Node3D
-		if smesh and smesh.position.z < 0.08:
+		if smesh and smesh.position.z < 0.06:
 			errors.append("ShotgunMesh still forward (z %s) — trigger/guard should sit at the screen edge" % smesh.position.z)
+		if smesh and smesh.position.z > 0.14:
+			errors.append("ShotgunMesh z %s is behind the camera near plane — hands vanish" % smesh.position.z)
 	var space: PhysicsDirectSpaceState3D = level.get_world_3d().direct_space_state
 	if space:
 		for sample in [Vector3(3.50, 0.95, 7.40), Vector3(12.50, 0.95, 12.00), Vector3(16.40, 0.95, 12.00)]:

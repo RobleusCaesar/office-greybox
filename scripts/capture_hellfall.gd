@@ -217,7 +217,7 @@ func _shot_level() -> void:
 			await process_frame
 		_save("mop-and-bucket.png")
 	# Playtest fix 2 stills.
-	_aim(level, Vector3(3.50, 1.48, 9.00), Vector3(2.00, 0.02, 9.00))
+	_aim(level, Vector3(3.35, 1.55, 9.00), Vector3(1.92, 0.12, 9.00))
 	for _j in 8:
 		await process_frame
 	_save("fix2-bath-threshold.png")
@@ -225,7 +225,7 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("fix2-hall-flush.png")
-	_aim(level, Vector3(0.15, 1.45, 9.20), Vector3(0.15, 1.20, 6.75))
+	_aim(level, Vector3(0.15, 1.48, 9.40), Vector3(0.15, 1.55, 6.72))
 	for _j in 8:
 		await process_frame
 	_save("fix2-vanity-mirror.png")
@@ -233,11 +233,11 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("fix2-urinals-back-wall.png")
-	_aim(level, Vector3(12.40, 1.50, 12.00), Vector3(17.40, 1.20, 12.00))
+	_aim(level, Vector3(11.20, 1.52, 12.00), Vector3(16.80, 1.25, 12.00))
 	for _j in 8:
 		await process_frame
 	_save("fix2-ember-approach.png")
-	_aim(level, Vector3(21.40, 1.55, 11.50), Vector3(24.80, 0.70, 11.50))
+	_aim(level, Vector3(22.60, 1.48, 10.20), Vector3(24.70, 0.55, 11.50))
 	for _j in 8:
 		await process_frame
 	_save("fix2-desk-flipped.png")
@@ -245,7 +245,7 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("fix2-ceo-facedown.png")
-	_aim(level, Vector3(2.20, 1.35, 4.10), Vector3(0.40, 0.25, 5.90))
+	_aim(level, Vector3(2.10, 1.32, 4.40), Vector3(0.40, 0.18, 5.85))
 	for _j in 8:
 		await process_frame
 	_save("fix2-guard-corner.png")

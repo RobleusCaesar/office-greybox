@@ -242,8 +242,8 @@ func _build() -> void:
 	for i in 6:
 		_box(_pump, "Rib_%d" % i, Vector3(0.052, 0.046, 0.01), Vector3(0.0, 0.0, -0.05 + i * 0.018), wood)
 
-	_hand(_pump, "HandL", Vector3(-0.036, -0.028, 0.016), skin, true)
-	_hand(self, "HandR", Vector3(0.028, -0.062, 0.118), skin, false)
+	_hand(_pump, "HandL", Vector3(-0.042, -0.032, 0.00), skin, true)
+	_hand(self, "HandR", Vector3(0.038, -0.048, 0.055), skin, false)
 
 	_muzzle = Node3D.new()
 	_muzzle.name = "Muzzle"
@@ -280,8 +280,10 @@ func _attach_meshy_visual() -> void:
 	inst.name = "ShotgunMesh"
 	inst.rotation_degrees = Vector3(0, -90, 0)
 	inst.scale = Vector3(0.42, 0.42, 0.42)
-	# Pull the mesh back so the trigger/guard sits at the screen edge, not a floating receiver.
-	inst.position = Vector3(0.0, -0.006, 0.155)
+	# Pull the mesh back so the trigger/guard sits at the screen edge — but keep
+	# the grip in front of the camera near plane (0.08). Combined with weapon
+	# root z=-0.24 this is camera-z ≈ -0.14.
+	inst.position = Vector3(0.0, -0.008, 0.10)
 	add_child(inst)
 	_show_hands()
 
@@ -301,7 +303,7 @@ func _force_visible(n: Node) -> void:
 	if n is GeometryInstance3D:
 		var gi := n as GeometryInstance3D
 		gi.visible = true
-		gi.sorting_offset = 0.08
+		gi.sorting_offset = 0.16
 	for c in n.get_children():
 		_force_visible(c)
 
@@ -310,6 +312,7 @@ func _hand(parent: Node3D, name: String, pos: Vector3, skin: Material, left: boo
 	var hand := Node3D.new()
 	hand.name = name
 	hand.position = pos
+	hand.scale = Vector3(1.35, 1.35, 1.35)
 	hand.rotation_degrees = Vector3(-12 if left else -28, 8 if left else -6, 70 if left else -18)
 	parent.add_child(hand)
 	_box(hand, "Palm", Vector3(0.034, 0.016, 0.05), Vector3.ZERO, skin)
@@ -334,7 +337,7 @@ func _hand(parent: Node3D, name: String, pos: Vector3, skin: Material, left: boo
 			band.position = Vector3(0, 0, -0.021)
 			band.rotation_degrees = Vector3(90, 0, 0)
 			band.material_override = _band()
-			band.sorting_offset = 0.08
+			band.sorting_offset = 0.16
 			finger.add_child(band)
 	var thumb := Node3D.new()
 	thumb.name = "Thumb"

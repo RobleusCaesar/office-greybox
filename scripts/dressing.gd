@@ -290,8 +290,9 @@ func _breakroom(level: Node3D) -> void:
 	# Lunch table: mesh AABB y −0.533..0.533, height 1.07. Scale 0.72 → ~0.76 m top so the cup / papers still sit.
 	_instance_glb(br, "res://models/kitchen_lunch_table.glb", "KitchenLunchTable", Vector3(3.50, 0.384, 3.70), Vector3(0, 0, 0), Vector3(0.72, 0.72, 0.72))
 	# Fallen guard — NW corner (doorway wall × crawl-hole wall). On the floor, back/shoulder on both walls.
-	# Mesh AABB y −0.480..0.493, length along Z. Roll onto his side so the back meets the west plaster.
-	var guard := _instance_glb(br, "res://models/fallen_security_guard.glb", "FallenSecurityGuard", Vector3(0.42, 0.455, 5.78), Vector3(-8, 12, 78), Vector3.ONE)
+	# Mesh AABB y −0.480..0.493, length along Z. Roll 90 so the back meets the west plaster.
+	var guard := _instance_glb(br, "res://models/fallen_security_guard.glb", "FallenSecurityGuard", Vector3(0.48, 0.48, 5.70), Vector3(-4, 8, 90), Vector3.ONE)
+	_seat_on_floor(guard)
 	_box_collision(guard, Vector3(0.70, 0.42, 1.55), Vector3(0.0, 0.0, 0.0))
 	# Cubicle keyboard + reception desk parts
 	var hall := _find(level, "FutureAssetSlots/EastHall")
@@ -579,9 +580,10 @@ func _bathroom(level: Node3D) -> void:
 	var vanity := _instance_glb(bath, "res://models/bathroom_vanity.glb", "BathroomVanity", Vector3(0.15, 0.427, 6.81), Vector3(0, 0, 0), Vector3(1.50, 1.00, 1.00))
 	_box_collision(vanity, Vector3(2.85, 0.84, 0.40), Vector3(0.0, 0.0, 0.0))
 	_box(bath, "Soap", Vector3(0.08, 0.12, 0.06), Vector3(-0.2, 0.92, 6.90), _tex_mat("res://textures/tex_porcelain.png", Color(0.7, 0.75, 0.6)), Vector3.ZERO, false)
-	# Silver reflective glass + wood frame. Cracks read as smashed silver, not a black pane.
-	var silver := _tex_mat("res://textures/tex_metal.png", Color(0.84, 0.87, 0.90), 0.06, 0.92)
-	silver.metallic_specular = 0.72
+	# Silver glass + wood frame. Compat has no IBL — keep metallic moderate and add a
+	# faint silver emission so the pane reads as smashed mirror, not a black rectangle.
+	var silver := _tex_mat("res://textures/tex_metal.png", Color(0.90, 0.92, 0.95), 0.30, 0.58, 0.26)
+	silver.metallic_specular = 0.42
 	_box(bath, "MirrorWide", Vector3(2.85, 1.15, 0.018), Vector3(0.15, 1.72, 6.695), silver, Vector3.ZERO, false)
 	var frame := _mat("res://materials/mat_walnut.tres")
 	if frame == null:
@@ -1161,6 +1163,29 @@ func _frame(parent: Node, name: String, pos: Vector3, size: Vector2, rot: Vector
 	_quad(parent, name + "Art", size, face, rot, art)
 
 
+func _accum_aabb(n: Node, acc: Array) -> void:
+	if n is MeshInstance3D:
+		var mi := n as MeshInstance3D
+		if mi.mesh:
+			var a: AABB = mi.global_transform * mi.mesh.get_aabb()
+			if acc[0]:
+				acc[1] = a
+				acc[0] = false
+			else:
+				acc[1] = (acc[1] as AABB).merge(a)
+	for c in n.get_children():
+		_accum_aabb(c, acc)
+
+
+func _seat_on_floor(n: Node3D) -> void:
+	var acc := [true, AABB()]
+	_accum_aabb(n, acc)
+	if acc[0]:
+		return
+	var a: AABB = acc[1]
+	n.global_position.y -= a.position.y
+
+
 func _box_collision(parent: Node3D, size: Vector3, pos: Vector3) -> void:
 	var sb := StaticBody3D.new()
 	sb.collision_layer = 1
@@ -1180,6 +1205,12 @@ func _fix_floors(level: Node3D) -> void:
 		var west := bath.position.x - bath.size.x * 0.5
 		bath.size.x = 1.94 - west
 		bath.position.x = (west + 1.94) * 0.5
+		# Light porcelain so the opening does not read as a void against the taupe carpet.
+		var tile := _tex_mat("res://textures/tex_porcelain.png", Color(0.86, 0.86, 0.84), 0.34, 0.04)
+		tile.uv1_triplanar = true
+		tile.uv1_world_triplanar = true
+		tile.uv1_scale = Vector3(0.55, 0.55, 0.55)
+		_set_csg_mat(bath, tile)
 	var nh := _find(level, "Architecture/Floors/NorthHallFloor") as CSGBox3D
 	if nh:
 		# X 2.00–5.00 (3.0 m), Z 6.52–10.50. No overlap with bathroom or corner.
@@ -1195,7 +1226,8 @@ func _fix_floors(level: Node3D) -> void:
 		eh.position = Vector3(11.50, -0.1000, 12.00)
 		eh.size = Vector3(13.00, 0.2000, 3.00)
 	var carpet := _office_carpet()
-	_box(level, "BathDoorThreshold", Vector3(0.28, 0.198, 1.30), Vector3(2.00, -0.099, 9.00), carpet)
+	# Thin carpet lip over the seam (X 1.79–2.21, door Z 8.32–9.68). Raised to avoid z-fight.
+	_box(level, "BathDoorThreshold", Vector3(0.42, 0.016, 1.36), Vector3(2.00, 0.008, 9.00), carpet)
 
 
 func _flush_hall(level: Node3D) -> void:
