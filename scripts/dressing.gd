@@ -1076,8 +1076,7 @@ func _walls(level: Node3D) -> void:
 	_trim_span(root, i, false, 0.20, 6.30, -9.58, [[2.70, 3.80]], trim)
 	_trim_span(root, i, false, 0.20, 6.30, -2.78, [[2.72, 3.68]], trim)
 	# L-shaped hallway walls stay flat — no baseboard / chair-rail nubs in the walk path.
-	# CEO sides of the divider — skip the two side openings
-	_trim_span(root, i, false, 6.60, 16.40, 25.86, [[6.60, 8.53], [14.48, 16.40]], trim)
+	# CEO side of the divider only (reception / logo face stays flush).
 	_trim_span(root, i, false, 8.53, 14.48, 26.14, [], trim)
 	# CEO south / north — skip nothing on the long walls
 	_trim_span(root, i, true, 26.20, 37.80, 6.62, [], trim)

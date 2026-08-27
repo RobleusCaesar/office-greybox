@@ -821,7 +821,7 @@ func _check_playtest_pass(level: Node, errors: PackedStringArray) -> void:
 			if not pth.contains("Floor") and not pth.contains("Floors"):
 				errors.append("stalker chase path blocked at %s (%s)" % [hit.get("position"), pth])
 		for sample in [Vector3(3.50, 0.95, 8.80), Vector3(3.55, 0.95, 9.60)]:
-			var hall_q := PhysicsRayQueryParameters3D.create(sample + Vector3(0, 0.8, 0), sample + Vector3(0, -0.9, 0))
+			var hall_q := PhysicsRayQueryParameters3D.create(sample + Vector3(0, 0.8, 0), sample + Vector3(0, -1.20, 0))
 			hall_q.collision_mask = 1
 			var hall_hit := space.intersect_ray(hall_q)
 			if hall_hit.is_empty():
@@ -857,7 +857,7 @@ func _in_l_hall(p: Vector3) -> bool:
 		return true
 	if p.x > 5.00 and p.x < 18.20 and p.z > 10.52 and p.z < 13.48:
 		return true
-	if p.x > 18.10 and p.x < 25.90 and p.z > 6.55 and p.z < 16.45:
+	if p.x > 18.10 and p.x < 25.80 and p.z > 6.55 and p.z < 16.45:
 		return true
 	return false
 
