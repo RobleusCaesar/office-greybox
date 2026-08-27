@@ -164,10 +164,14 @@ func _steel() -> StandardMaterial3D:
 
 func _skin() -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
-	m.albedo_color = Color(0.72, 0.5, 0.36)
+	m.albedo_color = Color(0.72, 0.50, 0.36)
 	m.albedo_texture = load("res://textures/hero/tex-hand-tan.png")
 	m.roughness = 0.58
 	m.metallic = 0.0
+	m.emission_enabled = true
+	m.emission = Color(0.48, 0.32, 0.20)
+	m.emission_energy_multiplier = 0.10
+	m.render_priority = 2
 	return m
 
 
@@ -187,6 +191,7 @@ func _box(parent: Node3D, name: String, size: Vector3, pos: Vector3, mat: Materi
 	mi.mesh = mesh
 	mi.position = pos
 	mi.material_override = mat
+	mi.sorting_offset = 0.16
 	parent.add_child(mi)
 	return mi
 
@@ -241,8 +246,8 @@ func _build() -> void:
 	for i in 6:
 		_box(_pump, "Rib_%d" % i, Vector3(0.052, 0.046, 0.01), Vector3(0.0, 0.0, -0.05 + i * 0.018), wood)
 
-	_hand(_pump, "HandL", Vector3(-0.034, -0.03, 0.01), skin, true)
-	_hand(self, "HandR", Vector3(0.03, -0.07, 0.09), skin, false)
+	_hand(_pump, "HandL", Vector3(-0.050, -0.006, 0.012), skin, true)
+	_hand(self, "HandR", Vector3(0.050, -0.010, 0.028), skin, false)
 
 	_muzzle = Node3D.new()
 	_muzzle.name = "Muzzle"
@@ -279,14 +284,39 @@ func _attach_meshy_visual() -> void:
 	inst.name = "ShotgunMesh"
 	inst.rotation_degrees = Vector3(0, -90, 0)
 	inst.scale = Vector3(0.42, 0.42, 0.42)
-	inst.position = Vector3(0.0, 0.012, -0.02)
+	# Pull the mesh back so the trigger/guard sits at the screen edge — keep the
+	# grip in front of the near plane (0.08). Combined with weapon root z=-0.26
+	# this is camera-z ≈ -0.18.
+	inst.position = Vector3(0.0, 0.006, 0.08)
 	add_child(inst)
+	_show_hands()
+
+
+func _show_hands() -> void:
+	# CSG gun parts are hidden; hands must stay visible and grip the Meshy mesh.
+	for path in ["Pump/HandL", "HandR"]:
+		var h := get_node_or_null(path) as Node3D
+		if h:
+			h.visible = true
+			_force_visible(h)
+
+
+func _force_visible(n: Node) -> void:
+	if n is Node3D:
+		(n as Node3D).visible = true
+	if n is GeometryInstance3D:
+		var gi := n as GeometryInstance3D
+		gi.visible = true
+		gi.sorting_offset = 0.16
+	for c in n.get_children():
+		_force_visible(c)
 
 
 func _hand(parent: Node3D, name: String, pos: Vector3, skin: Material, left: bool) -> void:
 	var hand := Node3D.new()
 	hand.name = name
 	hand.position = pos
+	hand.scale = Vector3(1.60, 1.60, 1.60)
 	hand.rotation_degrees = Vector3(-12 if left else -28, 8 if left else -6, 70 if left else -18)
 	parent.add_child(hand)
 	_box(hand, "Palm", Vector3(0.034, 0.016, 0.05), Vector3.ZERO, skin)
@@ -303,14 +333,15 @@ func _hand(parent: Node3D, name: String, pos: Vector3, skin: Material, left: boo
 			var band := MeshInstance3D.new()
 			band.name = "WeddingBand"
 			var torus := TorusMesh.new()
-			torus.inner_radius = 0.0036
-			torus.outer_radius = 0.0052
+			torus.inner_radius = 0.0048
+			torus.outer_radius = 0.0074
 			torus.rings = 10
 			torus.ring_segments = 8
 			band.mesh = torus
 			band.position = Vector3(0, 0, -0.021)
 			band.rotation_degrees = Vector3(90, 0, 0)
 			band.material_override = _band()
+			band.sorting_offset = 0.16
 			finger.add_child(band)
 	var thumb := Node3D.new()
 	thumb.name = "Thumb"

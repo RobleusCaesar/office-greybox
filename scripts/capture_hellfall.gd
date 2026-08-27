@@ -141,8 +141,8 @@ func _shot_level() -> void:
 		var pcam2: Camera3D = player.get_look_camera()
 		if pcam2:
 			pcam2.current = false
-	# Guard in the NE break-room corner (EXIT), opposite the west vent.
-	_aim(level, Vector3(3.70, 1.35, 4.40), Vector3(5.85, 0.25, 5.72))
+	# Guard leaned in the NW doorway × crawl-hole corner.
+	_aim(level, Vector3(2.40, 1.35, 4.20), Vector3(0.45, 0.28, 5.85))
 	for _j in 8:
 		await process_frame
 	_save("guard-breakroom-corner.png")
@@ -183,7 +183,7 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("playtest-hall-no-bath-door.png")
-	_aim(level, Vector3(1.35, 1.35, 8.95), Vector3(0.40, 0.12, 7.35))
+	_aim(level, Vector3(3.15, 1.42, 9.00), Vector3(1.70, 0.55, 8.45))
 	for _j in 8:
 		await process_frame
 	_save("playtest-bathroom-fallen-door.png")
@@ -216,5 +216,60 @@ func _shot_level() -> void:
 		for _j in 8:
 			await process_frame
 		_save("mop-and-bucket.png")
+	# Playtest fix 2 stills.
+	_aim(level, Vector3(3.40, 1.55, 9.00), Vector3(1.70, 0.40, 9.00))
+	for _j in 8:
+		await process_frame
+	_save("fix2-bath-threshold.png")
+	_aim(level, Vector3(3.50, 1.50, 7.80), Vector3(2.10, 1.10, 9.00))
+	for _j in 8:
+		await process_frame
+	_save("fix2-hall-flush.png")
+	_aim(level, Vector3(0.15, 1.48, 9.40), Vector3(0.15, 1.55, 6.72))
+	for _j in 8:
+		await process_frame
+	_save("fix2-vanity-mirror.png")
+	_aim(level, Vector3(0.50, 1.30, 10.40), Vector3(0.50, 0.80, 12.85))
+	for _j in 8:
+		await process_frame
+	_save("fix2-urinals-back-wall.png")
+	_aim(level, Vector3(11.20, 1.52, 12.00), Vector3(16.80, 1.25, 12.00))
+	for _j in 8:
+		await process_frame
+	_save("fix2-ember-approach.png")
+	_aim(level, Vector3(22.60, 1.48, 10.20), Vector3(24.70, 0.55, 11.50))
+	for _j in 8:
+		await process_frame
+	_save("fix2-desk-flipped.png")
+	_aim(level, Vector3(31.20, 1.20, 10.20), Vector3(32.10, 0.20, 11.50))
+	for _j in 8:
+		await process_frame
+	_save("fix2-ceo-facedown.png")
+	_aim(level, Vector3(2.05, 1.28, 4.55), Vector3(0.50, 0.12, 5.70))
+	for _j in 8:
+		await process_frame
+	_save("fix2-guard-corner.png")
+	_aim(level, Vector3(3.50, 1.45, 6.05), Vector3(3.50, 0.40, 3.70))
+	for _j in 8:
+		await process_frame
+	_save("fix2-table-no-chair-blocks.png")
+	_aim(level, Vector3(3.20, 1.48, 8.50), Vector3(5.00, 1.05, 8.50))
+	for _j in 8:
+		await process_frame
+	_save("fix2-elevator.png")
+	var hud3 := level.get_node_or_null("Player/HUD") as CanvasLayer
+	if hud3:
+		hud3.visible = false
+	var player2 := level.get_node_or_null("Player") as Node3D
+	if player2 and player2.has_method("get_look_camera"):
+		var cap := level.get_node_or_null("CaptureCam")
+		if cap and cap is Camera3D:
+			(cap as Camera3D).current = false
+		var pcam3: Camera3D = player2.get_look_camera()
+		if pcam3:
+			pcam3.current = true
+	for _j in 10:
+		await process_frame
+	_save("fix2-shotgun-hands.png")
 	level.queue_free()
 	await process_frame
