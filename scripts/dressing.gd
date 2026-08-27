@@ -292,7 +292,7 @@ func _breakroom(level: Node3D) -> void:
 	# Fallen guard — NW corner (doorway wall × crawl-hole wall). Lie as authored so
 	# the back is on the carpet (a 90° roll arched the torso and read as floating).
 	# Yaw tucks the shoulder into the north plaster; X keeps him on the west wall.
-	var guard := _instance_glb(br, "res://models/fallen_security_guard.glb", "FallenSecurityGuard", Vector3(0.44, 0.48, 5.66), Vector3(0, 14, 0), Vector3.ONE)
+	var guard := _instance_glb(br, "res://models/fallen_security_guard.glb", "FallenSecurityGuard", Vector3(0.70, 0.48, 5.46), Vector3(0, 14, 0), Vector3.ONE)
 	_seat_on_floor(guard)
 	# Authored sit/slump leaves a visible air gap once AABB-seated — plant him.
 	guard.position.y -= 0.14
