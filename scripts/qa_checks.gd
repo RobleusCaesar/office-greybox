@@ -256,6 +256,10 @@ func _run() -> void:
 		errors.append("player must reference audio/shotgun_blast.wav")
 	if not player_src.contains("shotgun_fire.wav"):
 		errors.append("player must fall back to shotgun_fire.wav when blast is missing")
+	if player_src.contains("FileAccess.file_exists"):
+		errors.append("player must load() shotgun wavs without FileAccess.file_exists")
+	if player_src.contains("_load_real_wav"):
+		errors.append("player must load() blast wavs directly, no _load_real_wav exists-gate")
 	if not player_src.contains("_spawn_impact"):
 		errors.append("player must fade air blood in _spawn_impact")
 	if not player_src.contains("0.72"):
@@ -265,6 +269,8 @@ func _run() -> void:
 		errors.append("hero_shotgun must reference Rob's cock/reload wavs")
 	if not vm_src.contains("CockSfx") or not vm_src.contains("ReloadSfx"):
 		errors.append("hero_shotgun must have dedicated CockSfx and ReloadSfx")
+	if vm_src.contains("FileAccess.file_exists") or vm_src.contains("_load_real_wav"):
+		errors.append("hero_shotgun must load() cock/reload wavs without FileAccess.file_exists")
 	if FileAccess.file_exists("res://scenes/_check_audio.tscn") or FileAccess.file_exists("res://scenes/_ceo_rot_proof.tscn"):
 		errors.append("debug helper scenes must not ship")
 	var pane := level.get_node_or_null("FutureAssetSlots/CEOOffice/MoneyShotWindow/Pane_02") as CSGBox3D

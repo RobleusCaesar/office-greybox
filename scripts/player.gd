@@ -521,18 +521,11 @@ func _build_hud() -> void:
 	_hud_prompt.visible = false
 
 
-func _load_real_wav(path: String) -> AudioStream:
-	# Prefer load() so HTML5 can resolve the import remap inside the pck.
-	# Keep the tiny-stub guard only when the raw file is readable (desktop).
-	if FileAccess.file_exists(path):
-		var f := FileAccess.open(path, FileAccess.READ)
-		if f == null or f.get_length() <= 1024:
-			return null
-	return load(path) as AudioStream
-
-
 func _build_audio() -> void:
-	SND_BLAST = _load_real_wav(BLAST_PATH)
+	# load() only — packed-res probes miss remapped wavs on HTML5.
+	SND_BLAST = load(BLAST_PATH) as AudioStream
+	if SND_BLAST == null:
+		SND_BLAST = load("res://audio/shotgun_fire.wav") as AudioStream
 	_gun_sfx = AudioStreamPlayer.new()
 	_gun_sfx.name = "GunSfx"
 	_gun_sfx.volume_db = -2.0
