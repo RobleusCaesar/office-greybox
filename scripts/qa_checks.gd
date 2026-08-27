@@ -231,8 +231,12 @@ func _run() -> void:
 		errors.append("existing locked SupplyCloset must stay small")
 	var spawn := level.get_node_or_null("Player") as Node3D
 	if spawn:
-		if absf(spawn.position.x - 3.5) > 0.08 or absf(spawn.position.z - 2.1) > 0.08:
-			errors.append("player spawn moved to %s, expected (3.5, 0, 2.1)" % spawn.position)
+		if spawn.position.x > -4.20 or spawn.position.x < -8.80 or spawn.position.z < 1.40 or spawn.position.z > 5.10:
+			errors.append("player spawn %s is not standing in IntroCloset" % spawn.position)
+		if absf(spawn.position.x - 3.5) < 0.20 and absf(spawn.position.z - 2.1) < 0.20:
+			errors.append("player still spawns in the break room")
+		if spawn.position.x > -2.90:
+			errors.append("player spawn clips the closet east wall / vent")
 	var dead_ex := level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive")
 	if dead_ex == null:
 		errors.append("dead executive missing")
@@ -309,6 +313,12 @@ func _run() -> void:
 		errors.append("dressing must instance mop_and_bucket.glb")
 	if not dress_src.contains("broken_door.glb"):
 		errors.append("dressing must instance broken_door.glb")
+	if not dress_src.contains("_disable_collision"):
+		errors.append("broken door collider must be disabled so the threshold does not snag")
+	if not dress_src.contains("ShotgunPickup"):
+		errors.append("dressing must place ShotgunPickup by the guard")
+	if dress_src.contains("FileAccess.file_exists(\"res://scripts/shotgun_pickup"):
+		errors.append("shotgun pickup must load() without exists-gate")
 	if not dress_src.contains("CEO_couch_coffee_table.glb"):
 		errors.append("dressing must instance CEO_couch_coffee_table.glb")
 	if not dress_src.contains("_relit_couch_set"):
@@ -343,6 +353,18 @@ func _run() -> void:
 		errors.append("ammo pickup missing")
 	if level.get_node_or_null("Ammo_Break") != null:
 		errors.append("second ammo pickup must not exist")
+	var sg_pick := level.get_node_or_null("FutureAssetSlots/BreakRoom/ShotgunPickup") as Node3D
+	if sg_pick == null:
+		errors.append("world shotgun pickup missing next to the guard")
+	else:
+		if absf(sg_pick.position.x - 1.82) > 0.35 or absf(sg_pick.position.z - 5.16) > 0.45:
+			errors.append("shotgun pickup at %s is not on the break-room floor by the guard" % sg_pick.position)
+		if sg_pick.position.x < -2.0:
+			errors.append("shotgun pickup must not be in the closet")
+		if sg_pick.get_node_or_null("WorldShotgun") == null:
+			errors.append("ShotgunPickup must instance shotgun.glb as WorldShotgun")
+		if sg_pick.find_child("PickupHaloLight", true, false) == null:
+			errors.append("world shotgun missing the light-green pickup halo")
 	var dia := level.get_node_or_null("ExteriorDiorama")
 	if dia:
 		var backdrop := dia.get_node_or_null("Backdrop") as MeshInstance3D
@@ -512,6 +534,13 @@ func _run() -> void:
 	var sg_player := level.get_node_or_null("Player")
 	if sg_player and sg_player.find_child("ShotgunMesh", true, false) == null:
 		errors.append("hero shotgun must instance shotgun.glb as ShotgunMesh")
+	if sg_player:
+		var wroot := sg_player.find_child("WeaponRoot", true, false) as Node3D
+		if wroot and wroot.visible:
+			errors.append("player spawned holding a weapon — must start unarmed")
+		var pmesh := sg_player.find_child("Pistol", true, false) as Node3D
+		if pmesh and pmesh.visible and (wroot == null or wroot.visible):
+			errors.append("pistol mesh visible at spawn")
 	var env_node := level.get_node_or_null("WorldEnvironment") as WorldEnvironment
 	if env_node and env_node.environment and env_node.environment.sdfgi_enabled:
 		errors.append("SDFGI must stay off")
@@ -604,6 +633,10 @@ func _run() -> void:
 	if haunt_src.contains("FileAccess.file_exists(\"res://audio/deamon") or haunt_src.contains("FileAccess.file_exists(\"res://audio/monster"):
 		errors.append("distant beds must load() without FileAccess.file_exists")
 	var player_src := FileAccess.get_file_as_string("res://scripts/player.gd")
+	if not player_src.contains("give_shotgun"):
+		errors.append("player must expose give_shotgun() for the E pickup")
+	if not player_src.contains("_has_gun"):
+		errors.append("player must spawn unarmed (_has_gun)")
 	if not player_src.contains("shotgun_blast.wav"):
 		errors.append("player must reference audio/shotgun_blast.wav")
 	if not player_src.contains("shotgun_fire.wav"):
@@ -788,6 +821,11 @@ func _run() -> void:
 		player._head.rotation = Vector3.ZERO
 		await process_frame
 		player._try_fire()
+		if d1.hp < hp1:
+			errors.append("unarmed spawn must not fire the shotgun")
+		if player.has_method("give_shotgun"):
+			player.give_shotgun()
+		player._try_fire()
 		await process_frame
 		if d1.hp >= hp1:
 			errors.append("shotgun did not damage demon 1")
@@ -896,6 +934,17 @@ func _check_playtest_pass(level: Node, errors: PackedStringArray) -> void:
 		var slab := fallen.get_node_or_null("Slab") as Node3D
 		if slab and slab is GeometryInstance3D and (slab as GeometryInstance3D).visible:
 			errors.append("greybox FallenDoor Slab is still visible in the bathroom frame")
+		var door_body := 0
+		var door_stack: Array[Node] = [fallen]
+		while door_stack.size():
+			var dn: Node = door_stack.pop_back()
+			if dn is CollisionObject3D and (dn as CollisionObject3D).collision_layer != 0:
+				if not (dn is Area3D):
+					door_body += 1
+			for dc in dn.get_children():
+				door_stack.append(dc)
+		if door_body > 0:
+			errors.append("broken door still has a solid collider — players wedge at the threshold")
 	var logo := level.get_node_or_null("FutureAssetSlots/Reception/AurumPlate") as MeshInstance3D
 	if logo == null or not logo.visible:
 		errors.append("logo node must be visible")
@@ -979,6 +1028,21 @@ func _check_playtest_pass(level: Node, errors: PackedStringArray) -> void:
 				var hpth := String((hcol as Node).get_path()) if hcol is Node else ""
 				if hpth.contains("FallenDoor") or hpth.contains("MensDoor"):
 					errors.append("bathroom / fallen door still occupies the hall at %s" % hp)
+		var door_probe := CapsuleShape3D.new()
+		door_probe.radius = 0.32
+		door_probe.height = 1.15
+		var dq := PhysicsShapeQueryParameters3D.new()
+		dq.shape = door_probe
+		dq.collision_mask = 1
+		dq.margin = 0.01
+		for p in [Vector3(2.00, 0.58, 9.00), Vector3(1.78, 0.58, 8.48), Vector3(1.70, 0.40, 8.22)]:
+			dq.transform = Transform3D(Basis(), p)
+			for sh in space.intersect_shape(dq, 8):
+				var dcol: Object = sh.get("collider")
+				var dpth := String((dcol as Node).get_path()) if dcol is Node else ""
+				if dpth.contains("FallenDoor") or dpth.contains("BrokenDoor"):
+					errors.append("broken door collider still snags the bathroom opening at %s (%s)" % [p, dpth])
+					break
 		var probe := SphereShape3D.new()
 		probe.radius = 0.36
 		var sq := PhysicsShapeQueryParameters3D.new()
@@ -1168,8 +1232,8 @@ func _check_crawl(level: Node, player: Node, errors: PackedStringArray) -> void:
 	if radius * 2.0 >= vent_cut.size.z:
 		errors.append("crawl capsule diameter %.2f does not fit VentCut width %.2f" % [radius * 2.0, vent_cut.size.z])
 	var spawn := level.get_node_or_null("Player") as Node3D
-	if spawn == null or absf(spawn.position.x - 3.5) > 0.08 or absf(spawn.position.z - 2.1) > 0.08:
-		errors.append("player spawn moved to %s, expected (3.5, 0, 2.1)" % (spawn.position if spawn else "?"))
+	if spawn == null or spawn.position.x > -4.20 or spawn.position.x < -8.80:
+		errors.append("player spawn %s is not in IntroCloset" % (spawn.position if spawn else "?"))
 
 	var was_processing: bool = player.is_physics_processing()
 	player.set_physics_process(false)
