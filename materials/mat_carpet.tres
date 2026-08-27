@@ -3,8 +3,8 @@
 [ext_resource type="Texture2D" path="res://textures/tex_carpet_beige.png" id="1"]
 
 [resource]
-resource_name = "OfficeBeigeCarpet"
-albedo_color = Color(1, 1, 1, 1)
+resource_name = "OfficeTaupeCarpet"
+albedo_color = Color(0.68, 0.58, 0.48, 1)
 albedo_texture = ExtResource("1")
 metallic = 0.0
 roughness = 0.92

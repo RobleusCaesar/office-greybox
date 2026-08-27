@@ -256,6 +256,31 @@ func _build() -> void:
 	add_child(_eject)
 	_residual = _smoke_burst(_eject, 10, 0.9, Vector3(0.6, 0.2, 0.1), 0.35)
 	_residual.emitting = false
+	_attach_meshy_visual()
+
+
+func _attach_meshy_visual() -> void:
+	# Rob's Meshy shotgun has no pump bones — swap the visual, keep pump / hands / muzzle / audio.
+	for path in ["Receiver", "Barrel", "MagTube", "Bead", "Stock"]:
+		var n := get_node_or_null(path)
+		if n:
+			n.visible = false
+	if _pump:
+		for c in _pump.get_children():
+			if c is MeshInstance3D:
+				(c as MeshInstance3D).visible = false
+	# load() only — do not exists-gate. Mesh is 1.90 m along X; viewmodel points −Z.
+	var packed: PackedScene = load("res://models/shotgun.glb")
+	if packed == null:
+		return
+	var inst := packed.instantiate() as Node3D
+	if inst == null:
+		return
+	inst.name = "ShotgunMesh"
+	inst.rotation_degrees = Vector3(0, -90, 0)
+	inst.scale = Vector3(0.42, 0.42, 0.42)
+	inst.position = Vector3(0.0, 0.012, -0.02)
+	add_child(inst)
 
 
 func _hand(parent: Node3D, name: String, pos: Vector3, skin: Material, left: bool) -> void:

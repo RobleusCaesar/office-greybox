@@ -120,5 +120,101 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("vent_duct_interior.png")
+	# Shotgun in first-person hands at spawn.
+	var hud2 := level.get_node_or_null("Player/HUD") as CanvasLayer
+	if hud2:
+		hud2.visible = false
+	var pcam_on := false
+	var player := level.get_node_or_null("Player") as Node3D
+	if player and player.has_method("get_look_camera"):
+		var pcam: Camera3D = player.get_look_camera()
+		if pcam:
+			var old_cap := level.get_node_or_null("CaptureCam")
+			if old_cap and old_cap is Camera3D:
+				(old_cap as Camera3D).current = false
+			pcam.current = true
+			pcam_on = true
+	for _j in 10:
+		await process_frame
+	_save("shotgun-in-hands.png")
+	if pcam_on and player and player.has_method("get_look_camera"):
+		var pcam2: Camera3D = player.get_look_camera()
+		if pcam2:
+			pcam2.current = false
+	# Guard in the NE break-room corner (EXIT), opposite the west vent.
+	_aim(level, Vector3(3.70, 1.35, 4.40), Vector3(5.85, 0.25, 5.72))
+	for _j in 8:
+		await process_frame
+	_save("guard-breakroom-corner.png")
+	# Fridge + lunch table from the north doorway.
+	_aim(level, Vector3(3.50, 1.45, 6.10), Vector3(4.80, 0.55, 2.40))
+	for _j in 8:
+		await process_frame
+	_save("fridge-lunch-table.png")
+	# Bathroom vanity + toilets (look south-west so sinks and a stall bowl share the frame).
+	_aim(level, Vector3(-1.10, 1.35, 10.40), Vector3(-2.40, 0.55, 7.40))
+	for _j in 8:
+		await process_frame
+	_save("bathroom-vanity-toilets.png")
+	# Stall toilets from the aisle.
+	_aim(level, Vector3(-3.10, 1.20, 9.50), Vector3(-5.35, 0.40, 9.10))
+	for _j in 8:
+		await process_frame
+	_save("bathroom-stall-toilets.png")
+	# Locked supply door.
+	_aim(level, Vector3(3.15, 1.45, 8.50), Vector3(5.00, 1.05, 8.50))
+	for _j in 8:
+		await process_frame
+	_save("locked-door-supply.png")
+	# Playtest pass — unique names so earlier Meshy stills stay.
+	_aim(level, Vector3(10.48, 1.38, 10.25), Vector3(10.20, 0.55, 8.35))
+	for _j in 8:
+		await process_frame
+	_save("playtest-stalker-chase-path.png")
+	_aim(level, Vector3(9.40, 1.42, 10.15), Vector3(8.10, 0.55, 8.40))
+	for _j in 8:
+		await process_frame
+	_save("playtest-alcove-cubicle.png")
+	_aim(level, Vector3(9.55, 1.42, 13.55), Vector3(8.20, 0.45, 15.05))
+	for _j in 8:
+		await process_frame
+	_save("playtest-alcove-copy.png")
+	_aim(level, Vector3(3.50, 1.48, 11.40), Vector3(2.10, 1.05, 8.90))
+	for _j in 8:
+		await process_frame
+	_save("playtest-hall-no-bath-door.png")
+	_aim(level, Vector3(1.35, 1.35, 8.95), Vector3(0.40, 0.12, 7.35))
+	for _j in 8:
+		await process_frame
+	_save("playtest-bathroom-fallen-door.png")
+	_aim(level, Vector3(12.20, 1.52, 11.70), Vector3(16.80, 1.55, 13.20))
+	for _j in 8:
+		await process_frame
+	_save("playtest-left-hall-art.png")
+	_aim(level, Vector3(21.80, 1.55, 11.50), Vector3(25.82, 1.70, 11.50))
+	for _j in 8:
+		await process_frame
+	_save("playtest-logo-desk.png")
+	_aim(level, Vector3(1.90, 1.20, 3.25), Vector3(0.00, 0.48, 3.20))
+	for _j in 8:
+		await process_frame
+	_save("playtest-vent-kitchen.png")
+	_aim(level, Vector3(-5.20, 1.20, 3.25), Vector3(-2.66, 0.48, 3.20))
+	for _j in 8:
+		await process_frame
+	_save("playtest-vent-closet.png")
+	_aim(level, Vector3(6.80, 1.50, 12.00), Vector3(16.50, 1.20, 12.00))
+	for _j in 8:
+		await process_frame
+	_save("playtest-l-hall-flat.png")
+	_aim(level, Vector3(8.80, 1.15, 12.00), Vector3(9.40, 0.02, 12.40))
+	for _j in 8:
+		await process_frame
+	_save("playtest-carpet-vs-wall.png")
+	if level.get_node_or_null("FutureAssetSlots/IntroCloset/MopAndBucket"):
+		_aim(level, Vector3(-4.40, 1.20, 3.25), Vector3(-2.90, 0.40, 2.40))
+		for _j in 8:
+			await process_frame
+		_save("mop-and-bucket.png")
 	level.queue_free()
 	await process_frame
