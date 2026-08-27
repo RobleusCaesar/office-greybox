@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/tex_scuff.png-2b9db1c252b7c1dafcf762baa5a7c63
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

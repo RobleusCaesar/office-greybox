@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/denver_fire_pane_03.png-b0dcbc3c167f3cf8e05c5
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

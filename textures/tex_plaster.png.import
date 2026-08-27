@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/tex_plaster.png-7344ed922af1b5a411a56c1b53d5a
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

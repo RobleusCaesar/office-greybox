@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/denver-fire-capitol-demon.png-6f2d054c44c21e6
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

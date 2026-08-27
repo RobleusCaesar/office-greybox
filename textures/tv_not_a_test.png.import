@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/tv_not_a_test.png-4f9880f7615c9621730409c8b8f
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

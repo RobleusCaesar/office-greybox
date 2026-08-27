@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/denver_fire_skyline.png-b6a631b400bf7a8cbefa8
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

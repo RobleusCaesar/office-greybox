@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/painting_certificate.png-884e5c784821bdc6fea1
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

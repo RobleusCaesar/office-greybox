@@ -21,11 +21,22 @@ var _pumping: bool = false
 var _cock_sfx: AudioStreamPlayer
 var _reload_sfx: AudioStreamPlayer
 var _cocked_this_cycle: bool = false
+var _meshy_attached: bool = false
 
 
 func _ready() -> void:
 	_build()
 	_build_sfx()
+	# Web Play hitch: do not load shotgun.glb while unarmed. Desktop/QA still attach now.
+	if not OS.has_feature("web"):
+		ensure_meshy_visual()
+
+
+func ensure_meshy_visual() -> void:
+	if _meshy_attached:
+		return
+	_meshy_attached = true
+	_attach_meshy_visual()
 
 
 func is_cycling() -> bool:
@@ -261,7 +272,6 @@ func _build() -> void:
 	add_child(_eject)
 	_residual = _smoke_burst(_eject, 10, 0.9, Vector3(0.6, 0.2, 0.1), 0.35)
 	_residual.emitting = false
-	_attach_meshy_visual()
 
 
 func _attach_meshy_visual() -> void:

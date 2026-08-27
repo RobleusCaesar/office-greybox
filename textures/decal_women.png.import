@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/decal_women.png-a6a7fd10c0d6e8a873bfba7f8e182
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

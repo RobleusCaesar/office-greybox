@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/tex_cardboard_copy.png-6431592ebe8c3977adb316
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

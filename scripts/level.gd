@@ -21,12 +21,13 @@ var _distant_screech: AudioStreamPlayer
 var _distant_growl: AudioStreamPlayer
 var _distant_wait: float = 0.0
 var _distant_toggle: bool = false
+var _dressing
+var _far_applied: bool = false
 
 
 func _ready() -> void:
-	var dressing = load("res://scripts/dressing.gd").new()
-	dressing.apply(self)
-	_spawn_demon()
+	_dressing = load("res://scripts/dressing.gd").new()
+	_dressing.apply_near(self)
 	_build_overlays()
 	_sting_player = AudioStreamPlayer.new()
 	_sting_player.stream = load("res://audio/window_sting.wav")
@@ -38,6 +39,23 @@ func _ready() -> void:
 		_player.died.connect(_on_player_died)
 	if _window_light:
 		_base_window_energy = _window_light.light_energy
+	call_deferred("_dress_after_first_frame")
+
+
+func _dress_after_first_frame() -> void:
+	# First closet frame paints, then far Meshy (CEO, couches, bath, elevator, ember).
+	await get_tree().process_frame
+	_apply_far_world()
+
+
+func _apply_far_world() -> void:
+	if _far_applied:
+		return
+	_far_applied = true
+	if _dressing == null:
+		_dressing = load("res://scripts/dressing.gd").new()
+	_dressing.apply_far(self)
+	_spawn_demon()
 
 
 func _process(delta: float) -> void:

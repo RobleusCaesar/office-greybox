@@ -3,9 +3,21 @@ extends RefCounted
 
 
 func apply(level: Node3D) -> void:
+	apply_near(level)
+	apply_far(level)
+
+
+func apply_near(level: Node3D) -> void:
+	# Closet + mop + painted architecture. Enough for Play / first frame.
 	_texture_existing(level)
-	_breakroom(level)
 	_intro_closet(level)
+	_flush_hall(level)
+
+
+func apply_far(level: Node3D) -> void:
+	# CEO / ember-adjacent / couches / bath Meshy / elevator / break-room GLBs.
+	_breakroom(level)
+	_reception(level)
 	_bathroom(level)
 	_dread(level)
 	_ceo(level)
@@ -14,7 +26,6 @@ func apply(level: Node3D) -> void:
 	_ammo(level)
 	_emergency(level)
 	_locked_doors(level)
-	_flush_hall(level)
 
 
 func _mat(path: String) -> Material:
@@ -271,7 +282,6 @@ func _texture_existing(level: Node3D) -> void:
 	_hide_visual(_find(level, "FutureAssetSlots/BreakRoom/FridgeHandle"))
 	_hide_visual(_find(level, "FutureAssetSlots/BreakRoom/BreakRoomTable"))
 	_hide_visual(_find(level, "FutureAssetSlots/BreakRoom/TablePedestal"))
-	_reception(level)
 	_paint_remaining(level)
 
 

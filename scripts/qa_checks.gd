@@ -185,11 +185,11 @@ func _run() -> void:
 		errors.append("BreakRoomWindowHead must be gone")
 	if level.get_node_or_null("Architecture/Walls/BreakRoomWest/WindowCut") != null:
 		errors.append("BreakRoomWest WindowCut must be gone")
-	var vent_cut := level.get_node_or_null("Architecture/Walls/BreakRoomWest/VentCut") as CSGBox3D
+	var vent_cut := level.get_node_or_null("Architecture/Walls/BreakRoomWest/VentCut") as Node3D
 	if vent_cut == null:
 		errors.append("BreakRoomWest VentCut missing")
 	else:
-		if vent_cut.operation != 2:
+		if _box_op(vent_cut) != 2:
 			errors.append("VentCut must subtract")
 		var west := level.get_node_or_null("Architecture/Walls/BreakRoomWest") as Node3D
 		if west:
@@ -1100,13 +1100,13 @@ func _check_playtest_fix2(level: Node, errors: PackedStringArray) -> void:
 	var glass := level.get_node_or_null("FutureAssetSlots/EastHall/DeadOfficeGlass") as Node3D
 	if glass and absf(glass.position.z - 10.50) > 0.08:
 		errors.append("conference glass at Z %s still leaks into the hall" % glass.position.z)
-	var cub_cut := level.get_node_or_null("Architecture/Walls/EastHallSouth/CubicleOpeningCut") as CSGBox3D
+	var cub_cut := level.get_node_or_null("Architecture/Walls/EastHallSouth/CubicleOpeningCut") as Node3D
 	if cub_cut == null or _box_op(cub_cut) != 2:
 		errors.append("cubicle alcove cut missing or not a hole")
-	var copy_cut := level.get_node_or_null("Architecture/Walls/EastHallNorth/CopyOpeningCut") as CSGBox3D
+	var copy_cut := level.get_node_or_null("Architecture/Walls/EastHallNorth/CopyOpeningCut") as Node3D
 	if copy_cut == null or _box_op(copy_cut) != 2:
 		errors.append("copy alcove cut missing or not a hole")
-	var bath_cut := level.get_node_or_null("Architecture/Walls/NorthHallWest/BathroomDoorCut") as CSGBox3D
+	var bath_cut := level.get_node_or_null("Architecture/Walls/NorthHallWest/BathroomDoorCut") as Node3D
 	if bath_cut == null or _box_op(bath_cut) != 2:
 		errors.append("bathroom hall doorway cut missing — opening must stay an opening")
 	var hall_map := level.get_node_or_null("WallDressing/HallMapFrame") as Node3D
@@ -1265,7 +1265,7 @@ func _check_crawl(level: Node, player: Node, errors: PackedStringArray) -> void:
 		return
 	var crawl_h: float = float(player.CRAWL_CAP)
 	var crouch_h: float = float(player.CROUCH_CAP)
-	var vent_cut := level.get_node_or_null("Architecture/Walls/BreakRoomWest/VentCut") as CSGBox3D
+	var vent_cut := level.get_node_or_null("Architecture/Walls/BreakRoomWest/VentCut") as Node3D
 	if vent_cut == null:
 		errors.append("VentCut missing for crawl fit")
 		return

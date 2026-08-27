@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/denver-fire-vista.png-d4869335e1c0f71ec75f177
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/tex_sheet_metal.png-927634d62e5b01d5aba780742
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

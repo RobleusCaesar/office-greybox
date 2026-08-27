@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/painting_front_range.png-8c5c1a665e41ec023d1c
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/tex_gun.png-5a0fce5ea04a94e16b9b8826ad52d580.
 
 [params]
 
-compress/mode=2
+compress/mode=4
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
