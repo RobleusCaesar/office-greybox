@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b4ql4ydpo4nwk"
-path.s3tc="res://.godot/imported/tex-light-oak.png-c6062687bbfea27b23e44a564471a985.s3tc.ctex"
-path.etc2="res://.godot/imported/tex-light-oak.png-c6062687bbfea27b23e44a564471a985.etc2.ctex"
+path="res://.godot/imported/tex-light-oak.png-c6062687bbfea27b23e44a564471a985.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/hero/tex-light-oak.png"
-dest_files=["res://.godot/imported/tex-light-oak.png-c6062687bbfea27b23e44a564471a985.s3tc.ctex", "res://.godot/imported/tex-light-oak.png-c6062687bbfea27b23e44a564471a985.etc2.ctex"]
+dest_files=["res://.godot/imported/tex-light-oak.png-c6062687bbfea27b23e44a564471a985.ctex"]
 
 [params]
 

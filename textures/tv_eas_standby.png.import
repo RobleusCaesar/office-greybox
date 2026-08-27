@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d013o6voyq1l1"
-path.s3tc="res://.godot/imported/tv_eas_standby.png-52b05290187610ca8c8fb52fbac914ce.s3tc.ctex"
-path.etc2="res://.godot/imported/tv_eas_standby.png-52b05290187610ca8c8fb52fbac914ce.etc2.ctex"
+path="res://.godot/imported/tv_eas_standby.png-52b05290187610ca8c8fb52fbac914ce.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/tv_eas_standby.png"
-dest_files=["res://.godot/imported/tv_eas_standby.png-52b05290187610ca8c8fb52fbac914ce.s3tc.ctex", "res://.godot/imported/tv_eas_standby.png-52b05290187610ca8c8fb52fbac914ce.etc2.ctex"]
+dest_files=["res://.godot/imported/tv_eas_standby.png-52b05290187610ca8c8fb52fbac914ce.ctex"]
 
 [params]
 

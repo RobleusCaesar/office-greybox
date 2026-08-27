@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://coaqvyhvw07io"
-path.s3tc="res://.godot/imported/shotgun-walnut-steel.png-929ce7891f50f312707094b72acb465d.s3tc.ctex"
-path.etc2="res://.godot/imported/shotgun-walnut-steel.png-929ce7891f50f312707094b72acb465d.etc2.ctex"
+path="res://.godot/imported/shotgun-walnut-steel.png-929ce7891f50f312707094b72acb465d.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/hero/shotgun-walnut-steel.png"
-dest_files=["res://.godot/imported/shotgun-walnut-steel.png-929ce7891f50f312707094b72acb465d.s3tc.ctex", "res://.godot/imported/shotgun-walnut-steel.png-929ce7891f50f312707094b72acb465d.etc2.ctex"]
+dest_files=["res://.godot/imported/shotgun-walnut-steel.png-929ce7891f50f312707094b72acb465d.ctex"]
 
 [params]
 

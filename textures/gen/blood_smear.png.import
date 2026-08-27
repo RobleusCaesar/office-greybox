@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cvpejwf3ben8i"
-path.s3tc="res://.godot/imported/blood_smear.png-fed67ba5c7adf88c26fd26877ac7d929.s3tc.ctex"
-path.etc2="res://.godot/imported/blood_smear.png-fed67ba5c7adf88c26fd26877ac7d929.etc2.ctex"
+path="res://.godot/imported/blood_smear.png-fed67ba5c7adf88c26fd26877ac7d929.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/gen/blood_smear.png"
-dest_files=["res://.godot/imported/blood_smear.png-fed67ba5c7adf88c26fd26877ac7d929.s3tc.ctex", "res://.godot/imported/blood_smear.png-fed67ba5c7adf88c26fd26877ac7d929.etc2.ctex"]
+dest_files=["res://.godot/imported/blood_smear.png-fed67ba5c7adf88c26fd26877ac7d929.ctex"]
 
 [params]
 

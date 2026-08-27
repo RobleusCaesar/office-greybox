@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b6w8nofgptclo"
-path.s3tc="res://.godot/imported/decal_women.png-a6a7fd10c0d6e8a873bfba7f8e18258a.s3tc.ctex"
-path.etc2="res://.godot/imported/decal_women.png-a6a7fd10c0d6e8a873bfba7f8e18258a.etc2.ctex"
+path="res://.godot/imported/decal_women.png-a6a7fd10c0d6e8a873bfba7f8e18258a.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/decal_women.png"
-dest_files=["res://.godot/imported/decal_women.png-a6a7fd10c0d6e8a873bfba7f8e18258a.s3tc.ctex", "res://.godot/imported/decal_women.png-a6a7fd10c0d6e8a873bfba7f8e18258a.etc2.ctex"]
+dest_files=["res://.godot/imported/decal_women.png-a6a7fd10c0d6e8a873bfba7f8e18258a.ctex"]
 
 [params]
 

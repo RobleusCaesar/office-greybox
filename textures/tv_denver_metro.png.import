@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cfhqr2jpdxgp7"
-path.s3tc="res://.godot/imported/tv_denver_metro.png-c6f82aa0adcf7442490a073ebbe006c1.s3tc.ctex"
-path.etc2="res://.godot/imported/tv_denver_metro.png-c6f82aa0adcf7442490a073ebbe006c1.etc2.ctex"
+path="res://.godot/imported/tv_denver_metro.png-c6f82aa0adcf7442490a073ebbe006c1.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/tv_denver_metro.png"
-dest_files=["res://.godot/imported/tv_denver_metro.png-c6f82aa0adcf7442490a073ebbe006c1.s3tc.ctex", "res://.godot/imported/tv_denver_metro.png-c6f82aa0adcf7442490a073ebbe006c1.etc2.ctex"]
+dest_files=["res://.godot/imported/tv_denver_metro.png-c6f82aa0adcf7442490a073ebbe006c1.ctex"]
 
 [params]
 

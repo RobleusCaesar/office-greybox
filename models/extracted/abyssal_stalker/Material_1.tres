@@ -1,0 +1,15 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cw5u3rcqrpmbr"]
+
+[ext_resource type="Texture2D" uid="uid://b83vfyh5aspi5" path="res://models/abyssal_stalker_texture_0.png" id="1_7n4op"]
+
+[resource]
+resource_name = "Material_1"
+cull_mode = 2
+albedo_texture = ExtResource("1_7n4op")
+metallic = 1.0
+roughness = 0.41008475
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_operator = 1
+emission_texture = ExtResource("1_7n4op")
+metadata/_gltf_primary_texture_coord = 0

@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://tv47wkimmpm"
-path.s3tc="res://.godot/imported/silhouette_person.png-6fadd25ac7f6b374e614057a2066c256.s3tc.ctex"
-path.etc2="res://.godot/imported/silhouette_person.png-6fadd25ac7f6b374e614057a2066c256.etc2.ctex"
+path="res://.godot/imported/silhouette_person.png-6fadd25ac7f6b374e614057a2066c256.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/silhouette_person.png"
-dest_files=["res://.godot/imported/silhouette_person.png-6fadd25ac7f6b374e614057a2066c256.s3tc.ctex", "res://.godot/imported/silhouette_person.png-6fadd25ac7f6b374e614057a2066c256.etc2.ctex"]
+dest_files=["res://.godot/imported/silhouette_person.png-6fadd25ac7f6b374e614057a2066c256.ctex"]
 
 [params]
 

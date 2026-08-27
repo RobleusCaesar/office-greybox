@@ -1,0 +1,20 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cmtbjgv7faluv"]
+
+[ext_resource type="Texture2D" uid="uid://cxonwjqdbfl2p" path="res://models/fallen_security_guard_base_color.jpg" id="1_c3e23"]
+[ext_resource type="Texture2D" uid="uid://76ge32gcbwwc" path="res://models/fallen_security_guard_metallic_roughness.jpg" id="2_o22nm"]
+[ext_resource type="Texture2D" uid="uid://bkp0b02pylg05" path="res://models/fallen_security_guard_normal.jpg" id="3_huso7"]
+
+[resource]
+resource_name = "material"
+cull_mode = 2
+albedo_texture = ExtResource("1_c3e23")
+metallic = 1.0
+metallic_texture = ExtResource("2_o22nm")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("2_o22nm")
+roughness_texture_channel = 1
+emission_enabled = true
+emission = Color(0.0019607844, 0.0019607844, 0.0019607844, 1)
+normal_enabled = true
+normal_texture = ExtResource("3_huso7")
+metadata/_gltf_primary_texture_coord = 0

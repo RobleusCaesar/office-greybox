@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cxitlqa7scvfv"
-path.s3tc="res://.godot/imported/denver_fire_skyline.png-b6a631b400bf7a8cbefa82d86975005f.s3tc.ctex"
-path.etc2="res://.godot/imported/denver_fire_skyline.png-b6a631b400bf7a8cbefa82d86975005f.etc2.ctex"
+path="res://.godot/imported/denver_fire_skyline.png-b6a631b400bf7a8cbefa82d86975005f.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/denver_fire_skyline.png"
-dest_files=["res://.godot/imported/denver_fire_skyline.png-b6a631b400bf7a8cbefa82d86975005f.s3tc.ctex", "res://.godot/imported/denver_fire_skyline.png-b6a631b400bf7a8cbefa82d86975005f.etc2.ctex"]
+dest_files=["res://.godot/imported/denver_fire_skyline.png-b6a631b400bf7a8cbefa82d86975005f.ctex"]
 
 [params]
 

@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://do4ox2x15m4sq"
-path.s3tc="res://.godot/imported/tv_snow.png-8cc0ce5352eaa0a0af4a36b605d31c7b.s3tc.ctex"
-path.etc2="res://.godot/imported/tv_snow.png-8cc0ce5352eaa0a0af4a36b605d31c7b.etc2.ctex"
+path="res://.godot/imported/tv_snow.png-8cc0ce5352eaa0a0af4a36b605d31c7b.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/tv_snow.png"
-dest_files=["res://.godot/imported/tv_snow.png-8cc0ce5352eaa0a0af4a36b605d31c7b.s3tc.ctex", "res://.godot/imported/tv_snow.png-8cc0ce5352eaa0a0af4a36b605d31c7b.etc2.ctex"]
+dest_files=["res://.godot/imported/tv_snow.png-8cc0ce5352eaa0a0af4a36b605d31c7b.ctex"]
 
 [params]
 

@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://da33hq1eiybdp"
-path.s3tc="res://.godot/imported/tex-hand-tan.png-cb898029d9bee0c7bee0d8ef668a957f.s3tc.ctex"
-path.etc2="res://.godot/imported/tex-hand-tan.png-cb898029d9bee0c7bee0d8ef668a957f.etc2.ctex"
+path="res://.godot/imported/tex-hand-tan.png-cb898029d9bee0c7bee0d8ef668a957f.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/hero/tex-hand-tan.png"
-dest_files=["res://.godot/imported/tex-hand-tan.png-cb898029d9bee0c7bee0d8ef668a957f.s3tc.ctex", "res://.godot/imported/tex-hand-tan.png-cb898029d9bee0c7bee0d8ef668a957f.etc2.ctex"]
+dest_files=["res://.godot/imported/tex-hand-tan.png-cb898029d9bee0c7bee0d8ef668a957f.ctex"]
 
 [params]
 

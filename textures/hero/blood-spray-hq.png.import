@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dx2c1d31fy1lq"
-path.s3tc="res://.godot/imported/blood-spray-hq.png-af325734b6fc8dd04adbc90ef2acaa13.s3tc.ctex"
-path.etc2="res://.godot/imported/blood-spray-hq.png-af325734b6fc8dd04adbc90ef2acaa13.etc2.ctex"
+path="res://.godot/imported/blood-spray-hq.png-af325734b6fc8dd04adbc90ef2acaa13.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/hero/blood-spray-hq.png"
-dest_files=["res://.godot/imported/blood-spray-hq.png-af325734b6fc8dd04adbc90ef2acaa13.s3tc.ctex", "res://.godot/imported/blood-spray-hq.png-af325734b6fc8dd04adbc90ef2acaa13.etc2.ctex"]
+dest_files=["res://.godot/imported/blood-spray-hq.png-af325734b6fc8dd04adbc90ef2acaa13.ctex"]
 
 [params]
 

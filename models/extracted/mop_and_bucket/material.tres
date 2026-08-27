@@ -1,0 +1,23 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bns0mtp5n8yem"]
+
+[ext_resource type="Texture2D" uid="uid://bqpfyfw7go3uw" path="res://models/mop_and_bucket_base_color.jpg" id="1_vgpba"]
+[ext_resource type="Texture2D" uid="uid://bixqa6malm1bs" path="res://models/mop_and_bucket_emissive.jpg" id="2_41p45"]
+[ext_resource type="Texture2D" uid="uid://c7xl6nfu87gp6" path="res://models/mop_and_bucket_metallic_roughness.jpg" id="3_6v0on"]
+[ext_resource type="Texture2D" uid="uid://cnk1o7swum5qf" path="res://models/mop_and_bucket_normal.jpg" id="4_fqrvg"]
+
+[resource]
+resource_name = "material"
+cull_mode = 2
+albedo_texture = ExtResource("1_vgpba")
+metallic = 1.0
+metallic_texture = ExtResource("3_6v0on")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_6v0on")
+roughness_texture_channel = 1
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_operator = 1
+emission_texture = ExtResource("2_41p45")
+normal_enabled = true
+normal_texture = ExtResource("4_fqrvg")
+metadata/_gltf_primary_texture_coord = 0

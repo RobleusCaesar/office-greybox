@@ -1,0 +1,18 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dbeu7n1r8ppnd"]
+
+[ext_resource type="Texture2D" uid="uid://dkjs3i0u2kfqg" path="res://models/reception_desk_base_color.jpg" id="1_p6r1p"]
+[ext_resource type="Texture2D" uid="uid://d1wg5jkcwuiqu" path="res://models/reception_desk_metallic_roughness.jpg" id="2_schbl"]
+[ext_resource type="Texture2D" uid="uid://dply26u0fqipv" path="res://models/reception_desk_normal.jpg" id="3_trp58"]
+
+[resource]
+resource_name = "material"
+cull_mode = 2
+albedo_texture = ExtResource("1_p6r1p")
+metallic = 1.0
+metallic_texture = ExtResource("2_schbl")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("2_schbl")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_texture = ExtResource("3_trp58")
+metadata/_gltf_primary_texture_coord = 0

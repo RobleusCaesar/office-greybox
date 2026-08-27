@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://csjh04bkpifsr"
-path.s3tc="res://.godot/imported/painting_mountains.png-b81ae2b37f71e6998cc909959a3b3ae2.s3tc.ctex"
-path.etc2="res://.godot/imported/painting_mountains.png-b81ae2b37f71e6998cc909959a3b3ae2.etc2.ctex"
+path="res://.godot/imported/painting_mountains.png-b81ae2b37f71e6998cc909959a3b3ae2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/painting_mountains.png"
-dest_files=["res://.godot/imported/painting_mountains.png-b81ae2b37f71e6998cc909959a3b3ae2.s3tc.ctex", "res://.godot/imported/painting_mountains.png-b81ae2b37f71e6998cc909959a3b3ae2.etc2.ctex"]
+dest_files=["res://.godot/imported/painting_mountains.png-b81ae2b37f71e6998cc909959a3b3ae2.ctex"]
 
 [params]
 

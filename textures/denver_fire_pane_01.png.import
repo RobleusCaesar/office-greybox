@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cgaejr0hlyq4r"
-path.s3tc="res://.godot/imported/denver_fire_pane_01.png-ce0c452339a2828797b94b83e106c622.s3tc.ctex"
-path.etc2="res://.godot/imported/denver_fire_pane_01.png-ce0c452339a2828797b94b83e106c622.etc2.ctex"
+path="res://.godot/imported/denver_fire_pane_01.png-ce0c452339a2828797b94b83e106c622.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/denver_fire_pane_01.png"
-dest_files=["res://.godot/imported/denver_fire_pane_01.png-ce0c452339a2828797b94b83e106c622.s3tc.ctex", "res://.godot/imported/denver_fire_pane_01.png-ce0c452339a2828797b94b83e106c622.etc2.ctex"]
+dest_files=["res://.godot/imported/denver_fire_pane_01.png-ce0c452339a2828797b94b83e106c622.ctex"]
 
 [params]
 

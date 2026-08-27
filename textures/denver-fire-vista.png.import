@@ -3,17 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bjigptp374ual"
-path.s3tc="res://.godot/imported/denver-fire-vista.png-d4869335e1c0f71ec75f177ad1548736.s3tc.ctex"
-path.etc2="res://.godot/imported/denver-fire-vista.png-d4869335e1c0f71ec75f177ad1548736.etc2.ctex"
+path="res://.godot/imported/denver-fire-vista.png-d4869335e1c0f71ec75f177ad1548736.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
 source_file="res://textures/denver-fire-vista.png"
-dest_files=["res://.godot/imported/denver-fire-vista.png-d4869335e1c0f71ec75f177ad1548736.s3tc.ctex", "res://.godot/imported/denver-fire-vista.png-d4869335e1c0f71ec75f177ad1548736.etc2.ctex"]
+dest_files=["res://.godot/imported/denver-fire-vista.png-d4869335e1c0f71ec75f177ad1548736.ctex"]
 
 [params]
 
