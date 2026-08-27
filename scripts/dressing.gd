@@ -153,6 +153,7 @@ func _texture_existing(level: Node3D) -> void:
 	_set_csg_mat(_find(level, "FutureAssetSlots/CEOOffice/Books_02"), paper)
 	_set_csg_mat(_find(level, "FutureAssetSlots/CEOOffice/Books_03"), paper)
 	_set_csg_mat(_find(level, "Architecture/Floors/CEOOfficeFloor"), walnut if walnut else stone)
+	_carpet_playable_floors(level)
 	var mirror := _find(level, "FutureAssetSlots/Bathroom/Mirror")
 	if mirror:
 		_set_csg_mat(mirror, _tex_mat("res://textures/tex_metal.png", Color(0.72, 0.78, 0.82), 0.08, 0.85))
@@ -289,13 +290,44 @@ func _breakroom(level: Node3D) -> void:
 
 func _cardboard_mat(path: String, rough: float = 0.84) -> StandardMaterial3D:
 	# Dedicated albedo on BoxMesh / quads — same care as tv.gd, not a CSG wood tint.
+	# load() only. White albedo so the authored PNG reads, not a beige smear.
 	var m := StandardMaterial3D.new()
-	m.albedo_color = Color(0.94, 0.86, 0.72)
+	m.albedo_color = Color.WHITE
 	m.albedo_texture = load(path)
 	m.roughness = rough
 	m.metallic = 0.0
 	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	return m
+
+
+func _office_carpet() -> StandardMaterial3D:
+	var m: Material = _mat("res://materials/mat_carpet.tres")
+	if m is StandardMaterial3D:
+		return m as StandardMaterial3D
+	# Soft-fail authored the same way as _tex_mat — load() the PNG, no exists-gate.
+	var carpet := _tex_mat("res://textures/tex_carpet_beige.png", Color.WHITE, 0.92)
+	carpet.uv1_triplanar = true
+	carpet.uv1_world_triplanar = true
+	carpet.uv1_scale = Vector3(0.85, 0.85, 0.85)
+	return carpet
+
+
+func _carpet_playable_floors(level: Node3D) -> void:
+	# Closet + kitchen + halls were sharing a near-black polished stone.
+	# CEO stays walnut. Bathroom stays porcelain/stone.
+	var carpet := _office_carpet()
+	for p in [
+		"Architecture/Floors/IntroClosetFloor",
+		"Architecture/Floors/BreakRoomFloor",
+		"Architecture/Floors/NorthHallFloor",
+		"Architecture/Floors/EastHallFloor",
+		"Architecture/Floors/CornerFloor",
+		"Architecture/Floors/CubicleFloor",
+		"Architecture/Floors/CopyAlcoveFloor",
+		"Architecture/Floors/ReceptionFloor",
+		"Architecture/Floors/DeadOfficeFloor",
+	]:
+		_set_csg_mat(_find(level, p), carpet)
 
 
 func _sheet_metal() -> StandardMaterial3D:
@@ -327,11 +359,11 @@ func _intro_closet(level: Node3D) -> void:
 	]:
 		_set_csg_mat(_find(level, p), metal)
 	# Floor-to-ceiling units on N / S / W. East wall is the vent — no shelves.
-	# Inset so boards never clip plaster or the chaos door.
-	_shelf_run(ic, "South", Vector3(-6.48, 0.0, 0.10), Vector3.RIGHT, Vector3.BACK, 6.16, 5)
-	_shelf_run(ic, "North", Vector3(-6.48, 0.0, 6.32), Vector3.RIGHT, Vector3.FORWARD, 6.16, 5)
-	_shelf_run(ic, "WestS", Vector3(-6.90, 0.0, 0.56), Vector3.BACK, Vector3.RIGHT, 2.06, 2)
-	_shelf_run(ic, "WestN", Vector3(-6.90, 0.0, 3.90), Vector3.BACK, Vector3.RIGHT, 2.24, 2)
+	# Recentered for the gapped closet (east wall at X=-2.66, west at X=-9.66).
+	_shelf_run(ic, "South", Vector3(-9.14, 0.0, 0.10), Vector3.RIGHT, Vector3.BACK, 6.16, 5)
+	_shelf_run(ic, "North", Vector3(-9.14, 0.0, 6.32), Vector3.RIGHT, Vector3.FORWARD, 6.16, 5)
+	_shelf_run(ic, "WestS", Vector3(-9.56, 0.0, 0.56), Vector3.BACK, Vector3.RIGHT, 2.06, 2)
+	_shelf_run(ic, "WestN", Vector3(-9.56, 0.0, 3.90), Vector3.BACK, Vector3.RIGHT, 2.24, 2)
 	_floor_cartons(ic)
 	var br := _find(level, "FutureAssetSlots/BreakRoom")
 	if br:
@@ -407,7 +439,6 @@ func _stock_board(parent: Node, stem: String, bay: int, hi: int, board_pos: Vect
 		var spec: Array = catalog[(bay * 7 + hi * 3 + k + stem.length()) % catalog.size()]
 		var tex: String = spec[0]
 		var raw: Vector3 = spec[1]
-		var rough: float = spec[2]
 		# Keep the box on the board: depth along inward, width along the run.
 		var size := along.abs() * minf(raw.x, board_len * 0.42) + Vector3.UP * raw.y + inward.abs() * minf(raw.z, board_depth * 0.82)
 		if size.x < 0.08:
@@ -417,8 +448,21 @@ func _stock_board(parent: Node, stem: String, bay: int, hi: int, board_pos: Vect
 		var t := (float(k) + 0.5) / float(n_boxes) - 0.5
 		var pos := board_pos + along * (t * board_len * 0.72) + inward * (0.03 * float(k - 1))
 		pos.y = board_top + size.y * 0.5
-		var yaw := float(((bay + hi * 2 + k) % 7) - 3) * 4.0
-		_box(parent, "%s_Box_%d_%d_%d" % [stem, bay, hi, k], size, pos, _cardboard_mat(tex, rough), Vector3(0, yaw, 0), false)
+		# Face the aisle so FRAGILE / COPY PAPER read at shelf distance.
+		var yaw := _face_yaw(inward) + float(((bay + hi * 2 + k) % 5) - 2) * 3.0
+		_carton(parent, "%s_Box_%d_%d_%d" % [stem, bay, hi, k], size, pos, yaw, tex, false)
+
+
+func _face_yaw(inward: Vector3) -> float:
+	if inward.z > 0.5:
+		return 0.0
+	if inward.z < -0.5:
+		return 180.0
+	if inward.x > 0.5:
+		return -90.0
+	if inward.x < -0.5:
+		return 90.0
+	return 0.0
 
 
 func _carton(parent: Node, name: String, size: Vector3, pos: Vector3, yaw: float, face_tex: String, collide: bool) -> void:
@@ -445,12 +489,13 @@ func _carton(parent: Node, name: String, size: Vector3, pos: Vector3, yaw: float
 
 func _floor_cartons(ic: Node) -> void:
 	# A few on the floor. Leave the aisle, vent mouth, and chaos door clear.
-	_carton(ic, "Floor_Fragile", Vector3(0.52, 0.40, 0.40), Vector3(-5.85, 0.20, 1.05), 18.0, "res://textures/tex_cardboard_fragile.png", true)
-	_carton(ic, "Floor_Copy", Vector3(0.46, 0.28, 0.36), Vector3(-5.55, 0.14, 1.38), -12.0, "res://textures/tex_cardboard_copy.png", true)
-	_carton(ic, "Floor_Tape", Vector3(0.38, 0.24, 0.32), Vector3(-5.70, 0.12, 5.55), 8.0, "res://textures/tex_cardboard_tape.png", true)
-	_carton(ic, "Floor_Copy2", Vector3(0.42, 0.22, 0.34), Vector3(-5.40, 0.11, 5.22), -22.0, "res://textures/tex_cardboard_copy.png", true)
-	_carton(ic, "Floor_Plain", Vector3(0.34, 0.20, 0.28), Vector3(-1.55, 0.10, 0.88), 14.0, "res://textures/tex_cardboard.png", true)
-	_carton(ic, "Floor_Fragile2", Vector3(0.36, 0.26, 0.30), Vector3(-1.85, 0.13, 5.40), -8.0, "res://textures/tex_cardboard_fragile.png", true)
+	# Recentered: old positions minus 2.66 m (closet shifted west off BreakRoomWest).
+	_carton(ic, "Floor_Fragile", Vector3(0.52, 0.40, 0.40), Vector3(-8.51, 0.20, 1.05), 18.0, "res://textures/tex_cardboard_fragile.png", true)
+	_carton(ic, "Floor_Copy", Vector3(0.46, 0.28, 0.36), Vector3(-8.21, 0.14, 1.38), -12.0, "res://textures/tex_cardboard_copy.png", true)
+	_carton(ic, "Floor_Tape", Vector3(0.38, 0.24, 0.32), Vector3(-8.36, 0.12, 5.55), 8.0, "res://textures/tex_cardboard_tape.png", true)
+	_carton(ic, "Floor_Copy2", Vector3(0.42, 0.22, 0.34), Vector3(-8.06, 0.11, 5.22), -22.0, "res://textures/tex_cardboard_copy.png", true)
+	_carton(ic, "Floor_Plain", Vector3(0.34, 0.20, 0.28), Vector3(-4.21, 0.10, 0.88), 14.0, "res://textures/tex_cardboard.png", true)
+	_carton(ic, "Floor_Fragile2", Vector3(0.36, 0.26, 0.30), Vector3(-4.51, 0.13, 5.40), -8.0, "res://textures/tex_cardboard_fragile.png", true)
 
 
 func _vent_cover(br: Node) -> void:
@@ -951,10 +996,10 @@ func _walls(level: Node3D) -> void:
 	_trim_span(root, i, false, 0.20, 6.40, 0.12, [[2.72, 3.68]], trim)
 	_trim_span(root, i, false, 0.20, 6.40, 6.88, [], trim)
 	# Intro closet — skip chaos door and the closet-side duct mouth
-	_trim_span(root, i, true, -6.80, -0.22, 0.12, [], trim)
-	_trim_span(root, i, true, -6.80, -0.22, 6.34, [], trim)
-	_trim_span(root, i, false, 0.20, 6.30, -6.92, [[2.70, 3.80]], trim)
-	_trim_span(root, i, false, 0.20, 6.30, -0.12, [[2.72, 3.68]], trim)
+	_trim_span(root, i, true, -9.46, -2.88, 0.12, [], trim)
+	_trim_span(root, i, true, -9.46, -2.88, 6.34, [], trim)
+	_trim_span(root, i, false, 0.20, 6.30, -9.58, [[2.70, 3.80]], trim)
+	_trim_span(root, i, false, 0.20, 6.30, -2.78, [[2.72, 3.68]], trim)
 	# North hall west — skip bathroom entry Z 8.39–9.61 @ X ~2
 	_trim_span(root, i, false, 6.58, 13.20, 2.08, [[8.39, 9.61]], trim)
 	# North hall east — skip supply / elevator slab
