@@ -14,8 +14,7 @@ func apply(level: Node3D) -> void:
 	_ammo(level)
 	_emergency(level)
 	_locked_doors(level)
-	# TODO: wire models/closed_elevator.glb when it lands on main — replaces the existing elevator door, not a hall door.
-	# TODO: wire models/mop_and_bucket.glb when it lands on main — IntroCloset, wall LEFT or RIGHT of the vent mouth (east wall). Do not block the crawl hole or the aisle.
+	_flush_hall(level)
 
 
 func _mat(path: String) -> Material:
@@ -157,6 +156,7 @@ func _texture_existing(level: Node3D) -> void:
 	_set_csg_mat(_find(level, "FutureAssetSlots/CEOOffice/Books_03"), paper)
 	_set_csg_mat(_find(level, "Architecture/Floors/CEOOfficeFloor"), walnut if walnut else stone)
 	_carpet_playable_floors(level)
+	_fix_floors(level)
 	var mirror := _find(level, "FutureAssetSlots/Bathroom/Mirror")
 	if mirror:
 		_set_csg_mat(mirror, _tex_mat("res://textures/tex_metal.png", Color(0.72, 0.78, 0.82), 0.08, 0.85))
@@ -211,6 +211,15 @@ func _texture_existing(level: Node3D) -> void:
 		"FutureAssetSlots/Reception/ReceptionMonitor",
 		"FutureAssetSlots/Reception/BadgeNiche",
 		"FutureAssetSlots/Reception/BadgeCard",
+		"FutureAssetSlots/BreakRoom/BreakRoomChair_01",
+		"FutureAssetSlots/BreakRoom/BreakRoomChair_01_Back",
+		"FutureAssetSlots/BreakRoom/BreakRoomChair_02",
+		"FutureAssetSlots/BreakRoom/BreakRoomChair_02_Back",
+		"FutureAssetSlots/BreakRoom/BreakRoomChair_03",
+		"FutureAssetSlots/BreakRoom/BreakRoomChair_03_Back",
+		"FutureAssetSlots/BreakRoom/BreakRoomChair_04",
+		"FutureAssetSlots/BreakRoom/BreakRoomChair_04_Back",
+		"FutureAssetSlots/Bathroom/Bench",
 	])
 	# Hide CSG stand-ins that Rob's Meshy GLBs replace. Keep collision footprints.
 	_hide_visual(_find(level, "FutureAssetSlots/BreakRoom/Fridge"))
@@ -280,10 +289,10 @@ func _breakroom(level: Node3D) -> void:
 	_instance_glb(br, "res://models/refrigerator_open.glb", "RefrigeratorOpen", Vector3(6.40, 0.952, 0.65), Vector3(0, 0, 0), Vector3.ONE)
 	# Lunch table: mesh AABB y −0.533..0.533, height 1.07. Scale 0.72 → ~0.76 m top so the cup / papers still sit.
 	_instance_glb(br, "res://models/kitchen_lunch_table.glb", "KitchenLunchTable", Vector3(3.50, 0.384, 3.70), Vector3(0, 0, 0), Vector3(0.72, 0.72, 0.72))
-	# Fallen guard — NE corner by the EXIT (north doorway), opposite the west-wall vent.
-	# Mesh AABB y −0.480..0.493, length along Z. Yaw 90 so he lies along X, off the doorway and vent.
-	var guard := _instance_glb(br, "res://models/fallen_security_guard.glb", "FallenSecurityGuard", Vector3(5.85, 0.480, 5.72), Vector3(0, 90, 0), Vector3.ONE)
-	_box_collision(guard, Vector3(0.70, 0.36, 1.70), Vector3(0.0, 0.0, 0.0))
+	# Fallen guard — NW corner (doorway wall × crawl-hole wall). On the floor, back/shoulder on both walls.
+	# Mesh AABB y −0.480..0.493, length along Z. Roll onto his side so the back meets the west plaster.
+	var guard := _instance_glb(br, "res://models/fallen_security_guard.glb", "FallenSecurityGuard", Vector3(0.42, 0.455, 5.78), Vector3(-8, 12, 78), Vector3.ONE)
+	_box_collision(guard, Vector3(0.70, 0.42, 1.55), Vector3(0.0, 0.0, 0.0))
 	# Cubicle keyboard + reception desk parts
 	var hall := _find(level, "FutureAssetSlots/EastHall")
 	if hall:
@@ -387,6 +396,10 @@ func _intro_closet(level: Node3D) -> void:
 	_shelf_run(ic, "WestS", Vector3(-9.56, 0.0, 0.56), Vector3.BACK, Vector3.RIGHT, 2.06, 2)
 	_shelf_run(ic, "WestN", Vector3(-9.56, 0.0, 3.90), Vector3.BACK, Vector3.RIGHT, 2.24, 2)
 	_floor_cartons(ic)
+	# Mop: east wall, RIGHT of the vent mouth (south). Scale 0.50 → ~0.95 m. load() only.
+	# Mesh AABB y −0.952..0.951, 1.64 × 1.90 × 1.27. Do not block the crawl hole or the aisle.
+	var mop := _instance_glb(ic, "res://models/mop_and_bucket.glb", "MopAndBucket", Vector3(-3.04, 0.476, 2.02), Vector3(0, 90, 0), Vector3(0.50, 0.50, 0.50))
+	_box_collision(mop, Vector3(0.42, 0.90, 0.52), Vector3(0.0, 0.0, 0.0))
 	var br := _find(level, "FutureAssetSlots/BreakRoom")
 	if br:
 		_vent_cover(br)
@@ -555,26 +568,33 @@ func _bathroom(level: Node3D) -> void:
 	var tz := [7.95, 9.10, 10.25, 11.40]
 	for i in tz.size():
 		_toilet(bath, "Toilet_%d" % (i + 1), Vector3(-5.35, 0.0, tz[i]), porcelain, metal)
-	# Urinal bank on the north wall — same bowl mesh, names kept for QA.
-	for i in 3:
-		var ux := -0.15 + i * 0.85
-		_toilet(bath, "Urinal_%d" % i, Vector3(ux, 0.0, 12.48), porcelain, metal, 180.0)
-	# Urinal dividers between the three bowls
-	_box(bath, "UrinalDivider_0", Vector3(0.04, 0.95, 0.42), Vector3(0.275, 0.90, 12.62), porcelain)
-	_box(bath, "UrinalDivider_1", Vector3(0.04, 0.95, 0.42), Vector3(1.125, 0.90, 12.62), porcelain)
-	# Vanity along the south wall. Mesh AABB y −0.427..0.427, 1.90 × 0.85 × 0.42.
-	var vanity := _instance_glb(bath, "res://models/bathroom_vanity.glb", "BathroomVanity", Vector3(0.15, 0.427, 6.81), Vector3(0, 0, 0), Vector3.ONE)
-	_box_collision(vanity, Vector3(1.88, 0.84, 0.40), Vector3(0.0, 0.0, 0.0))
+	# Urinal bank on the BACK (north) wall, east of the stall run — not on stall-door partitions.
+	var ux := [-0.50, 0.50, 1.50]
+	for i in ux.size():
+		_toilet(bath, "Urinal_%d" % i, Vector3(ux[i], 0.0, 12.82), porcelain, metal, 180.0)
+	# Real privacy screens: taller + deeper than the old 0.95 × 0.42 slabs.
+	_box(bath, "UrinalDivider_0", Vector3(0.05, 1.48, 0.74), Vector3(0.00, 1.08, 12.70), porcelain)
+	_box(bath, "UrinalDivider_1", Vector3(0.05, 1.48, 0.74), Vector3(1.00, 1.08, 12.70), porcelain)
+	# Vanity along the south wall. Mesh AABB 1.90 × 0.85 × 0.42. Scale X to the 2.85 m mirror.
+	var vanity := _instance_glb(bath, "res://models/bathroom_vanity.glb", "BathroomVanity", Vector3(0.15, 0.427, 6.81), Vector3(0, 0, 0), Vector3(1.50, 1.00, 1.00))
+	_box_collision(vanity, Vector3(2.85, 0.84, 0.40), Vector3(0.0, 0.0, 0.0))
 	_box(bath, "Soap", Vector3(0.08, 0.12, 0.06), Vector3(-0.2, 0.92, 6.90), _tex_mat("res://textures/tex_porcelain.png", Color(0.7, 0.75, 0.6)), Vector3.ZERO, false)
-	# Large smashed mirrors
-	var mirror := _tex_mat("res://textures/tex_metal.png", Color(0.78, 0.82, 0.86, 0.92), 0.08, 0.88)
-	mirror.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_box(bath, "MirrorWide", Vector3(2.85, 1.15, 0.03), Vector3(0.15, 1.72, 6.68), mirror, Vector3.ZERO, false)
-	var crack := _tex_mat("", Color(0.04, 0.04, 0.05, 0.88), 0.9)
+	# Silver reflective glass + wood frame. Cracks read as smashed silver, not a black pane.
+	var silver := _tex_mat("res://textures/tex_metal.png", Color(0.84, 0.87, 0.90), 0.06, 0.92)
+	silver.metallic_specular = 0.72
+	_box(bath, "MirrorWide", Vector3(2.85, 1.15, 0.018), Vector3(0.15, 1.72, 6.695), silver, Vector3.ZERO, false)
+	var frame := _mat("res://materials/mat_walnut.tres")
+	if frame == null:
+		frame = wood
+	_box(bath, "MirrorFrame_T", Vector3(3.02, 0.07, 0.045), Vector3(0.15, 2.325, 6.688), frame, Vector3.ZERO, false)
+	_box(bath, "MirrorFrame_B", Vector3(3.02, 0.07, 0.045), Vector3(0.15, 1.115, 6.688), frame, Vector3.ZERO, false)
+	_box(bath, "MirrorFrame_L", Vector3(0.07, 1.28, 0.045), Vector3(-1.340, 1.72, 6.688), frame, Vector3.ZERO, false)
+	_box(bath, "MirrorFrame_R", Vector3(0.07, 1.28, 0.045), Vector3(1.640, 1.72, 6.688), frame, Vector3.ZERO, false)
+	var crack := _tex_mat("", Color(0.22, 0.24, 0.26, 0.78), 0.55, 0.35)
 	crack.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_box(bath, "MirrorCrack_0", Vector3(0.012, 1.05, 0.01), Vector3(-0.55, 1.70, 6.70), crack, Vector3(0, 0, 18), false)
-	_box(bath, "MirrorCrack_1", Vector3(0.90, 0.012, 0.01), Vector3(0.40, 1.95, 6.70), crack, Vector3(0, 0, -22), false)
-	_box(bath, "MirrorCrack_2", Vector3(0.012, 0.70, 0.01), Vector3(1.05, 1.55, 6.70), crack, Vector3(0, 0, -12), false)
+	_box(bath, "MirrorCrack_0", Vector3(0.010, 1.02, 0.008), Vector3(-0.55, 1.70, 6.708), crack, Vector3(0, 0, 18), false)
+	_box(bath, "MirrorCrack_1", Vector3(0.86, 0.010, 0.008), Vector3(0.40, 1.95, 6.708), crack, Vector3(0, 0, -22), false)
+	_box(bath, "MirrorCrack_2", Vector3(0.010, 0.68, 0.008), Vector3(1.05, 1.55, 6.708), crack, Vector3(0, 0, -12), false)
 	# Stall doors hinged on the partitions, not floating mid-gap
 	var hinge_z := [7.40, 8.55, 9.70, 10.85]
 	for i in hinge_z.size():
@@ -591,10 +611,7 @@ func _bathroom(level: Node3D) -> void:
 
 
 func _oak_mat() -> StandardMaterial3D:
-	var path := "res://textures/hero/tex-light-oak.png"
-	if not FileAccess.file_exists(path):
-		path = "res://textures/tex_wood.png"
-	var oak := _tex_mat(path, Color(0.98, 0.90, 0.72), 0.38)
+	var oak := _tex_mat("res://textures/hero/tex-light-oak.png", Color(0.98, 0.90, 0.72), 0.38)
 	oak.uv1_triplanar = true
 	oak.uv1_world_triplanar = true
 	oak.uv1_scale = Vector3(1.35, 1.35, 1.35)
@@ -610,10 +627,8 @@ func _reception(level: Node3D) -> void:
 	var metal := _mat("res://materials/mat_metal_furn.tres")
 	var paper := _mat("res://materials/mat_paper.tres")
 	var leather := _mat("res://materials/mat_leather.tres")
-	# Parent yaw 180: local −X is the sit-side (world east / logo wall). Receptionist
-	# sits with their back to the logo and faces the lobby. Counter height 0.86 m.
-	# GLB work surface / sit-side needs yaw +90 so it faces the logo wall (east).
-	# Receptionist sits on that side, back to the logo, looking into the lobby.
+	# Parent yaw 180. Mesh was +90; flip 180 → −90 so the sit-side faces the lobby.
+	# Chair stays on the sit side after the flip. Counter height 0.86 m.
 	var desk := Node3D.new()
 	desk.name = "ReceptionDesk2"
 	desk.position = Vector3(24.55, 0.0, 11.50)
@@ -629,7 +644,7 @@ func _reception(level: Node3D) -> void:
 			inst.name = "ReceptionDeskMesh"
 			# Mesh AABB y −0.665..0.667. Sit on the floor; high back stays in the GLB.
 			inst.position = Vector3(0.0, 0.665, 0.0)
-			inst.rotation_degrees = Vector3(0, 90, 0)
+			inst.rotation_degrees = Vector3(0, -90, 0)
 			desk.add_child(inst)
 			var body := _box(desk, "ReceptionDesk", Vector3(1.16, 0.82, 1.88), Vector3(0.0, 0.41, 0.0), oak)
 			body.visible = false
@@ -642,20 +657,20 @@ func _reception(level: Node3D) -> void:
 		_box(desk, "VisitorLedge", Vector3(0.30, 0.10, 1.15), Vector3(0.46, 0.91, -0.62), oak)
 		_box(desk, "ReceptionDrawer", Vector3(0.02, 0.10, 0.36), Vector3(0.56, 0.46, 0.85), dark, Vector3.ZERO, false)
 		_box(desk, "ReceptionDrawer_02", Vector3(0.02, 0.10, 0.36), Vector3(0.56, 0.46, -0.85), dark, Vector3.ZERO, false)
-	# Monitor / keyboard / papers face the wall (local −X = world east).
-	_box(desk, "ReceptionMonitor", Vector3(0.07, 0.28, 0.42), Vector3(-0.36, 1.04, 0.16), metal)
-	_box(desk, "ReceptionMonitorStand", Vector3(0.08, 0.10, 0.10), Vector3(-0.30, 0.89, 0.16), metal, Vector3.ZERO, false)
+	# Monitor / keyboard / papers face the sit-side (local +X = world west / lobby).
+	_box(desk, "ReceptionMonitor", Vector3(0.07, 0.28, 0.42), Vector3(0.36, 1.04, 0.16), metal)
+	_box(desk, "ReceptionMonitorStand", Vector3(0.08, 0.10, 0.10), Vector3(0.30, 0.89, 0.16), metal, Vector3.ZERO, false)
 	var screen := _tex_mat("res://textures/tv_snow.png", Color(0.08, 0.10, 0.12), 0.35, 0.0, 0.12)
-	_quad(desk, "ReceptionScreen", Vector2(0.40, 0.24), Vector3(-0.405, 1.05, 0.16), Vector3(0, -90, 0), screen)
-	_box(desk, "ReceptionKeyboard", Vector3(0.14, 0.02, 0.32), Vector3(-0.18, 0.87, 0.16), metal, Vector3.ZERO, false)
-	_box(desk, "ReceptionPapers", Vector3(0.18, 0.01, 0.24), Vector3(-0.16, 0.87, -0.55), paper, Vector3(0, 16, 0), false)
-	_box(desk, "Stapler", Vector3(0.08, 0.035, 0.03), Vector3(0.10, 0.88, 0.72), metal, Vector3.ZERO, false)
-	_box(desk, "Tape", Vector3(0.07, 0.05, 0.07), Vector3(0.14, 0.885, -0.88), metal, Vector3.ZERO, false)
-	# Chair on the wall side, under the AURUM sign — back peeks over the desk.
-	_box(desk, "LeatherSeat", Vector3(0.44, 0.06, 0.42), Vector3(-0.78, 0.46, 0.0), leather, Vector3.ZERO, false)
-	_box(desk, "LeatherBack", Vector3(0.07, 0.78, 0.44), Vector3(-0.96, 0.92, 0.0), leather, Vector3.ZERO, false)
-	_box(desk, "LeatherArm_L", Vector3(0.28, 0.14, 0.06), Vector3(-0.78, 0.58, 0.20), leather, Vector3.ZERO, false)
-	_box(desk, "LeatherArm_R", Vector3(0.28, 0.14, 0.06), Vector3(-0.78, 0.58, -0.20), leather, Vector3.ZERO, false)
+	_quad(desk, "ReceptionScreen", Vector2(0.40, 0.24), Vector3(0.405, 1.05, 0.16), Vector3(0, 90, 0), screen)
+	_box(desk, "ReceptionKeyboard", Vector3(0.14, 0.02, 0.32), Vector3(0.18, 0.87, 0.16), metal, Vector3.ZERO, false)
+	_box(desk, "ReceptionPapers", Vector3(0.18, 0.01, 0.24), Vector3(0.16, 0.87, -0.55), paper, Vector3(0, 16, 0), false)
+	_box(desk, "Stapler", Vector3(0.08, 0.035, 0.03), Vector3(-0.10, 0.88, 0.72), metal, Vector3.ZERO, false)
+	_box(desk, "Tape", Vector3(0.07, 0.05, 0.07), Vector3(-0.14, 0.885, -0.88), metal, Vector3.ZERO, false)
+	# Chair on the sit side after the 180 flip (local +X = world west / lobby).
+	_box(desk, "LeatherSeat", Vector3(0.44, 0.06, 0.42), Vector3(0.78, 0.46, 0.0), leather, Vector3.ZERO, false)
+	_box(desk, "LeatherBack", Vector3(0.07, 0.78, 0.44), Vector3(0.96, 0.92, 0.0), leather, Vector3.ZERO, false)
+	_box(desk, "LeatherArm_L", Vector3(0.28, 0.14, 0.06), Vector3(0.78, 0.58, 0.20), leather, Vector3.ZERO, false)
+	_box(desk, "LeatherArm_R", Vector3(0.28, 0.14, 0.06), Vector3(0.78, 0.58, -0.20), leather, Vector3.ZERO, false)
 	# Dark walnut panels on the divider west face, then the AURUM plate.
 	var panel := _tex_mat("res://textures/tex_walnut.png", Color(0.24, 0.14, 0.08), 0.50)
 	panel.uv1_triplanar = true
@@ -692,8 +707,13 @@ func _dread(level: Node3D) -> void:
 	for p in papers:
 		_box(root, "Paper_%d" % i, Vector3(0.22, 0.005, 0.16), p, paper, Vector3(0, float(i * 23), 0), false)
 		i += 1
-	# Fallen door INSIDE the bathroom (south of the entry walk). Hall stays passable.
-	_box(root, "FallenDoor", Vector3(1.85, 0.08, 0.88), Vector3(0.45, 0.04, 7.35), wood, Vector3(0, 22, 0))
+	# Fallen door stood as wreckage at the bathroom opening (south jamb). Hall stays walkable.
+	var fallen := Node3D.new()
+	fallen.name = "FallenDoor"
+	fallen.position = Vector3(1.58, 0.0, 8.38)
+	fallen.rotation_degrees = Vector3(0, 14, 0)
+	root.add_child(fallen)
+	_box(fallen, "Slab", Vector3(0.08, 1.86, 0.90), Vector3(0.04, 0.70, 0.18), wood, Vector3(18, 0, -28))
 	# Glass shards in EAST HALL only (not money-shot)
 	for j in 7:
 		var gx := 10.5 + j * 0.55
@@ -805,11 +825,11 @@ func _build_ceo_body(ceo: Node) -> void:
 		var inst := packed.instantiate() as Node3D
 		if inst:
 			inst.name = "CeoDeadMesh"
-			# Mesh AABB y −0.152..0.141, length along X. Parent Y=0.27 / X=0 is locked.
-			# Yaw 90 so length follows the old +Z body. X=180 flips the authored
-			# face-down mesh onto his back without moving the DeadExecutive parent.
+			# Mesh AABB y −0.152..0.141, length along X. Authored face-down.
+			# Parent Y=0.27 / rot X=0 is locked. Yaw 90 follows the old +Z body.
+			# Do not X-rotate 180 — that put him on his back.
 			inst.position = Vector3(0.0, -0.129, 0.0)
-			inst.rotation_degrees = Vector3(180, 90, 0)
+			inst.rotation_degrees = Vector3(0, 90, 0)
 			inst.scale = Vector3.ONE
 			body.add_child(inst)
 			return
@@ -874,8 +894,6 @@ func _diorama(level: Node3D) -> void:
 	dia.position = Vector3(42.25, 0.0, 11.5)
 	level.add_child(dia)
 	var vista := "res://textures/hero/denver-fire-capitol-demon.png"
-	if not FileAccess.file_exists(vista):
-		vista = "res://textures/denver-fire-vista.png"
 	var sky := _city_mat(vista)
 	# Sealed box: floor, roof, N, S, E. No stone. No gaps beside/above the vista.
 	_quad(dia, "Backdrop", Vector2(14.0, 8.0), Vector3(4.40, 3.20, 0.0), Vector3(0, 90, 0), sky)
@@ -980,10 +998,19 @@ func _toilet(parent: Node, name: String, pos: Vector3, porcelain: Material, meta
 
 
 func _locked_doors(level: Node3D) -> void:
-	# closed_door.glb replaces locked slabs. Keep CSG collision so they stay sealed.
-	# Do not swap IntroCloset ChaosDoor — sealed-can't-open behavior stays on that unique door.
-	_swap_locked_door(_find(level, "FutureAssetSlots/SupplyCloset/LockedDoor_Supply"), 90.0)
+	# Elevator GLB replaces the existing elevator door (north-hall east / supply opening).
+	# closed_door.glb stays on the conference hall lock. ChaosDoor is not swapped.
+	_swap_elevator(_find(level, "FutureAssetSlots/SupplyCloset/LockedDoor_Supply"))
 	_swap_locked_door(_find(level, "FutureAssetSlots/EastHall/LockedDoor_DeadOffice"), 0.0)
+
+
+func _swap_elevator(door: Node) -> void:
+	if door == null:
+		return
+	_hide_visual(door.get_node_or_null("Slab"))
+	_hide_visual(door.get_node_or_null("Handle"))
+	# Mesh AABB y −0.952..0.951, 1.16 × 1.90 × 0.18. Seat on the floor in the frame.
+	_instance_glb(door, "res://models/closed_elevator.glb", "ClosedElevator", Vector3(0.0, 0.952, 0.0), Vector3(0, 90, 0), Vector3.ONE)
 
 
 func _swap_locked_door(door: Node, yaw: float) -> void:
@@ -1086,9 +1113,9 @@ func _walls(level: Node3D) -> void:
 		[Vector3(3.40, 0.22, 0.14), Vector2(1.50, 0.30), Vector3(0, 0, 0)],
 		[Vector3(5.80, 0.20, 0.14), Vector2(0.90, 0.22), Vector3(0, 0, 0)],
 		[Vector3(0.14, 0.24, 2.40), Vector2(1.10, 0.26), Vector3(0, 90, 0)],
-		[Vector3(8.90, 0.24, 11.14), Vector2(1.20, 0.28), Vector3(0, 0, 0)],
-		[Vector3(13.20, 0.22, 11.14), Vector2(1.00, 0.24), Vector3(0, 0, 0)],
-		[Vector3(16.60, 0.22, 12.86), Vector2(1.30, 0.26), Vector3(0, 180, 0)],
+		[Vector3(8.90, 0.24, 10.54), Vector2(1.20, 0.28), Vector3(0, 0, 0)],
+		[Vector3(13.20, 0.22, 10.54), Vector2(1.00, 0.24), Vector3(0, 0, 0)],
+		[Vector3(16.60, 0.22, 13.46), Vector2(1.30, 0.26), Vector3(0, 180, 0)],
 		[Vector3(21.20, 0.26, 6.64), Vector2(1.10, 0.28), Vector3(0, 0, 0)],
 		[Vector3(26.18, 0.28, 10.40), Vector2(1.20, 0.34), Vector3(0, 90, 0)],
 		[Vector3(29.80, 0.24, 6.64), Vector2(1.40, 0.28), Vector3(0, 0, 0)],
@@ -1108,7 +1135,7 @@ func _walls(level: Node3D) -> void:
 	_frame(root, "HallFrontRange", Vector3(13.70, 1.70, 13.36), Vector2(1.08, 0.70), Vector3(0, 180, 0), wood, front_range)
 	_frame(root, "HallDenver", Vector3(18.15, 1.68, 13.36), Vector2(1.00, 0.66), Vector3(0, 180, 0), wood, denver)
 	# South wall of that stretch — one map, well clear of the north-wall pair.
-	_frame(root, "HallMap", Vector3(14.10, 1.68, 11.14), Vector2(0.88, 0.62), Vector3(0, 0, 0), wood, city)
+	_frame(root, "HallMap", Vector3(14.10, 1.68, 10.56), Vector2(0.88, 0.62), Vector3(0, 0, 0), wood, city)
 	_frame(root, "ReceptionMap", Vector3(20.20, 1.72, 16.36), Vector2(0.95, 0.66), Vector3(0, 180, 0), wood, city)
 	_frame(root, "ReceptionDenver", Vector3(23.55, 1.70, 16.36), Vector2(0.92, 0.62), Vector3(0, 180, 0), wood, denver)
 	_frame(root, "ReceptionMountains", Vector3(21.80, 1.70, 6.64), Vector2(1.02, 0.68), Vector3(0, 0, 0), wood, mountains)
@@ -1144,6 +1171,49 @@ func _box_collision(parent: Node3D, size: Vector3, pos: Vector3) -> void:
 	cs.shape = sh
 	sb.add_child(cs)
 	parent.add_child(sb)
+
+
+func _fix_floors(level: Node3D) -> void:
+	# Bathroom stone used to overlap hall carpet at the doorway (black band / flicker).
+	var bath := _find(level, "Architecture/Floors/BathroomFloor") as CSGBox3D
+	if bath:
+		var west := bath.position.x - bath.size.x * 0.5
+		bath.size.x = 1.94 - west
+		bath.position.x = (west + 1.94) * 0.5
+	var nh := _find(level, "Architecture/Floors/NorthHallFloor") as CSGBox3D
+	if nh:
+		# X 2.00–5.00 (3.0 m), Z 6.52–10.50. No overlap with bathroom or corner.
+		nh.position = Vector3(3.50, -0.1000, 8.51)
+		nh.size = Vector3(3.00, 0.2000, 3.98)
+	var cf := _find(level, "Architecture/Floors/CornerFloor") as CSGBox3D
+	if cf:
+		cf.position = Vector3(3.50, -0.1000, 12.00)
+		cf.size = Vector3(3.00, 0.2000, 3.00)
+	var eh := _find(level, "Architecture/Floors/EastHallFloor") as CSGBox3D
+	if eh:
+		# Meet the corner at X=5.00. Z span stays 3.0 m.
+		eh.position = Vector3(11.50, -0.1000, 12.00)
+		eh.size = Vector3(13.00, 0.2000, 3.00)
+	var carpet := _office_carpet()
+	_box(level, "BathDoorThreshold", Vector3(0.28, 0.198, 1.30), Vector3(2.00, -0.099, 9.00), carpet)
+
+
+func _flush_hall(level: Node3D) -> void:
+	# Bathroom long walls were 8.66 m and stabbed 0.58 m into the 3 m hall.
+	for p in ["Architecture/Walls/BathroomSouth", "Architecture/Walls/BathroomNorth"]:
+		var w := _find(level, p) as CSGBox3D
+		if w:
+			var west := w.position.x - w.size.x * 0.5
+			w.size.x = 1.92 - west
+			w.position.x = (west + 1.92) * 0.5
+	# Conference door + glass sat at Z=11.0 (0.5 m into the east-hall lane).
+	var door := _find(level, "FutureAssetSlots/EastHall/LockedDoor_DeadOffice") as Node3D
+	if door:
+		door.position.z = 10.50
+	for gp in ["DeadOfficeGlass", "DeadOfficeGlassMullion", "DeadOfficeGlassMullion_02", "DeadOfficeGlassMullion_03", "DeadOfficeGlassSill"]:
+		var g := _find(level, "FutureAssetSlots/EastHall/%s" % gp) as Node3D
+		if g:
+			g.position.z = 10.50
 
 
 func _emergency(level: Node3D) -> void:

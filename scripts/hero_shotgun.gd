@@ -187,6 +187,7 @@ func _box(parent: Node3D, name: String, size: Vector3, pos: Vector3, mat: Materi
 	mi.mesh = mesh
 	mi.position = pos
 	mi.material_override = mat
+	mi.sorting_offset = 0.08
 	parent.add_child(mi)
 	return mi
 
@@ -241,8 +242,8 @@ func _build() -> void:
 	for i in 6:
 		_box(_pump, "Rib_%d" % i, Vector3(0.052, 0.046, 0.01), Vector3(0.0, 0.0, -0.05 + i * 0.018), wood)
 
-	_hand(_pump, "HandL", Vector3(-0.034, -0.03, 0.01), skin, true)
-	_hand(self, "HandR", Vector3(0.03, -0.07, 0.09), skin, false)
+	_hand(_pump, "HandL", Vector3(-0.036, -0.028, 0.016), skin, true)
+	_hand(self, "HandR", Vector3(0.028, -0.062, 0.118), skin, false)
 
 	_muzzle = Node3D.new()
 	_muzzle.name = "Muzzle"
@@ -279,8 +280,30 @@ func _attach_meshy_visual() -> void:
 	inst.name = "ShotgunMesh"
 	inst.rotation_degrees = Vector3(0, -90, 0)
 	inst.scale = Vector3(0.42, 0.42, 0.42)
-	inst.position = Vector3(0.0, 0.012, -0.02)
+	# Pull the mesh back so the trigger/guard sits at the screen edge, not a floating receiver.
+	inst.position = Vector3(0.0, -0.006, 0.155)
 	add_child(inst)
+	_show_hands()
+
+
+func _show_hands() -> void:
+	# CSG gun parts are hidden; hands must stay visible and grip the Meshy mesh.
+	for path in ["Pump/HandL", "HandR"]:
+		var h := get_node_or_null(path) as Node3D
+		if h:
+			h.visible = true
+			_force_visible(h)
+
+
+func _force_visible(n: Node) -> void:
+	if n is Node3D:
+		(n as Node3D).visible = true
+	if n is GeometryInstance3D:
+		var gi := n as GeometryInstance3D
+		gi.visible = true
+		gi.sorting_offset = 0.08
+	for c in n.get_children():
+		_force_visible(c)
 
 
 func _hand(parent: Node3D, name: String, pos: Vector3, skin: Material, left: bool) -> void:
@@ -311,6 +334,7 @@ func _hand(parent: Node3D, name: String, pos: Vector3, skin: Material, left: boo
 			band.position = Vector3(0, 0, -0.021)
 			band.rotation_degrees = Vector3(90, 0, 0)
 			band.material_override = _band()
+			band.sorting_offset = 0.08
 			finger.add_child(band)
 	var thumb := Node3D.new()
 	thumb.name = "Thumb"

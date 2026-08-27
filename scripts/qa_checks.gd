@@ -70,6 +70,7 @@ func _run() -> void:
 		"shotgun.glb", "ceo_dead2.glb", "fallen_security_guard.glb",
 		"refrigerator_open.glb", "kitchen_lunch_table.glb",
 		"bathroom_vanity.glb", "toiletbowl.glb", "closed_door.glb",
+		"closed_elevator.glb", "mop_and_bucket.glb",
 	]:
 		if not FileAccess.file_exists("res://models/%s" % glb_name):
 			errors.append("%s missing" % glb_name)
@@ -238,7 +239,10 @@ func _run() -> void:
 			errors.append("dead executive at %s, expected (32.05, 0.27, 11.45)" % dp)
 		var dr := dn.rotation_degrees
 		if absf(dr.x - 0.0) > 2.0 or absf(dr.y - 18.0) > 2.0:
-			errors.append("dead executive rot %s, expected (0, 18, 0) supine" % dr)
+			errors.append("dead executive parent rot %s, expected (0, 18, 0)" % dr)
+		var ceo_mesh := dn.get_node_or_null("CeoDeadMesh") as Node3D
+		if ceo_mesh and absf(ceo_mesh.rotation_degrees.x) > 8.0:
+			errors.append("CEO mesh X-rot %s — must be face-down (authored, no 180 flip)" % ceo_mesh.rotation_degrees)
 		if absf(dn.scale.x - 1.0) > 0.05:
 			errors.append("dead executive scale %s, expected 1.0" % dn.scale)
 		if dp.z < 9.0:
@@ -295,6 +299,12 @@ func _run() -> void:
 		errors.append("dressing must instance fallen_security_guard.glb")
 	if not dress_src.contains("closed_door.glb"):
 		errors.append("dressing must instance closed_door.glb")
+	if not dress_src.contains("closed_elevator.glb"):
+		errors.append("dressing must instance closed_elevator.glb")
+	if not dress_src.contains("mop_and_bucket.glb"):
+		errors.append("dressing must instance mop_and_bucket.glb")
+	if dress_src.contains("TODO: wire models/closed_elevator") or dress_src.contains("TODO: wire models/mop_and_bucket"):
+		errors.append("elevator / mop TODOs must be dropped once instanced")
 	if dress_src.contains("FileAccess.file_exists(\"res://models/ceo_dead") \
 			or dress_src.contains("FileAccess.file_exists(\"res://models/shotgun") \
 			or dress_src.contains("FileAccess.file_exists(\"res://models/refrigerator") \
@@ -302,8 +312,13 @@ func _run() -> void:
 			or dress_src.contains("FileAccess.file_exists(\"res://models/bathroom_vanity") \
 			or dress_src.contains("FileAccess.file_exists(\"res://models/toiletbowl") \
 			or dress_src.contains("FileAccess.file_exists(\"res://models/fallen_security") \
-			or dress_src.contains("FileAccess.file_exists(\"res://models/closed_door"):
+			or dress_src.contains("FileAccess.file_exists(\"res://models/closed_door") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/closed_elevator") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/mop_and"):
 		errors.append("new Meshy glbs must load() without exists-gate")
+	if dress_src.contains("FileAccess.file_exists(\"res://textures/hero/tex-light-oak") \
+			or dress_src.contains("FileAccess.file_exists(\"res://textures/hero/denver-fire"):
+		errors.append("oak / diorama vista must load() without exists-gate")
 	var tv_src := FileAccess.get_file_as_string("res://scripts/tv.gd")
 	if not tv_src.contains("tv_not_a_test.png"):
 		errors.append("TV missing THIS IS NOT A TEST card")
@@ -369,20 +384,45 @@ func _run() -> void:
 	else:
 		var guard := level.get_node_or_null("FutureAssetSlots/BreakRoom/FallenSecurityGuard") as Node3D
 		if guard:
-			if guard.position.x < 4.8 or guard.position.z < 4.8:
-				errors.append("guard at %s is not in the NE exit corner (opposite the west vent)" % guard.position)
-			if guard.position.x < 2.0:
-				errors.append("guard blocks the west vent crawl")
+			if guard.position.x > 1.15 or guard.position.z < 5.20 or guard.position.z > 6.40:
+				errors.append("guard at %s is not leaned in the NW doorway×vent corner" % guard.position)
+			if guard.position.y < 0.20 or guard.position.y > 0.70:
+				errors.append("guard Y %s — must sit on the floor, not float" % guard.position.y)
 			if absf(guard.position.x - 3.5) < 0.80 and guard.position.z > 5.8:
 				errors.append("guard blocks the north doorway")
+			if guard.position.z > 2.70 and guard.position.z < 3.70 and guard.position.x < 0.55:
+				errors.append("guard blocks the west vent crawl")
+	for ch_name in ["BreakRoomChair_01", "BreakRoomChair_02", "BreakRoomChair_03", "BreakRoomChair_04"]:
+		var ch := level.get_node_or_null("FutureAssetSlots/BreakRoom/%s" % ch_name)
+		if ch is GeometryInstance3D and (ch as GeometryInstance3D).visible:
+			errors.append("%s must be deleted / hidden (Rob X'd the chair blocks)" % ch_name)
+	var lunch := level.get_node_or_null("FutureAssetSlots/BreakRoom/KitchenLunchTable") as Node3D
+	if lunch:
+		if absf(lunch.position.x - 3.50) > 0.04 or absf(lunch.position.z - 3.70) > 0.04:
+			errors.append("kitchen lunch table moved to %s — leave it and its two chairs" % lunch.position)
+		if absf(lunch.scale.x - 0.72) > 0.02:
+			errors.append("kitchen lunch table scale %s, expected 0.72" % lunch.scale)
 	var fridge_csg := level.get_node_or_null("FutureAssetSlots/BreakRoom/Fridge") as CSGBox3D
 	if fridge_csg and fridge_csg.visible:
 		errors.append("old CSG fridge must be hidden")
 	var table_csg := level.get_node_or_null("FutureAssetSlots/BreakRoom/BreakRoomTable") as CSGBox3D
 	if table_csg and table_csg.visible:
 		errors.append("old CSG break-room table must be hidden")
-	if level.get_node_or_null("FutureAssetSlots/SupplyCloset/LockedDoor_Supply/ClosedDoor") == null:
-		errors.append("supply lock must instance closed_door.glb")
+	if level.get_node_or_null("FutureAssetSlots/SupplyCloset/LockedDoor_Supply/ClosedElevator") == null:
+		errors.append("elevator door must instance closed_elevator.glb")
+	if level.get_node_or_null("FutureAssetSlots/SupplyCloset/LockedDoor_Supply/ClosedDoor") != null:
+		errors.append("supply / elevator opening must not keep closed_door.glb")
+	if level.get_node_or_null("FutureAssetSlots/IntroCloset/MopAndBucket") == null:
+		errors.append("mop_and_bucket.glb must instance on IntroCloset")
+	else:
+		var mop := level.get_node_or_null("FutureAssetSlots/IntroCloset/MopAndBucket") as Node3D
+		if mop:
+			if mop.position.x > -2.70 or mop.position.x < -4.20:
+				errors.append("mop at %s is not on the closet east wall" % mop.position)
+			if mop.position.z > 2.70 and mop.position.z < 3.70:
+				errors.append("mop blocks the crawl vent mouth (Z %s)" % mop.position.z)
+			if mop.position.x < -5.50:
+				errors.append("mop blocks the closet aisle")
 	if level.get_node_or_null("FutureAssetSlots/EastHall/LockedDoor_DeadOffice/ClosedDoor") == null:
 		errors.append("dead-office lock must instance closed_door.glb")
 	if level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive/CeoDeadMesh") == null:
@@ -430,15 +470,15 @@ func _run() -> void:
 			if absf(top_y - 0.86) > 0.04:
 				errors.append("reception counter height %.2f, expected 0.86" % top_y)
 		if rec_desk.get_node_or_null("LeatherBack") == null:
-			errors.append("reception chair missing on the wall side")
+			errors.append("reception chair missing on the sit side")
 		var back := rec_desk.get_node_or_null("LeatherBack") as Node3D
-		if back and back.global_position.x < rec_desk.global_position.x + 0.12:
-			errors.append("reception sit-side does not face the logo wall (chair X %s, desk X %s)" % [back.global_position.x, rec_desk.global_position.x])
+		if back and back.global_position.x > rec_desk.global_position.x - 0.12:
+			errors.append("reception chair not on the sit side after the 180 flip (chair X %s, desk X %s)" % [back.global_position.x, rec_desk.global_position.x])
 		var mesh := rec_desk.get_node_or_null("ReceptionDeskMesh") as Node3D
 		if mesh == null:
 			errors.append("reception_desk.glb mesh missing")
-		elif absf(mesh.rotation_degrees.y - 90.0) > 4.0:
-			errors.append("reception desk mesh yaw %s, expected +90 so the sit-side faces the logo wall" % mesh.rotation_degrees.y)
+		elif absf(absf(mesh.rotation_degrees.y) - 90.0) > 4.0 or mesh.rotation_degrees.y > 0.0:
+			errors.append("reception desk mesh yaw %s, expected −90 (180 flip from +90)" % mesh.rotation_degrees.y)
 	var logo := level.get_node_or_null("FutureAssetSlots/Reception/AurumPlate") as MeshInstance3D
 	if logo == null:
 		errors.append("AURUM plate missing")
@@ -517,6 +557,13 @@ func _run() -> void:
 		errors.append("hero_shotgun must instance shotgun.glb")
 	if vm_src.contains("FileAccess.file_exists(\"res://models/shotgun"):
 		errors.append("hero_shotgun must load() shotgun.glb without exists-gate")
+	if not vm_src.contains("WeddingBand") or not vm_src.contains("HandL") or not vm_src.contains("HandR"):
+		errors.append("hero_shotgun must still build tanned hands + wedding band")
+	if not vm_src.contains("_show_hands"):
+		errors.append("hero_shotgun must keep hands visible on the Meshy mesh")
+	var player_src_vm := FileAccess.get_file_as_string("res://scripts/player.gd")
+	if player_src_vm.contains("Vector3(0.18, -0.16, -0.34)"):
+		errors.append("weapon root still at the old forward pose — pull the shotgun back")
 	if FileAccess.file_exists("res://scenes/_check_audio.tscn") or FileAccess.file_exists("res://scenes/_ceo_rot_proof.tscn"):
 		errors.append("debug helper scenes must not ship")
 	var pane := level.get_node_or_null("FutureAssetSlots/CEOOffice/MoneyShotWindow/Pane_02") as CSGBox3D
@@ -747,10 +794,13 @@ func _check_playtest_pass(level: Node, errors: PackedStringArray) -> void:
 		errors.append("FallenDoor missing")
 	else:
 		var fp := fallen.global_position
-		if fp.x > 1.85 or fp.z < 6.70 or fp.z > 12.80:
-			errors.append("FallenDoor at %s is not inside the bathroom" % fp)
-		if fp.x > 2.2 and fp.z > 8.0 and fp.z < 11.0:
+		if fp.x < 1.20 or fp.x > 2.05 or fp.z < 7.90 or fp.z > 9.20:
+			errors.append("FallenDoor at %s is not stood at the bathroom doorway" % fp)
+		if fp.x > 2.15 and fp.z > 8.0 and fp.z < 11.0:
 			errors.append("FallenDoor still blocks the north hall")
+		var slab := fallen.get_node_or_null("Slab") as Node3D
+		if slab and slab.position.y < 0.30:
+			errors.append("FallenDoor is still flat on the floor, not stood at the opening")
 	var logo := level.get_node_or_null("FutureAssetSlots/Reception/AurumPlate") as MeshInstance3D
 	if logo == null or not logo.visible:
 		errors.append("logo node must be visible")
@@ -849,6 +899,94 @@ func _check_playtest_pass(level: Node, errors: PackedStringArray) -> void:
 				if spth.contains("CubiclePartition") or spth.contains("CubicleDesk") or spth.contains("CubicleChair") or spth.contains("CubicleBin") or spth.contains("CubicleHide") or spth.contains("CubicleFile"):
 					errors.append("solid blocker in stalker chase path at %s (%s)" % [p, spth])
 					break
+	_check_playtest_fix2(level, errors)
+
+
+func _check_playtest_fix2(level: Node, errors: PackedStringArray) -> void:
+	var bath_fl := level.get_node_or_null("Architecture/Floors/BathroomFloor") as CSGBox3D
+	if bath_fl:
+		var east := bath_fl.position.x + bath_fl.size.x * 0.5
+		if east > 2.02:
+			errors.append("bathroom floor still overlaps the hall (east X %s)" % east)
+	var bs := level.get_node_or_null("Architecture/Walls/BathroomSouth") as CSGBox3D
+	if bs:
+		var be := bs.position.x + bs.size.x * 0.5
+		if be > 2.00:
+			errors.append("BathroomSouth still juts into the hall (east X %s)" % be)
+	var bn := level.get_node_or_null("Architecture/Walls/BathroomNorth") as CSGBox3D
+	if bn:
+		var bne := bn.position.x + bn.size.x * 0.5
+		if bne > 2.00:
+			errors.append("BathroomNorth still juts into the hall (east X %s)" % bne)
+	var conf := level.get_node_or_null("FutureAssetSlots/EastHall/LockedDoor_DeadOffice") as Node3D
+	if conf and absf(conf.position.z - 10.50) > 0.08:
+		errors.append("conference door at Z %s, expected 10.50 (flush hall wall)" % conf.position.z)
+	var glass := level.get_node_or_null("FutureAssetSlots/EastHall/DeadOfficeGlass") as Node3D
+	if glass and absf(glass.position.z - 10.50) > 0.08:
+		errors.append("conference glass at Z %s still leaks into the hall" % glass.position.z)
+	var hall_map := level.get_node_or_null("WallDressing/HallMapFrame") as Node3D
+	if hall_map and hall_map.global_position.z > 10.70:
+		errors.append("HallMap still floats in the east-hall lane (Z %s)" % hall_map.global_position.z)
+	var vanity := level.get_node_or_null("FutureAssetSlots/Bathroom/BathroomVanity") as Node3D
+	var mirror := level.get_node_or_null("FutureAssetSlots/Bathroom/MirrorWide") as MeshInstance3D
+	if vanity == null or mirror == null:
+		errors.append("vanity or MirrorWide missing")
+	elif mirror.mesh is BoxMesh:
+		var mw: float = (mirror.mesh as BoxMesh).size.x
+		var vw := 1.9035 * vanity.scale.x
+		if absf(vw - mw) > 0.20:
+			errors.append("vanity width %.2f does not match mirror span %.2f" % [vw, mw])
+		if mw < 2.60:
+			errors.append("mirror was shrunk to %.2f — keep the 2.85 m span" % mw)
+	if mirror and mirror.material_override is StandardMaterial3D:
+		var mm := mirror.material_override as StandardMaterial3D
+		if mm.albedo_color.r < 0.45 and mm.albedo_color.g < 0.45 and mm.albedo_color.b < 0.45:
+			errors.append("mirror reads black")
+		if mm.metallic < 0.55:
+			errors.append("mirror is not silver / metallic glass")
+	if level.get_node_or_null("FutureAssetSlots/Bathroom/MirrorFrame_T") == null:
+		errors.append("mirror frame missing")
+	if level.get_node_or_null("FutureAssetSlots/Bathroom/Bench") is GeometryInstance3D:
+		var bench := level.get_node_or_null("FutureAssetSlots/Bathroom/Bench") as GeometryInstance3D
+		if bench.visible:
+			errors.append("mystery bench block near the urinals must be gone")
+	for i in 3:
+		var u := level.get_node_or_null("FutureAssetSlots/Bathroom/Urinal_%d" % i) as Node3D
+		if u == null:
+			errors.append("Urinal_%d missing" % i)
+		elif u.position.z < 12.40 or u.position.x < -2.20:
+			errors.append("Urinal_%d at %s is not on the back wall (away from stall doors)" % [i, u.position])
+	var div0 := level.get_node_or_null("FutureAssetSlots/Bathroom/UrinalDivider_0") as MeshInstance3D
+	if div0 and div0.mesh is BoxMesh:
+		var ds := (div0.mesh as BoxMesh).size
+		if ds.y < 1.25 or ds.z < 0.60:
+			errors.append("urinal dividers still tiny (%s) — need taller + deeper privacy screens" % ds)
+	var player := level.get_node_or_null("Player")
+	if player:
+		var hl := player.find_child("HandL", true, false)
+		var hr := player.find_child("HandR", true, false)
+		var band := player.find_child("WeddingBand", true, false)
+		if hl == null or hr == null:
+			errors.append("shotgun hands missing (HandL/HandR)")
+		elif hl is Node3D and not (hl as Node3D).visible:
+			errors.append("HandL is hidden")
+		elif hr is Node3D and not (hr as Node3D).visible:
+			errors.append("HandR is hidden")
+		if band == null:
+			errors.append("wedding band missing on the left ring finger")
+		var smesh := player.find_child("ShotgunMesh", true, false) as Node3D
+		if smesh and smesh.position.z < 0.08:
+			errors.append("ShotgunMesh still forward (z %s) — trigger/guard should sit at the screen edge" % smesh.position.z)
+	var space: PhysicsDirectSpaceState3D = level.get_world_3d().direct_space_state
+	if space:
+		for sample in [Vector3(3.50, 0.95, 7.40), Vector3(12.50, 0.95, 12.00), Vector3(16.40, 0.95, 12.00)]:
+			var hq := PhysicsRayQueryParameters3D.create(sample + Vector3(0, 0.85, 0), sample + Vector3(0, -1.20, 0))
+			hq.collision_mask = 1
+			var hh := space.intersect_ray(hq)
+			if hh.is_empty():
+				errors.append("hall floor missing at %s" % sample)
+			elif (hh.position as Vector3).y > 0.18:
+				errors.append("hall blocked at %s" % hh.position)
 
 
 func _in_l_hall(p: Vector3) -> bool:
