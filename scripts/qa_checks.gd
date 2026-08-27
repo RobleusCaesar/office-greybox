@@ -83,17 +83,41 @@ func _run() -> void:
 		errors.append("ExteriorDiorama missing")
 	if level.get_node_or_null("Demon_02") != null:
 		errors.append("second demon must not exist")
+	var ember := level.get_node_or_null("Ember_01") as Node3D
+	if ember == null:
+		errors.append("Ember_01 missing at DemonSpot_Reception")
+	else:
+		var ep := ember.global_position
+		if absf(ep.x - 21.55) > 0.40 or absf(ep.z - 11.55) > 0.40:
+			errors.append("Ember_01 at %s, expected ~21.55, 0, 11.55" % ep)
+		var yaw := ember.rotation_degrees.y
+		if absf(yaw + 90.0) > 8.0 and absf(absf(yaw) - 270.0) > 8.0:
+			errors.append("Ember_01 yaw %s, expected -90" % yaw)
+		if absf(ember.scale.x - 1.0) > 0.05:
+			errors.append("Ember_01 scale %s, expected 1.0" % ember.scale)
+		if ember.get_node_or_null("EmberDemon") == null and ember.get_node_or_null("EmberPlaceholder") == null:
+			errors.append("Ember_01 has no mesh")
+	if level.get_node_or_null("DemonSpots/DemonSpot_Reception") == null:
+		errors.append("DemonSpot_Reception missing")
 	if level.get_node_or_null("FutureAssetSlots/BreakRoom/BreakRoomTV") == null:
 		errors.append("break room TV missing")
 	var dead_ex := level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive")
 	if dead_ex == null:
 		errors.append("dead executive missing")
 	elif dead_ex is Node3D:
-		var dp := (dead_ex as Node3D).position
-		if absf(dp.x - 32.0) > 1.2 or absf(dp.z - 11.5) > 1.4:
-			errors.append("dead executive at %s, expected ~32, 11.5" % dp)
+		var dn := dead_ex as Node3D
+		var dp := dn.position
+		if absf(dp.x - 32.05) > 0.20 or absf(dp.y - 0.27) > 0.12 or absf(dp.z - 11.45) > 0.20:
+			errors.append("dead executive at %s, expected (32.05, 0.27, 11.45)" % dp)
+		var dr := dn.rotation_degrees
+		if absf(dr.x - 180.0) > 2.0 or absf(dr.y - 18.0) > 2.0:
+			errors.append("dead executive rot %s, expected (180, 18, 0)" % dr)
+		if absf(dn.scale.x - 1.0) > 0.05:
+			errors.append("dead executive scale %s, expected 1.0" % dn.scale)
 		if dp.z < 9.0:
 			errors.append("dead executive blocks the south-entry path")
+	if level.get_node_or_null("FutureAssetSlots/CEOOffice/CeoBloodPool") == null:
+		errors.append("CEO blood pool missing")
 	var tv_src := FileAccess.get_file_as_string("res://scripts/tv.gd")
 	if not tv_src.contains("tv_not_a_test.png"):
 		errors.append("TV missing THIS IS NOT A TEST card")
@@ -165,7 +189,20 @@ func _run() -> void:
 			errors.append("divider Z span %s–%s, expected 8.53–14.48" % [z0, z1])
 	var rec_desk := level.get_node_or_null("FutureAssetSlots/Reception/ReceptionDesk2") as Node3D
 	if rec_desk == null:
-		rec_desk = level.find_child("ReceptionDesk", true, false) as Node3D
+		errors.append("ReceptionDesk2 missing")
+	else:
+		var ry := rec_desk.rotation_degrees.y
+		if absf(ry - 180.0) > 2.0 and absf(ry + 180.0) > 2.0:
+			errors.append("reception desk yaw %s, expected 180" % ry)
+		var top := rec_desk.get_node_or_null("ReceptionDeskTop") as MeshInstance3D
+		if top and top.mesh is BoxMesh:
+			var top_y := top.position.y + (top.mesh as BoxMesh).size.y * 0.5
+			if absf(top_y - 0.86) > 0.04:
+				errors.append("reception counter height %.2f, expected 0.86" % top_y)
+		if rec_desk.get_node_or_null("LeatherBack") == null:
+			errors.append("reception chair missing on the wall side")
+	if level.get_node_or_null("FutureAssetSlots/Reception/AurumPlate") == null:
+		errors.append("AURUM plate missing")
 	var player_hud := level.get_node_or_null("Player")
 	if player_hud:
 		var mark := player_hud.find_child("TitleMark", true, false) as Label
@@ -216,6 +253,31 @@ func _run() -> void:
 			var demon_src := FileAccess.get_file_as_string("res://scripts/demon.gd")
 			if demon_src.contains("_build_ashwight") or demon_src.contains("CapsuleMesh"):
 				errors.append("scripts/demon.gd still builds a capsule Ashwight")
+	var ember_src := FileAccess.get_file_as_string("res://scripts/ember.gd")
+	if ember_src.is_empty():
+		errors.append("scripts/ember.gd missing")
+	else:
+		if not ember_src.contains("Idle_8"):
+			errors.append("ember idle clip must be Idle_8")
+		if not ember_src.contains("Walking"):
+			errors.append("ember chase clip must be Walking")
+		if not ember_src.contains("CLIP_ATTACK := \"Attack\""):
+			errors.append("ember attack clip must be Attack")
+		if not ember_src.contains("Shot_and_Fall_Backward"):
+			errors.append("ember death clip must be Shot_and_Fall_Backward")
+		if not ember_src.contains("Hit_Reaction"):
+			errors.append("ember hit clip must be Hit_Reaction")
+		if not ember_src.contains("0.55"):
+			errors.append("ember emission cap must be 0.55")
+		if ember_src.contains("look_at("):
+			errors.append("ember must face with atan2, not look_at")
+		if ember_src.contains("Axe_Spin_Attack"):
+			errors.append("ember must not use stalker Axe_Spin_Attack")
+		var ember_die := ember_src.find("func _die")
+		if ember_die >= 0:
+			var ember_chunk := ember_src.substr(ember_die, 360)
+			if ember_chunk.contains("queue_free("):
+				errors.append("death must not queue_free the ember")
 
 	var space: PhysicsDirectSpaceState3D = level.get_world_3d().direct_space_state
 	var window := Vector3(38.1, 1.7, 11.5)

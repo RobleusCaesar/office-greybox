@@ -2045,9 +2045,20 @@ use_collision = false
 material = ExtResource("10_demon")
 editor_description = "Low marker. Collision OFF. Walk through."
 
+[node name="DemonSpot_Reception" type="Node3D" parent="DemonSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.5500, 0.0000, 11.5500)
+editor_description = "Ember Demon — west of the AURUM desk. Yaw -90, scale 1.0. Stalker stays at DemonSpot_01."
+
+[node name="Decal" type="CSGBox3D" parent="DemonSpots/DemonSpot_Reception"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0150, 0.0000)
+size = Vector3(1.2500, 0.0300, 1.2500)
+use_collision = false
+material = ExtResource("10_demon")
+editor_description = "Dull-red floor decal. Collision OFF."
+
 [node name="DemonSpot_02" type="Node3D" parent="DemonSpots"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.5500, 0.0000, 7.5500)
-editor_description = "SECOND demon — attack + interest. Arena at the CEO south threshold, beside the side opening. After the corner, as the window hits. Punishes the turn into the money shot."
+editor_description = "UNUSED — CEO south threshold. Do not spawn Demon_02 here. Ember is at DemonSpot_Reception."
 
 [node name="Decal" type="CSGBox3D" parent="DemonSpots/DemonSpot_02"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0150, 0.0000)

@@ -67,13 +67,17 @@ func _shot_level() -> void:
 	for _j in 10:
 		await process_frame
 	_save("window-reveal.png")
-	_aim(level, Vector3(22.4, 1.55, 11.50), Vector3(26.0, 1.55, 11.50))
+	_aim(level, Vector3(19.15, 1.58, 11.55), Vector3(25.40, 1.35, 11.50))
 	for _j in 8:
 		await process_frame
-	_save("reception-aurum.png")
-	_aim(level, Vector3(27.4, 1.45, 8.15), Vector3(32.0, 0.35, 11.50))
+	_save("ember-aurum.png")
+	_aim(level, Vector3(22.35, 1.52, 11.50), Vector3(25.90, 1.45, 11.50))
 	for _j in 8:
 		await process_frame
-	_save("ceo-body.png")
+	_save("reception-desk.png")
+	_aim(level, Vector3(28.55, 1.48, 8.05), Vector3(36.40, 1.20, 11.50))
+	for _j in 8:
+		await process_frame
+	_save("ceo-mid.png")
 	level.queue_free()
 	await process_frame
