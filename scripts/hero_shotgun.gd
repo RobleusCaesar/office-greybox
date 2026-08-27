@@ -171,6 +171,7 @@ func _skin() -> StandardMaterial3D:
 	m.emission_enabled = true
 	m.emission = Color(0.55, 0.38, 0.24)
 	m.emission_energy_multiplier = 0.22
+	m.render_priority = 2
 	return m
 
 
@@ -191,7 +192,6 @@ func _box(parent: Node3D, name: String, size: Vector3, pos: Vector3, mat: Materi
 	mi.position = pos
 	mi.material_override = mat
 	mi.sorting_offset = 0.16
-	mi.render_priority = 2
 	parent.add_child(mi)
 	return mi
 
