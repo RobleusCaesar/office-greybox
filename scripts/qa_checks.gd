@@ -41,6 +41,10 @@ func _run() -> void:
 		errors.append("haunt_bed.wav missing")
 	if not FileAccess.file_exists("res://audio/shotgun_fire.wav"):
 		errors.append("shotgun_fire.wav missing")
+	if not FileAccess.file_exists("res://textures/gen/blood_smear.png"):
+		errors.append("blood_smear.png missing")
+	if not FileAccess.file_exists("res://textures/hero/blood-spray-hq.png"):
+		errors.append("blood-spray-hq.png missing")
 	var title_src := FileAccess.get_file_as_string("res://scripts/title.gd")
 	if title_src.contains("denver-fire-vista"):
 		errors.append("title must not use denver-fire-vista")
