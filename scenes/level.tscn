@@ -2028,8 +2028,8 @@ material = ExtResource("7_frame")
 editor_description = "Window head at Y=2.95."
 
 [node name="DemonSpot_01" type="Node3D" parent="DemonSpots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2500, 0.0000, 10.3500)
-editor_description = "FIRST demon — attack + interest. Tight choke in the cubicle stub south of the east hall. You must pass it. Close range, no room to kite."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.2000, 0.0000, 8.3000)
+editor_description = "Abyssal Stalker — SE cubicle corner, south of the partition, out of sight from spawn / east-hall doorway. Jump-scare when the player commits into the cubicle."
 
 [node name="Decal" type="CSGBox3D" parent="DemonSpots/DemonSpot_01"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0150, 0.0000)

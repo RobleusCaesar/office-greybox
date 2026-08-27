@@ -47,6 +47,17 @@ func _run() -> void:
 			errors.append("%s missing" % wav_name)
 		if not FileAccess.file_exists(wav_path + ".import"):
 			errors.append("%s.import missing — web export will skip this wav" % wav_name)
+	for pack_name in [
+		"deamon_attack.mp3", "deamon_attack2.wav", "deamon_growl.wav",
+		"deamon_growl_distant.mp3", "monster_screech_distant.wav",
+	]:
+		var pack_path := "res://audio/%s" % pack_name
+		if not FileAccess.file_exists(pack_path + ".import"):
+			errors.append("%s.import missing — web export will skip this audio" % pack_name)
+	if not FileAccess.file_exists("res://models/reception_desk.glb.import"):
+		errors.append("reception_desk.glb.import missing — web export will skip this glb")
+	if not FileAccess.file_exists("res://models/blood_pool.glb.import"):
+		errors.append("blood_pool.glb.import missing — web export will skip this glb")
 	if not FileAccess.file_exists("res://textures/gen/blood_smear.png"):
 		errors.append("blood_smear.png missing")
 	if not FileAccess.file_exists("res://textures/hero/blood-spray-hq.png"):
@@ -131,13 +142,17 @@ func _run() -> void:
 	if level.get_node_or_null("FutureAssetSlots/CEOOffice/BodyPoolLight") != null:
 		errors.append("BodyPoolLight must be gone")
 	for bi in range(1, 8):
-		if level.get_node_or_null("FutureAssetSlots/CEOOffice/BodyBlood_%d" % bi) == null:
-			errors.append("BodyBlood_%d missing" % bi)
-	var bb1 := level.get_node_or_null("FutureAssetSlots/CEOOffice/BodyBlood_1") as MeshInstance3D
-	if bb1 and bb1.material_override is StandardMaterial3D:
-		var bm1 := bb1.material_override as StandardMaterial3D
-		if bm1.emission_enabled:
-			errors.append("CEO floor blood must not emit")
+		if level.get_node_or_null("FutureAssetSlots/CEOOffice/BodyBlood_%d" % bi) != null:
+			errors.append("BodyBlood_%d blotch must be gone" % bi)
+	var dress_src := FileAccess.get_file_as_string("res://scripts/dressing.gd")
+	if dress_src.contains("Meshy_AI_Photoreal") or dress_src.contains("blood_seepi"):
+		errors.append("dressing must not load the Meshy_* blood filename")
+	if not dress_src.contains("blood_pool.glb"):
+		errors.append("dressing must instance blood_pool.glb")
+	if dress_src.contains("FileAccess.file_exists(\"res://models/blood_pool") or dress_src.contains("FileAccess.file_exists(\"res://models/reception_desk"):
+		errors.append("blood_pool / reception_desk must load() without exists-gate")
+	if not dress_src.contains("reception_desk.glb"):
+		errors.append("dressing must instance reception_desk.glb")
 	var tv_src := FileAccess.get_file_as_string("res://scripts/tv.gd")
 	if not tv_src.contains("tv_not_a_test.png"):
 		errors.append("TV missing THIS IS NOT A TEST card")
@@ -232,8 +247,8 @@ func _run() -> void:
 	if haunt == null:
 		errors.append("haunt bed loop missing")
 	else:
-		if absf(haunt.volume_db + 6.0) > 0.15:
-			errors.append("HauntBed volume_db %s, expected -6.0" % haunt.volume_db)
+		if absf(haunt.volume_db + 9.0) > 0.15:
+			errors.append("HauntBed volume_db %s, expected -9.0" % haunt.volume_db)
 		if haunt.process_mode != Node.PROCESS_MODE_ALWAYS:
 			errors.append("HauntBed process_mode must be ALWAYS")
 		if haunt.autoplay:
@@ -251,6 +266,12 @@ func _run() -> void:
 		var haunt_chunk := haunt_src.substr(haunt_fn, 520)
 		if haunt_chunk.contains("FileAccess.file_exists"):
 			errors.append("haunt bed must load() without FileAccess.file_exists")
+	if not haunt_src.contains("monster_screech_distant.wav"):
+		errors.append("level must play monster_screech_distant as a distant bed")
+	if not haunt_src.contains("deamon_growl_distant.mp3"):
+		errors.append("level must play deamon_growl_distant as a distant bed")
+	if haunt_src.contains("FileAccess.file_exists(\"res://audio/deamon") or haunt_src.contains("FileAccess.file_exists(\"res://audio/monster"):
+		errors.append("distant beds must load() without FileAccess.file_exists")
 	var player_src := FileAccess.get_file_as_string("res://scripts/player.gd")
 	if not player_src.contains("shotgun_blast.wav"):
 		errors.append("player must reference audio/shotgun_blast.wav")
@@ -264,6 +285,16 @@ func _run() -> void:
 		errors.append("player must fade air blood in _spawn_impact")
 	if not player_src.contains("0.72"):
 		errors.append("player impact splat must die at 0.72s")
+	var start_rel := player_src.find("func _start_reload")
+	if start_rel >= 0:
+		var start_chunk := player_src.substr(start_rel, 420)
+		if start_chunk.contains("_snd_reload.play()") and not start_chunk.contains("PISTOL"):
+			errors.append("shotgun R must not play reload.wav one-shot")
+	var tick_rel := player_src.find("func _tick_reload")
+	if tick_rel >= 0:
+		var tick_chunk := player_src.substr(tick_rel, 420)
+		if tick_chunk.contains("_snd_reload.play()"):
+			errors.append("shotgun shell insert must not replay reload.wav")
 	var vm_src := FileAccess.get_file_as_string("res://scripts/hero_shotgun.gd")
 	if not vm_src.contains("shotgun_cocking.wav") or not vm_src.contains("shotgun_reloading.wav"):
 		errors.append("hero_shotgun must reference Rob's cock/reload wavs")
@@ -271,6 +302,8 @@ func _run() -> void:
 		errors.append("hero_shotgun must have dedicated CockSfx and ReloadSfx")
 	if vm_src.contains("FileAccess.file_exists") or vm_src.contains("_load_real_wav"):
 		errors.append("hero_shotgun must load() cock/reload wavs without FileAccess.file_exists")
+	if not vm_src.contains("const PUMP_TRAVEL := 0.092") or not vm_src.contains("const CYCLE := 0.94"):
+		errors.append("shotgun recoil/pump timing must stay 0.092 / 0.94")
 	if FileAccess.file_exists("res://scenes/_check_audio.tscn") or FileAccess.file_exists("res://scenes/_ceo_rot_proof.tscn"):
 		errors.append("debug helper scenes must not ship")
 	var pane := level.get_node_or_null("FutureAssetSlots/CEOOffice/MoneyShotWindow/Pane_02") as CSGBox3D
@@ -316,6 +349,10 @@ func _run() -> void:
 			var demon_src := FileAccess.get_file_as_string("res://scripts/demon.gd")
 			if demon_src.contains("_build_ashwight") or demon_src.contains("CapsuleMesh"):
 				errors.append("scripts/demon.gd still builds a capsule Ashwight")
+		if not enemy_src.contains("deamon_attack2.wav"):
+			errors.append("stalker lunge must play deamon_attack2.wav")
+		if not enemy_src.contains("deamon_attack.mp3"):
+			errors.append("stalker reveal must play deamon_attack.mp3")
 	var ember_src := FileAccess.get_file_as_string("res://scripts/ember.gd")
 	if ember_src.is_empty():
 		errors.append("scripts/ember.gd missing")
@@ -336,6 +373,10 @@ func _run() -> void:
 			errors.append("ember must face with atan2, not look_at")
 		if ember_src.contains("Axe_Spin_Attack"):
 			errors.append("ember must not use stalker Axe_Spin_Attack")
+		if not ember_src.contains("deamon_attack2.wav"):
+			errors.append("ember lunge must play deamon_attack2.wav")
+		if not ember_src.contains("deamon_growl.wav"):
+			errors.append("ember first-see must play deamon_growl.wav")
 		var ember_die := ember_src.find("func _die")
 		if ember_die >= 0:
 			var ember_chunk := ember_src.substr(ember_die, 360)
@@ -365,8 +406,9 @@ func _run() -> void:
 		errors.append("player missing")
 	else:
 		var hp1: float = d1.hp
-		player.global_position = Vector3(9.25, 0.0, 11.55)
-		player.look_at(Vector3(9.25, 0.0, 10.2))
+		player.global_position = Vector3(9.50, 0.0, 8.90)
+		var aim: Vector3 = d1.global_position
+		player.look_at(Vector3(aim.x, 0.0, aim.z))
 		player._head.rotation = Vector3.ZERO
 		await process_frame
 		player._try_fire()
@@ -424,6 +466,8 @@ func _check_stalker(d1: Node, errors: PackedStringArray) -> void:
 		_check_material_1(d1, errors)
 	if d1.get_node_or_null("Rig") != null:
 		errors.append("Ashwight Rig still attached")
+	if d1 is Node3D and (d1 as Node3D).global_position.z > 9.60:
+		errors.append("stalker still in the cubicle doorway — must hide off-spawn")
 
 
 func _clip_listed(clips: PackedStringArray, want: String) -> bool:

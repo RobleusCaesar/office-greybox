@@ -348,7 +348,8 @@ func _start_reload() -> void:
 			return
 		_reload_left = 0.85
 	_reloading = true
-	if _snd_reload:
+	# Shotgun R: only hero_shotgun.insert_shell → shotgun_reloading. No reload.wav one-shot.
+	if _weapon == PISTOL and _snd_reload:
 		_snd_reload.play()
 
 
@@ -364,8 +365,6 @@ func _tick_reload() -> void:
 			_hero_shotgun.insert_shell()
 		if _sg_mag < SHOTGUN_MAG and _sg_res > 0:
 			_reload_left = SHOTGUN_SHELL_TIME
-			if _snd_reload:
-				_snd_reload.play()
 		else:
 			_reloading = false
 	else:

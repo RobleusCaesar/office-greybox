@@ -21,8 +21,8 @@ func _run() -> void:
 	shot.current = true
 	shot.fov = 52.0
 	level.add_child(shot)
-	# Hall side of the cubicle opening, looking in at DemonSpot_01.
-	shot.look_at_from_position(Vector3(9.25, 1.55, 12.40), Vector3(9.25, 0.95, 10.20), Vector3.UP)
+	# Just inside the cubicle, looking at the SE-corner ambush (DemonSpot_01).
+	shot.look_at_from_position(Vector3(9.25, 1.55, 10.05), Vector3(10.20, 0.95, 8.30), Vector3.UP)
 	var d1 := level.get_node_or_null("Demon_01")
 	if d1 and d1.has_method("imported_clip_names"):
 		print("STALKER_CLIPS ", ", ".join(d1.imported_clip_names()))
