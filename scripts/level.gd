@@ -17,6 +17,10 @@ var _sting_boost: float = 0.0
 var _death_ui: Control
 var _win_ui: Control
 var _sting_player: AudioStreamPlayer
+var _distant_screech: AudioStreamPlayer
+var _distant_growl: AudioStreamPlayer
+var _distant_wait: float = 0.0
+var _distant_toggle: bool = false
 
 
 func _ready() -> void:
@@ -29,6 +33,7 @@ func _ready() -> void:
 	_sting_player.volume_db = -3.0
 	add_child(_sting_player)
 	_setup_haunt_bed()
+	_setup_distant_beds()
 	if _player:
 		_player.died.connect(_on_player_died)
 	if _window_light:
@@ -36,6 +41,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_tick_distant_beds(delta)
 	_maybe_sting()
 	if _sting_boost > 0.0 and _window_light:
 		_sting_boost = maxf(0.0, _sting_boost - delta * 6.0)
@@ -69,12 +75,46 @@ func _setup_haunt_bed() -> void:
 	var bed := AudioStreamPlayer.new()
 	bed.name = "HauntBed"
 	bed.stream = stream
-	bed.volume_db = -6.0
+	bed.volume_db = -9.0
 	bed.bus = "Master"
 	bed.process_mode = Node.PROCESS_MODE_ALWAYS
 	bed.autoplay = false
 	add_child(bed)
 	bed.play()
+
+
+func _setup_distant_beds() -> void:
+	# Occasional distant one-shots — quieter than HauntBed (−9 dB), never stacked on it.
+	# load() only; packed-res FileAccess probes lie on HTML5.
+	_distant_screech = _make_distant("DistantScreech", load("res://audio/monster_screech_distant.wav"))
+	_distant_growl = _make_distant("DistantGrowl", load("res://audio/deamon_growl_distant.mp3"))
+	_distant_wait = randf_range(9.0, 16.0)
+
+
+func _make_distant(p_name: String, stream: AudioStream) -> AudioStreamPlayer:
+	if stream == null:
+		return null
+	var p := AudioStreamPlayer.new()
+	p.name = p_name
+	p.stream = stream
+	p.volume_db = -20.0
+	p.bus = "Master"
+	p.autoplay = false
+	add_child(p)
+	return p
+
+
+func _tick_distant_beds(delta: float) -> void:
+	_distant_wait -= delta
+	if _distant_wait > 0.0:
+		return
+	_distant_wait = randf_range(16.0, 30.0)
+	if (_distant_screech and _distant_screech.playing) or (_distant_growl and _distant_growl.playing):
+		return
+	var pick := _distant_growl if _distant_toggle else _distant_screech
+	_distant_toggle = not _distant_toggle
+	if pick and pick.stream:
+		pick.play()
 
 
 func _player_at_window() -> bool:

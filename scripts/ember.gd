@@ -41,6 +41,8 @@ var _hit_stun: float = 0.0
 var _growls: Dictionary = {}
 var _clips: Dictionary = {}
 var _clip_names: PackedStringArray = PackedStringArray()
+var _first_seen: bool = false
+var _see_growl: AudioStream
 
 
 func _ready() -> void:
@@ -50,6 +52,7 @@ func _ready() -> void:
 	add_to_group("enemies")
 	_instance_visual()
 	_load_growls()
+	_see_growl = load("res://audio/deamon_growl.wav")
 	_snd = AudioStreamPlayer3D.new()
 	_snd.volume_db = -2.0
 	_snd.max_distance = 18.0
@@ -114,6 +117,7 @@ func _physics_process(delta: float) -> void:
 		velocity.z = 0.0
 		move_and_slide()
 		return
+	_maybe_first_see(player)
 
 	var to_player := player.global_position - global_position
 	to_player.y = 0.0
@@ -224,12 +228,35 @@ func _load_growls() -> void:
 	_growls = {
 		"idle": load("res://audio/ashwight_idle.wav"),
 		"chase": load("res://audio/ashwight_chase.wav"),
-		"attack": load("res://audio/ashwight_attack.wav"),
+		"attack": load("res://audio/deamon_attack2.wav"),
 		"pain": load("res://audio/ashwight_pain.wav"),
 		"death": load("res://audio/ashwight_death.wav"),
 	}
+	if _growls["attack"] == null:
+		_growls["attack"] = load("res://audio/ashwight_attack.wav")
 	if _growls["idle"] == null:
 		_growls["idle"] = load("res://audio/demon_growl.wav")
+
+
+func _maybe_first_see(player: Node3D) -> void:
+	if _first_seen or _dead:
+		return
+	if not _has_los(player):
+		return
+	var cam: Camera3D = player.get_look_camera() if player.has_method("get_look_camera") else null
+	if cam == null:
+		return
+	var to := (global_position + Vector3(0.0, 1.20, 0.0)) - cam.global_position
+	if to.length() > 14.0:
+		return
+	var facing := -cam.global_transform.basis.z
+	if facing.dot(to.normalized()) < 0.38:
+		return
+	_first_seen = true
+	if _snd == null or _see_growl == null:
+		return
+	_snd.stream = _see_growl
+	_snd.play()
 
 
 func _spawn_body_splat(pos: Vector3, nrm: Vector3) -> void:

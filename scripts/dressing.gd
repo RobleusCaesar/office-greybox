@@ -368,18 +368,34 @@ func _reception(level: Node3D) -> void:
 	var paper := _mat("res://materials/mat_paper.tres")
 	var leather := _mat("res://materials/mat_leather.tres")
 	# Yaw 180: local +X is the visitor counter (west hall). Local −X is the
-	# receptionist / AURUM wall (east). Counter height 0.86 m. Light oak.
+	# receptionist / AURUM wall (east). Counter height 0.86 m.
 	var desk := Node3D.new()
 	desk.name = "ReceptionDesk2"
 	desk.position = Vector3(24.55, 0.0, 11.50)
 	desk.rotation_degrees = Vector3(0, 180, 0)
 	rec.add_child(desk)
-	_box(desk, "ReceptionDesk", Vector3(1.10, 0.82, 2.55), Vector3(0.0, 0.41, 0.0), oak)
-	_box(desk, "ReceptionDeskTop", Vector3(1.24, 0.04, 2.70), Vector3(0.0, 0.84, 0.0), oak)
-	# Raised visitor ledge — player's left (world +Z = local −Z).
-	_box(desk, "VisitorLedge", Vector3(0.30, 0.10, 1.15), Vector3(0.46, 0.91, -0.62), oak)
-	_box(desk, "ReceptionDrawer", Vector3(0.02, 0.10, 0.36), Vector3(0.56, 0.46, 0.85), dark, Vector3.ZERO, false)
-	_box(desk, "ReceptionDrawer_02", Vector3(0.02, 0.10, 0.36), Vector3(0.56, 0.46, -0.85), dark, Vector3.ZERO, false)
+	# load() only — do not exists-gate. Soft-fail to the oak CSG desk.
+	var packed: PackedScene = load("res://models/reception_desk.glb")
+	var used_glb := false
+	if packed:
+		var inst := packed.instantiate() as Node3D
+		if inst:
+			used_glb = true
+			inst.name = "ReceptionDeskMesh"
+			# Mesh AABB y −0.665..0.667. Sit on the floor; high back stays in the GLB.
+			inst.position = Vector3(0.0, 0.665, 0.0)
+			desk.add_child(inst)
+			var body := _box(desk, "ReceptionDesk", Vector3(1.16, 0.82, 1.88), Vector3(0.0, 0.41, 0.0), oak)
+			body.visible = false
+			var top := _box(desk, "ReceptionDeskTop", Vector3(1.24, 0.04, 1.88), Vector3(0.0, 0.84, 0.0), oak)
+			top.visible = false
+	if not used_glb:
+		_box(desk, "ReceptionDesk", Vector3(1.10, 0.82, 2.55), Vector3(0.0, 0.41, 0.0), oak)
+		_box(desk, "ReceptionDeskTop", Vector3(1.24, 0.04, 2.70), Vector3(0.0, 0.84, 0.0), oak)
+		# Raised visitor ledge — player's left (world +Z = local −Z).
+		_box(desk, "VisitorLedge", Vector3(0.30, 0.10, 1.15), Vector3(0.46, 0.91, -0.62), oak)
+		_box(desk, "ReceptionDrawer", Vector3(0.02, 0.10, 0.36), Vector3(0.56, 0.46, 0.85), dark, Vector3.ZERO, false)
+		_box(desk, "ReceptionDrawer_02", Vector3(0.02, 0.10, 0.36), Vector3(0.56, 0.46, -0.85), dark, Vector3.ZERO, false)
 	# Monitor / keyboard / papers face the wall (local −X = world east).
 	_box(desk, "ReceptionMonitor", Vector3(0.07, 0.28, 0.42), Vector3(-0.36, 1.04, 0.16), metal)
 	_box(desk, "ReceptionMonitorStand", Vector3(0.08, 0.10, 0.10), Vector3(-0.30, 0.89, 0.16), metal, Vector3.ZERO, false)
@@ -527,48 +543,29 @@ func _build_ceo_body(ceo: Node) -> void:
 	_box(body, "ShoeR", Vector3(0.11, 0.08, 0.17), Vector3(0.11, 0.08, 0.86), shoe, Vector3.ZERO, false)
 
 
-func _wet_pool_mat(tex_path: String, tint: Color) -> StandardMaterial3D:
-	var base: Material = load("res://materials/mat_blood.tres")
-	var m: StandardMaterial3D
-	if base is StandardMaterial3D:
-		m = (base as StandardMaterial3D).duplicate() as StandardMaterial3D
-	else:
-		m = StandardMaterial3D.new()
-	if tex_path != "":
-		m.albedo_texture = load(tex_path)
-	m.albedo_color = tint
-	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	m.emission_enabled = false
-	m.roughness = 0.16
-	m.metallic = 0.12
-	m.cull_mode = BaseMaterial3D.CULL_DISABLED
-	return m
-
-
 func _build_ceo_blood(ceo: Node) -> void:
-	# Wet irregular pool — no huge sticker quads, no colored omni.
+	# Founder rejected the seven blotches / smear-spray / pool light. Mesh only.
 	for gone in ["CeoBloodPool", "BodyPoolLight", "BodyBlood", "BodyBlood_A", "BodyBlood_B"]:
 		var old := ceo.get_node_or_null(gone)
 		if old:
 			old.free()
-	var smear := "res://textures/gen/blood_smear.png"
-	if not FileAccess.file_exists(smear):
-		smear = "res://textures/tex_blood.png"
-	var spray := "res://textures/hero/blood-spray-hq.png"
-	if not FileAccess.file_exists(spray):
-		spray = "res://textures/tex_blood.png"
-	var blotches := [
-		["BodyBlood_1", Vector3(32.04, 0.014, 11.42), Vector2(0.82, 0.54), 20.0, smear, Color(0.34, 0.02, 0.04, 0.94)],
-		["BodyBlood_2", Vector3(32.22, 0.016, 11.18), Vector2(0.58, 0.40), -32.0, spray, Color(0.40, 0.03, 0.05, 0.90)],
-		["BodyBlood_3", Vector3(32.24, 0.015, 11.92), Vector2(0.48, 0.38), 50.0, spray, Color(0.30, 0.02, 0.04, 0.88)],
-		["BodyBlood_4", Vector3(31.80, 0.013, 11.60), Vector2(0.44, 0.32), -44.0, smear, Color(0.26, 0.015, 0.03, 0.92)],
-		["BodyBlood_5", Vector3(31.94, 0.017, 11.04), Vector2(0.56, 0.36), 12.0, smear, Color(0.36, 0.025, 0.045, 0.96)],
-		["BodyBlood_6", Vector3(32.34, 0.014, 11.64), Vector2(0.36, 0.26), 64.0, spray, Color(0.38, 0.03, 0.05, 0.86)],
-		["BodyBlood_7", Vector3(32.10, 0.018, 11.72), Vector2(0.40, 0.30), -6.0, smear, Color(0.28, 0.02, 0.04, 0.91)],
-	]
-	for b in blotches:
-		var mat := _wet_pool_mat(str(b[4]), b[5])
-		_quad(ceo, str(b[0]), b[2], b[1], Vector3(-90.0, float(b[3]), 0.0), mat)
+	for i in range(1, 8):
+		var blot := ceo.get_node_or_null("BodyBlood_%d" % i)
+		if blot:
+			blot.free()
+	# load() only — do not exists-gate. Soft-fail if the GLB is not packed yet.
+	var packed: PackedScene = load("res://models/blood_pool.glb")
+	if packed == null:
+		return
+	var inst := packed.instantiate() as Node3D
+	if inst == null:
+		return
+	inst.name = "BloodPool"
+	# Flat pool (~1.9 x 1.8 m, ~2 cm thick) on the floor under the supine CEO.
+	# CEO stays at (32.05, 0.27, 11.45), rotation (0, 18, 0). Do not move him.
+	inst.position = Vector3(32.05, 0.016, 11.45)
+	inst.rotation_degrees = Vector3(0, 18, 0)
+	ceo.add_child(inst)
 
 
 func _city_mat(vista: String) -> StandardMaterial3D:

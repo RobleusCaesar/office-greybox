@@ -38,6 +38,9 @@ var _shot_gate: float = 0.0
 var _growls: Dictionary = {}
 var _clips: Dictionary = {}
 var _clip_names: PackedStringArray = PackedStringArray()
+var _ambush: bool = true
+var _revealed: bool = false
+var _scare: AudioStream
 
 
 func _ready() -> void:
@@ -47,6 +50,7 @@ func _ready() -> void:
 	add_to_group("enemies")
 	_instance_glb()
 	_load_growls()
+	_scare = load("res://audio/deamon_attack.mp3")
 	_snd = AudioStreamPlayer3D.new()
 	_snd.volume_db = -2.0
 	_snd.max_distance = 18.0
@@ -78,6 +82,7 @@ func take_damage(amount: float, hit_pos: Vector3 = Vector3.ZERO, hit_normal: Vec
 		_spawn_body_splat(fallback, Vector3.UP)
 		_spawn_spray(fallback, Vector3.UP)
 	_play_growl("pain")
+	_reveal()
 	if state == State.IDLE:
 		state = State.CHASE
 	if hp <= 0.0:
@@ -120,7 +125,10 @@ func _physics_process(delta: float) -> void:
 			velocity.x = 0.0
 			velocity.z = 0.0
 			_keep_anim(CLIP_IDLE)
-			if dist <= aggro_range and _has_los(player):
+			if _player_committed_to_cubicle(player):
+				_reveal()
+				state = State.CHASE
+			elif (not _ambush) and dist <= aggro_range and _has_los(player):
 				state = State.CHASE
 				_play_growl("chase")
 		State.CHASE:
@@ -218,12 +226,30 @@ func _load_growls() -> void:
 	_growls = {
 		"idle": load("res://audio/ashwight_idle.wav"),
 		"chase": load("res://audio/ashwight_chase.wav"),
-		"attack": load("res://audio/ashwight_attack.wav"),
+		"attack": load("res://audio/deamon_attack2.wav"),
 		"pain": load("res://audio/ashwight_pain.wav"),
 		"death": load("res://audio/ashwight_death.wav"),
 	}
+	if _growls["attack"] == null:
+		_growls["attack"] = load("res://audio/ashwight_attack.wav")
 	if _growls["idle"] == null:
 		_growls["idle"] = load("res://audio/demon_growl.wav")
+
+
+func _player_committed_to_cubicle(player: Node3D) -> bool:
+	var p := player.global_position
+	return p.x > 7.55 and p.x < 10.95 and p.z < 10.22 and p.z > 7.75
+
+
+func _reveal() -> void:
+	if _revealed:
+		return
+	_revealed = true
+	_ambush = false
+	if _snd == null or _scare == null:
+		return
+	_snd.stream = _scare
+	_snd.play()
 
 
 func _spawn_body_splat(pos: Vector3, nrm: Vector3) -> void:
