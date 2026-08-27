@@ -614,12 +614,6 @@ func _run() -> void:
 		errors.append("hero_shotgun must load() shotgun.glb without exists-gate")
 	if not vm_src.contains("WeddingBand") or not vm_src.contains("HandL") or not vm_src.contains("HandR"):
 		errors.append("hero_shotgun must still build tanned hands + wedding band")
-	var enemy_src := FileAccess.get_file_as_string("res://scripts/enemy.gd")
-	if enemy_src.contains("FileAccess.file_exists"):
-		errors.append("enemy must load() abyssal_stalker.glb without FileAccess.file_exists")
-	var ember_src := FileAccess.get_file_as_string("res://scripts/ember.gd")
-	if ember_src.contains("FileAccess.file_exists"):
-		errors.append("ember must load() ember_demon.glb without FileAccess.file_exists")
 	var export_cfg := FileAccess.get_file_as_string("res://export_presets.cfg")
 	if not export_cfg.contains("models/ceo_dead.glb"):
 		errors.append("unused ceo_dead.glb must be excluded from the web pack")
@@ -652,6 +646,8 @@ func _run() -> void:
 	if enemy_src.is_empty():
 		errors.append("scripts/enemy.gd missing")
 	else:
+		if enemy_src.contains("FileAccess.file_exists"):
+			errors.append("enemy must load() abyssal_stalker.glb without FileAccess.file_exists")
 		if not enemy_src.contains("Idle_8"):
 			errors.append("idle clip must be Idle_8")
 		if not enemy_src.contains("Walking"):
@@ -682,6 +678,8 @@ func _run() -> void:
 		if not enemy_src.contains("deamon_attack.mp3"):
 			errors.append("stalker reveal must play deamon_attack.mp3")
 	var ember_src := FileAccess.get_file_as_string("res://scripts/ember.gd")
+	if ember_src.contains("FileAccess.file_exists"):
+		errors.append("ember must load() ember_demon.glb without FileAccess.file_exists")
 	if ember_src.is_empty():
 		errors.append("scripts/ember.gd missing")
 	else:
