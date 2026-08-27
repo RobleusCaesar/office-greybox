@@ -933,25 +933,25 @@ editor_description = "Sheet-metal crawl duct. Lives in the 2.50 m gap only. Kitc
 
 [node name="DuctFloor" type="CSGBox3D" parent="Architecture/VentDuct"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3300, 0.0550, 3.2000)
-size = Vector3(2.5400, 0.0500, 0.9000)
+size = Vector3(2.4200, 0.0500, 0.9000)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("12_duct")
-editor_description = "Duct floor in the gap. Top at Y=0.08. X -2.60–-0.06. Does not enter kitchen or closet aisle."
+editor_description = "Duct floor in the gap. Top at Y=0.08. X -2.54–-0.12. Inset from both plaster faces so it cannot z-fight."
 
 [node name="DuctCeiling" type="CSGBox3D" parent="Architecture/VentDuct"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3300, 0.9750, 3.2000)
-size = Vector3(2.5400, 0.0500, 0.9000)
+size = Vector3(2.4200, 0.0500, 0.9000)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("12_duct")
-editor_description = "Duct ceiling. Bottom at Y=0.95. Gap only."
+editor_description = "Duct ceiling. Bottom at Y=0.95. Gap only. Inset from plaster."
 
 [node name="DuctSouth" type="CSGBox3D" parent="Architecture/VentDuct"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3300, 0.5150, 2.7750)
-size = Vector3(2.5400, 0.8700, 0.0500)
+size = Vector3(2.4200, 0.8700, 0.0500)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
@@ -959,7 +959,7 @@ material = ExtResource("12_duct")
 
 [node name="DuctNorth" type="CSGBox3D" parent="Architecture/VentDuct"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3300, 0.5150, 3.6250)
-size = Vector3(2.5400, 0.8700, 0.0500)
+size = Vector3(2.4200, 0.8700, 0.0500)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
@@ -970,33 +970,33 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.5150, 3.2000)
 editor_description = "Kitchen-side duct mouth. Flush in BreakRoomWest. Hole in the wall, not a tunnel object in the room."
 
 [node name="KitchenLip_L" type="CSGBox3D" parent="Architecture/VentDuct"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0600, 0.5150, 2.7400)
-size = Vector3(0.0400, 0.9800, 0.0600)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.5150, 2.7400)
+size = Vector3(0.1000, 0.9800, 0.0600)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("12_duct")
-editor_description = "Kitchen-side metal lip. Flush with BreakRoomWest. Cover removed."
+editor_description = "Kitchen-side metal lip. Centered in BreakRoomWest thickness. Not coplanar with plaster."
 
 [node name="KitchenLip_R" type="CSGBox3D" parent="Architecture/VentDuct"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0600, 0.5150, 3.6600)
-size = Vector3(0.0400, 0.9800, 0.0600)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.5150, 3.6600)
+size = Vector3(0.1000, 0.9800, 0.0600)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("12_duct")
 
 [node name="KitchenLip_T" type="CSGBox3D" parent="Architecture/VentDuct"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0600, 1.0100, 3.2000)
-size = Vector3(0.0400, 0.0800, 0.9800)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.0100, 3.2000)
+size = Vector3(0.1000, 0.0800, 0.9800)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("12_duct")
 
 [node name="KitchenLip_B" type="CSGBox3D" parent="Architecture/VentDuct"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0600, 0.0400, 3.2000)
-size = Vector3(0.0400, 0.0800, 0.9800)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0400, 3.2000)
+size = Vector3(0.1000, 0.0800, 0.9800)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
@@ -1007,32 +1007,32 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6600, 0.5150, 3.2000)
 editor_description = "Closet-side duct mouth. Flush in IntroClosetEast. Hole in the wall, not a black box in the room."
 
 [node name="ClosetLip_L" type="CSGBox3D" parent="Architecture/VentDuct"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7200, 0.5150, 2.7400)
-size = Vector3(0.0400, 0.9800, 0.0600)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6600, 0.5150, 2.7400)
+size = Vector3(0.1000, 0.9800, 0.0600)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("12_duct")
 
 [node name="ClosetLip_R" type="CSGBox3D" parent="Architecture/VentDuct"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7200, 0.5150, 3.6600)
-size = Vector3(0.0400, 0.9800, 0.0600)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6600, 0.5150, 3.6600)
+size = Vector3(0.1000, 0.9800, 0.0600)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("12_duct")
 
 [node name="ClosetLip_T" type="CSGBox3D" parent="Architecture/VentDuct"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7200, 1.0100, 3.2000)
-size = Vector3(0.0400, 0.0800, 0.9800)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6600, 1.0100, 3.2000)
+size = Vector3(0.1000, 0.0800, 0.9800)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("12_duct")
 
 [node name="ClosetLip_B" type="CSGBox3D" parent="Architecture/VentDuct"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7200, 0.0400, 3.2000)
-size = Vector3(0.0400, 0.0800, 0.9800)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6600, 0.0400, 3.2000)
+size = Vector3(0.1000, 0.0800, 0.9800)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
@@ -1534,25 +1534,34 @@ collision_mask = 1
 material = ExtResource("7_frame")
 
 [node name="CubiclePartition" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2500, 0.7500, 9.1500)
-size = Vector3(2.5000, 1.5000, 0.0600)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.2000, 0.7500, 9.1500)
+size = Vector3(1.2000, 1.5000, 0.0600)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("5_furn")
-editor_description = "FUTURE-ASSET — cubicle partition. Tightens DemonSpot_01 into a choke."
+editor_description = "Desk-back partition on the WEST bay only. East chase lane stays open so DemonSpot_01 can reach the aisle."
+
+[node name="CubicleHideScreen" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.4400, 0.7200, 8.7200)
+size = Vector3(0.8800, 1.4400, 0.0600)
+use_collision = false
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("5_furn")
+editor_description = "Visual jump-scare hide in front of DemonSpot_01. Collision OFF so the stalker can walk the aisle line after reveal."
 
 [node name="CubicleDesk" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.1500, 0.3800, 8.5000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.0500, 0.3800, 8.3500)
 size = Vector3(1.2000, 0.7600, 0.6400)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("5_furn")
-editor_description = "FUTURE-ASSET — cubicle desk."
+editor_description = "FUTURE-ASSET — cubicle desk. West bay, off the stalker chase lane."
 
 [node name="CubicleMonitor" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.1500, 0.9200, 8.2800)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.0500, 0.9200, 8.1300)
 size = Vector3(0.4600, 0.3200, 0.0800)
 use_collision = true
 collision_layer = 1
@@ -1560,16 +1569,16 @@ collision_mask = 1
 material = ExtResource("9_dim")
 
 [node name="CubicleChair" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.1500, 0.4600, 9.1000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.0500, 0.4600, 8.9500)
 size = Vector3(0.4400, 0.9200, 0.4400)
 use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("5_furn")
-editor_description = "FUTURE-ASSET — cubicle chair."
+editor_description = "FUTURE-ASSET — cubicle chair. West bay."
 
 [node name="CubicleChairBack" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.1500, 0.8000, 9.2800)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.0500, 0.8000, 9.1300)
 size = Vector3(0.4200, 0.4000, 0.0800)
 use_collision = true
 collision_layer = 1
@@ -1577,7 +1586,7 @@ collision_mask = 1
 material = ExtResource("5_furn")
 
 [node name="CubicleBin" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.4000, 0.2200, 8.2000)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.7800, 0.2200, 8.0500)
 size = Vector3(0.2800, 0.4400, 0.2800)
 use_collision = true
 collision_layer = 1

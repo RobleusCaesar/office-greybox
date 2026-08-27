@@ -166,6 +166,51 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("locked-door-supply.png")
+	# Playtest pass — unique names so earlier Meshy stills stay.
+	_aim(level, Vector3(9.15, 1.45, 10.35), Vector3(10.20, 0.55, 8.40))
+	for _j in 8:
+		await process_frame
+	_save("playtest-stalker-chase-path.png")
+	_aim(level, Vector3(9.40, 1.42, 10.15), Vector3(8.10, 0.55, 8.40))
+	for _j in 8:
+		await process_frame
+	_save("playtest-alcove-cubicle.png")
+	_aim(level, Vector3(9.40, 1.45, 13.70), Vector3(8.50, 0.55, 15.20))
+	for _j in 8:
+		await process_frame
+	_save("playtest-alcove-copy.png")
+	_aim(level, Vector3(3.50, 1.48, 11.40), Vector3(2.10, 1.05, 8.90))
+	for _j in 8:
+		await process_frame
+	_save("playtest-hall-no-bath-door.png")
+	_aim(level, Vector3(1.35, 1.35, 8.95), Vector3(0.40, 0.12, 7.35))
+	for _j in 8:
+		await process_frame
+	_save("playtest-bathroom-fallen-door.png")
+	_aim(level, Vector3(12.20, 1.52, 11.70), Vector3(16.80, 1.55, 13.20))
+	for _j in 8:
+		await process_frame
+	_save("playtest-left-hall-art.png")
+	_aim(level, Vector3(21.80, 1.55, 11.50), Vector3(25.82, 1.70, 11.50))
+	for _j in 8:
+		await process_frame
+	_save("playtest-logo-desk.png")
+	_aim(level, Vector3(1.90, 1.20, 3.25), Vector3(0.00, 0.48, 3.20))
+	for _j in 8:
+		await process_frame
+	_save("playtest-vent-kitchen.png")
+	_aim(level, Vector3(-5.20, 1.20, 3.25), Vector3(-2.66, 0.48, 3.20))
+	for _j in 8:
+		await process_frame
+	_save("playtest-vent-closet.png")
+	_aim(level, Vector3(6.80, 1.50, 12.00), Vector3(16.50, 1.20, 12.00))
+	for _j in 8:
+		await process_frame
+	_save("playtest-l-hall-flat.png")
+	_aim(level, Vector3(8.80, 1.15, 12.00), Vector3(9.40, 0.02, 12.40))
+	for _j in 8:
+		await process_frame
+	_save("playtest-carpet-vs-wall.png")
 	if level.get_node_or_null("FutureAssetSlots/IntroCloset/MopAndBucket"):
 		_aim(level, Vector3(-4.40, 1.20, 3.25), Vector3(-2.90, 0.40, 2.40))
 		for _j in 8:

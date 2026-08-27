@@ -287,8 +287,8 @@ func _breakroom(level: Node3D) -> void:
 	# Cubicle keyboard + reception desk parts
 	var hall := _find(level, "FutureAssetSlots/EastHall")
 	if hall:
-		_box(hall, "CubicleKeyboard", Vector3(0.36, 0.02, 0.14), Vector3(8.15, 0.77, 8.62), metal, Vector3.ZERO, false)
-		_box(hall, "CubicleDrawer", Vector3(0.28, 0.1, 0.02), Vector3(8.15, 0.42, 8.82), wood, Vector3.ZERO, false)
+		_box(hall, "CubicleKeyboard", Vector3(0.36, 0.02, 0.14), Vector3(8.05, 0.77, 8.48), metal, Vector3.ZERO, false)
+		_box(hall, "CubicleDrawer", Vector3(0.28, 0.1, 0.02), Vector3(8.05, 0.42, 8.68), wood, Vector3.ZERO, false)
 	# Reception desk is rebuilt in _reception (flipped, light wood).
 	# Table papers / cup rest on the new tabletop (~0.77 m).
 	_box(br, "TablePapers", Vector3(0.28, 0.01, 0.2), Vector3(3.7, 0.77, 3.55), paper, Vector3(0, 18, 0), false)
@@ -584,17 +584,7 @@ func _bathroom(level: Node3D) -> void:
 		hinge.rotation_degrees = Vector3(0, 28 + i * 4, 0)
 		bath.add_child(hinge)
 		_box(hinge, "Slab", Vector3(0.04, 1.86, 0.92), Vector3(0.0, 1.00, 0.48), wood)
-	# Ajar MEN door on the north-hall opening (wall now at X=2.0)
-	var door := Node3D.new()
-	door.name = "MensDoorAjar"
-	door.position = Vector3(2.00, 0.0, 8.42)
-	door.rotation_degrees = Vector3(0, 52, 0)
-	level.add_child(door)
-	_box(door, "Slab", Vector3(0.06, 2.08, 1.16), Vector3(0.0, 1.04, 0.58), wood)
-	var men := _tex_mat("res://textures/decal_men.png", Color.WHITE, 0.5)
-	men.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_quad(door, "MenDecal", Vector2(0.28, 0.28), Vector3(-0.04, 1.55, 0.58), Vector3(0, -90, 0), men)
-	# WOMEN on locked supply slab
+	# WOMEN on locked supply slab. The bathroom hall door that stuck into the aisle is gone.
 	var women := _tex_mat("res://textures/decal_women.png", Color.WHITE, 0.5)
 	women.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_quad(level, "WomenDecal", Vector2(0.28, 0.28), Vector3(4.88, 1.55, 8.50), Vector3(0, 90, 0), women)
@@ -620,8 +610,9 @@ func _reception(level: Node3D) -> void:
 	var metal := _mat("res://materials/mat_metal_furn.tres")
 	var paper := _mat("res://materials/mat_paper.tres")
 	var leather := _mat("res://materials/mat_leather.tres")
-	# Yaw 180: local +X is the visitor counter (west hall). Local −X is the
-	# receptionist / AURUM wall (east). Counter height 0.86 m.
+	# Parent yaw 180: local −X is the sit-side (world east / logo wall). Receptionist
+	# sits with their back to the logo and faces the lobby. Counter height 0.86 m.
+	# GLB high-back is local +Z — yaw −90 on the mesh so that back faces the logo wall.
 	var desk := Node3D.new()
 	desk.name = "ReceptionDesk2"
 	desk.position = Vector3(24.55, 0.0, 11.50)
@@ -637,6 +628,7 @@ func _reception(level: Node3D) -> void:
 			inst.name = "ReceptionDeskMesh"
 			# Mesh AABB y −0.665..0.667. Sit on the floor; high back stays in the GLB.
 			inst.position = Vector3(0.0, 0.665, 0.0)
+			inst.rotation_degrees = Vector3(0, -90, 0)
 			desk.add_child(inst)
 			var body := _box(desk, "ReceptionDesk", Vector3(1.16, 0.82, 1.88), Vector3(0.0, 0.41, 0.0), oak)
 			body.visible = false
@@ -671,10 +663,14 @@ func _reception(level: Node3D) -> void:
 	for i in 5:
 		var z := 9.55 + i * 0.98
 		_box(rec, "WalnutPanel_%d" % i, Vector3(0.018, 2.72, 0.92), Vector3(25.888, 1.50, z), panel, Vector3.ZERO, false)
-	var plate := _tex_mat("res://textures/hero/aurum-logo.png", Color.WHITE, 0.72)
+	var plate := _tex_mat("res://textures/hero/aurum-logo.png", Color.WHITE, 0.55)
 	plate.metallic = 0.04
-	plate.roughness = 0.72
-	_box(rec, "AurumPlate", Vector3(0.03, 0.92, 1.45), Vector3(25.86, 1.82, 11.50), plate, Vector3.ZERO, false)
+	plate.roughness = 0.55
+	plate.emission_enabled = true
+	plate.emission = Color(1.0, 0.96, 0.88)
+	plate.emission_energy_multiplier = 0.42
+	# West-facing quad in front of the walnut so the logo actually reads from the lobby.
+	_quad(rec, "AurumPlate", Vector2(1.72, 1.08), Vector3(25.82, 1.88, 11.50), Vector3(0, -90, 0), plate)
 
 
 func _dread(level: Node3D) -> void:
@@ -695,8 +691,8 @@ func _dread(level: Node3D) -> void:
 	for p in papers:
 		_box(root, "Paper_%d" % i, Vector3(0.22, 0.005, 0.16), p, paper, Vector3(0, float(i * 23), 0), false)
 		i += 1
-	# Fallen door in north hall
-	_box(root, "FallenDoor", Vector3(0.08, 0.9, 2.0), Vector3(3.55, 0.08, 9.6), wood, Vector3(8, 18, 82))
+	# Fallen door INSIDE the bathroom (south of the entry walk). Hall stays passable.
+	_box(root, "FallenDoor", Vector3(1.85, 0.08, 0.88), Vector3(0.45, 0.04, 7.35), wood, Vector3(0, 22, 0))
 	# Glass shards in EAST HALL only (not money-shot)
 	for j in 7:
 		var gx := 10.5 + j * 0.55
@@ -710,6 +706,44 @@ func _dread(level: Node3D) -> void:
 		var copier := _instance_glb(hall, "res://models/office_copier.glb", "OfficeCopier", Vector3(8.35, 0.0, 15.15), Vector3(0, 180, 0), Vector3.ONE)
 		_apply_mesh_mats(copier, "res://materials/mat_metal_furn.tres", "res://materials/mat_metal_furn.tres")
 		_box_collision(copier, Vector3(0.74, 1.10, 0.68), Vector3(0.0, 0.55, 0.0))
+		_dress_alcoves(hall)
+
+
+func _dress_alcoves(hall: Node) -> void:
+	# Cubicle stub (south) + copy/mail alcove (north). Real office junk, not empty grey.
+	# Keep the east cubicle chase lane (X ≳ 9.9, Z 8.2–10.2) clear.
+	var wood := _mat("res://materials/mat_wood.tres")
+	var metal := _mat("res://materials/mat_metal_furn.tres")
+	var paper := _mat("res://materials/mat_paper.tres")
+	var plant := _mat("res://materials/mat_plant.tres")
+	var leather := _mat("res://materials/mat_leather.tres")
+	# Cubicle — west bay around the desk.
+	_box(hall, "CubicleFileCab", Vector3(0.42, 1.12, 0.56), Vector3(7.78, 0.56, 9.55), metal)
+	_box(hall, "CubicleFileDrawer_0", Vector3(0.38, 0.18, 0.04), Vector3(7.78, 0.78, 9.84), metal, Vector3.ZERO, false)
+	_box(hall, "CubicleFileDrawer_1", Vector3(0.38, 0.18, 0.04), Vector3(7.78, 0.52, 9.84), metal, Vector3.ZERO, false)
+	_box(hall, "CubicleInbox", Vector3(0.28, 0.04, 0.22), Vector3(8.42, 0.80, 8.22), paper, Vector3(0, -12, 0), false)
+	_box(hall, "CubiclePapers", Vector3(0.22, 0.01, 0.16), Vector3(7.72, 0.79, 8.22), paper, Vector3(0, 18, 0), false)
+	_box(hall, "CubicleMug", Vector3(0.07, 0.09, 0.07), Vector3(8.38, 0.82, 8.52), _tex_mat("res://textures/tex_porcelain.png", Color(0.55, 0.22, 0.16)), Vector3.ZERO, false)
+	_box(hall, "CubicleLampBase", Vector3(0.08, 0.22, 0.08), Vector3(7.68, 0.90, 8.48), metal, Vector3.ZERO, false)
+	_box(hall, "CubicleLampArm", Vector3(0.28, 0.03, 0.03), Vector3(7.82, 1.02, 8.48), metal, Vector3.ZERO, false)
+	_box(hall, "CubicleLampHead", Vector3(0.12, 0.06, 0.10), Vector3(7.98, 1.00, 8.48), metal, Vector3.ZERO, false)
+	_box(hall, "CubicleBinders", Vector3(0.26, 0.20, 0.08), Vector3(7.78, 1.22, 9.55), _tex_mat("", Color(0.18, 0.28, 0.42)), Vector3.ZERO, false)
+	_box(hall, "CubiclePlantPot", Vector3(0.16, 0.14, 0.16), Vector3(7.78, 0.08, 8.85), wood, Vector3.ZERO, false)
+	_box(hall, "CubiclePlant", Vector3(0.22, 0.28, 0.18), Vector3(7.78, 0.28, 8.85), plant, Vector3.ZERO, false)
+	_box(hall, "CubicleCoatHook", Vector3(0.04, 0.08, 0.04), Vector3(7.62, 1.55, 9.95), metal, Vector3.ZERO, false)
+	_box(hall, "CubicleCoat", Vector3(0.08, 0.72, 0.28), Vector3(7.70, 1.12, 9.95), leather, Vector3.ZERO, false)
+	# Copy / mail alcove — around the copier, table, and slot bank.
+	_box(hall, "CopyWaterCooler", Vector3(0.36, 1.05, 0.36), Vector3(7.82, 0.53, 14.05), metal)
+	_box(hall, "CopyWaterJug", Vector3(0.28, 0.32, 0.28), Vector3(7.82, 1.22, 14.05), _tex_mat("res://textures/tex_porcelain.png", Color(0.75, 0.82, 0.88, 0.72), 0.12), Vector3.ZERO, false)
+	_box(hall, "CopyTrash", Vector3(0.28, 0.42, 0.28), Vector3(7.82, 0.22, 15.85), _tex_mat("res://textures/tex_metal.png", Color(0.22, 0.22, 0.20)), Vector3.ZERO, false)
+	_box(hall, "CopyClipboard", Vector3(0.22, 0.02, 0.30), Vector3(10.72, 0.82, 14.12), paper, Vector3(0, -8, 0), false)
+	_box(hall, "CopyStapler", Vector3(0.08, 0.04, 0.03), Vector3(10.88, 0.83, 13.92), metal, Vector3.ZERO, false)
+	_carton(hall, "CopyToner_0", Vector3(0.28, 0.18, 0.22), Vector3(9.15, 0.10, 15.75), 12.0, "res://textures/tex_cardboard.png", false)
+	_carton(hall, "CopyToner_1", Vector3(0.30, 0.16, 0.24), Vector3(9.48, 0.09, 15.55), -18.0, "res://textures/tex_cardboard_copy.png", false)
+	_carton(hall, "CopyMailCrate", Vector3(0.42, 0.22, 0.32), Vector3(11.55, 0.12, 14.15), 8.0, "res://textures/tex_cardboard_tape.png", false)
+	_box(hall, "CopyReam_0", Vector3(0.22, 0.06, 0.28), Vector3(10.55, 0.84, 13.88), paper, Vector3(0, 6, 0), false)
+	_box(hall, "CopyReam_1", Vector3(0.22, 0.06, 0.28), Vector3(10.55, 0.90, 13.88), paper, Vector3(0, -4, 0), false)
+	_box(hall, "CopyEnvelopes", Vector3(0.18, 0.04, 0.24), Vector3(10.90, 1.95, 16.02), paper, Vector3.ZERO, false)
 
 
 func _ceo(level: Node3D) -> void:
@@ -735,15 +769,15 @@ func _ceo(level: Node3D) -> void:
 	_box(ceo, "FallenBook_01", Vector3(0.22, 0.04, 0.16), Vector3(31.9, 0.03, 15.7), paper, Vector3(0, 40, 8), false)
 	_box(ceo, "FallenBook_02", Vector3(0.2, 0.04, 0.14), Vector3(31.55, 0.03, 15.45), _tex_mat("res://textures/tex_leather.png", Color(0.25, 0.08, 0.08), 0.7), Vector3(0, -22, 6), false)
 	_box(ceo, "FallenBook_03", Vector3(0.18, 0.03, 0.13), Vector3(32.15, 0.025, 15.85), paper, Vector3(0, 70, 4), false)
-	# Framed art — mountain on south wall + frame with the plant (right of the window)
+	# Framed art — Front Range / Denver. No diplomas.
 	var paint := _tex_mat("res://textures/painting_mountains.png")
-	var cert := _tex_mat("res://textures/painting_certificate.png")
+	var denver := _tex_mat("res://textures/painting_denver_city.png")
 	_box(ceo, "FrameMountain", Vector3(1.15, 0.8, 0.04), Vector3(32.2, 1.75, 6.62), wood, Vector3.ZERO, false)
 	_quad(ceo, "PaintingMountain", Vector2(1.05, 0.7), Vector3(32.2, 1.75, 6.65), Vector3.ZERO, paint)
 	_box(ceo, "FramePlant", Vector3(0.70, 0.88, 0.04), Vector3(35.15, 1.70, 6.62), wood, Vector3.ZERO, false)
-	_quad(ceo, "PaintingPlant", Vector2(0.62, 0.78), Vector3(35.15, 1.70, 6.65), Vector3.ZERO, cert)
-	_box(ceo, "FrameCert", Vector3(0.55, 0.7, 0.04), Vector3(27.2, 1.7, 14.2), wood, Vector3(0, 90, 0), false)
-	_quad(ceo, "PaintingCert", Vector2(0.48, 0.62), Vector3(27.23, 1.7, 14.2), Vector3(0, 90, 0), paint)
+	_quad(ceo, "PaintingPlant", Vector2(0.62, 0.78), Vector3(35.15, 1.70, 6.65), Vector3.ZERO, denver)
+	_box(ceo, "FrameWest", Vector3(0.55, 0.7, 0.04), Vector3(27.2, 1.7, 14.2), wood, Vector3(0, 90, 0), false)
+	_quad(ceo, "PaintingWest", Vector2(0.48, 0.62), Vector3(27.23, 1.7, 14.2), Vector3(0, 90, 0), paint)
 	# Dead executive — mid-office, visible from the south door, window ahead.
 	_build_ceo_body(ceo)
 
@@ -1041,19 +1075,7 @@ func _walls(level: Node3D) -> void:
 	_trim_span(root, i, true, -9.46, -2.88, 6.34, [], trim)
 	_trim_span(root, i, false, 0.20, 6.30, -9.58, [[2.70, 3.80]], trim)
 	_trim_span(root, i, false, 0.20, 6.30, -2.78, [[2.72, 3.68]], trim)
-	# North hall west — skip bathroom entry Z 8.39–9.61 @ X ~2
-	_trim_span(root, i, false, 6.58, 13.20, 2.08, [[8.39, 9.61]], trim)
-	# North hall east — skip supply / elevator slab
-	_trim_span(root, i, false, 6.58, 11.00, 4.92, [[8.05, 8.95]], trim)
-	# East hall south — skip cubicle, conference door/glass
-	_trim_span(root, i, true, 5.10, 17.85, 10.58, [[7.50, 11.00], [13.20, 14.20], [14.30, 17.80]], trim)
-	# East hall north — skip copy alcove
-	_trim_span(root, i, true, 5.10, 17.85, 13.42, [[7.50, 12.00]], trim)
-	# Reception mouth on west wall
-	_trim_span(root, i, false, 6.60, 16.40, 18.10, [[10.50, 13.50]], trim)
-	# Reception south / north
-	_trim_span(root, i, true, 18.10, 25.85, 6.62, [], trim)
-	_trim_span(root, i, true, 18.10, 25.85, 16.38, [], trim)
+	# L-shaped hallway walls stay flat — no baseboard / chair-rail nubs in the walk path.
 	# CEO sides of the divider — skip the two side openings
 	_trim_span(root, i, false, 6.60, 16.40, 25.86, [[6.60, 8.53], [14.48, 16.40]], trim)
 	_trim_span(root, i, false, 8.53, 14.48, 26.14, [], trim)
@@ -1079,20 +1101,22 @@ func _walls(level: Node3D) -> void:
 		j += 1
 	var wood := _mat("res://materials/mat_wood.tres")
 	var mountains := _tex_mat("res://textures/painting_mountains.png")
-	var cert := _tex_mat("res://textures/painting_certificate.png")
+	var front_range := _tex_mat("res://textures/painting_front_range.png")
+	var denver := _tex_mat("res://textures/painting_denver_city.png")
 	var city := _tex_mat("res://textures/painting_map.png")
-	# Paper on walls — lived-in office, not a furniture catalog
-	_frame(root, "HallMap", Vector3(14.60, 1.68, 11.14), Vector2(0.88, 0.62), Vector3(0, 0, 0), wood, city)
-	_frame(root, "HallCert", Vector3(16.90, 1.70, 11.14), Vector2(0.46, 0.60), Vector3(0, 0, 0), wood, cert)
-	_frame(root, "HallMountains", Vector3(17.20, 1.68, 12.86), Vector2(0.92, 0.64), Vector3(0, 180, 0), wood, mountains)
-	_frame(root, "ReceptionMap", Vector3(20.40, 1.72, 16.36), Vector2(0.95, 0.66), Vector3(0, 180, 0), wood, city)
-	_frame(root, "ReceptionCertA", Vector3(22.80, 1.70, 16.36), Vector2(0.44, 0.58), Vector3(0, 180, 0), wood, cert)
+	# Left wall walking east toward Ember / AURUM (north face Z≈13.4). Spaced, no diplomas.
+	_frame(root, "HallFrontRange", Vector3(13.70, 1.70, 13.36), Vector2(1.08, 0.70), Vector3(0, 180, 0), wood, front_range)
+	_frame(root, "HallDenver", Vector3(18.15, 1.68, 13.36), Vector2(1.00, 0.66), Vector3(0, 180, 0), wood, denver)
+	# South wall of that stretch — one map, well clear of the north-wall pair.
+	_frame(root, "HallMap", Vector3(14.10, 1.68, 11.14), Vector2(0.88, 0.62), Vector3(0, 0, 0), wood, city)
+	_frame(root, "ReceptionMap", Vector3(20.20, 1.72, 16.36), Vector2(0.95, 0.66), Vector3(0, 180, 0), wood, city)
+	_frame(root, "ReceptionDenver", Vector3(23.55, 1.70, 16.36), Vector2(0.92, 0.62), Vector3(0, 180, 0), wood, denver)
 	_frame(root, "ReceptionMountains", Vector3(21.80, 1.70, 6.64), Vector2(1.02, 0.68), Vector3(0, 0, 0), wood, mountains)
-	_frame(root, "DividerCert", Vector3(26.16, 1.68, 10.20), Vector2(0.46, 0.58), Vector3(0, 90, 0), wood, cert)
-	_frame(root, "DividerMap", Vector3(26.16, 1.72, 12.55), Vector2(0.80, 0.58), Vector3(0, 90, 0), wood, city)
+	_frame(root, "DividerFrontRange", Vector3(26.16, 1.70, 10.05), Vector2(0.86, 0.60), Vector3(0, 90, 0), wood, front_range)
+	_frame(root, "DividerMap", Vector3(26.16, 1.72, 12.70), Vector2(0.80, 0.58), Vector3(0, 90, 0), wood, city)
 	_frame(root, "CEONorthMap", Vector3(30.20, 1.72, 16.36), Vector2(0.90, 0.64), Vector3(0, 180, 0), wood, city)
-	_frame(root, "CEONorthCert", Vector3(33.10, 1.68, 16.36), Vector2(0.44, 0.56), Vector3(0, 180, 0), wood, cert)
-	_frame(root, "BreakCert", Vector3(0.14, 1.58, 4.20), Vector2(0.42, 0.54), Vector3(0, 90, 0), wood, cert)
+	_frame(root, "CEONorthDenver", Vector3(33.40, 1.70, 16.36), Vector2(0.88, 0.60), Vector3(0, 180, 0), wood, denver)
+	_frame(root, "BreakFrontRange", Vector3(0.14, 1.58, 4.20), Vector2(0.72, 0.50), Vector3(0, 90, 0), wood, front_range)
 	_frame(root, "BreakMap", Vector3(6.86, 1.62, 4.80), Vector2(0.70, 0.50), Vector3(0, -90, 0), wood, city)
 
 
@@ -1100,13 +1124,13 @@ func _frame(parent: Node, name: String, pos: Vector3, size: Vector2, rot: Vector
 	_box(parent, name + "Frame", Vector3(size.x + 0.08, size.y + 0.08, 0.035), pos, wood, rot, false)
 	var face := pos
 	if abs(rot.y) < 1.0:
-		face.z += 0.022
+		face.z += 0.038
 	elif abs(rot.y - 180.0) < 1.0:
-		face.z -= 0.022
+		face.z -= 0.038
 	elif abs(rot.y - 90.0) < 1.0:
-		face.x += 0.022
+		face.x += 0.038
 	elif abs(rot.y + 90.0) < 1.0:
-		face.x -= 0.022
+		face.x -= 0.038
 	_quad(parent, name + "Art", size, face, rot, art)
 
 
