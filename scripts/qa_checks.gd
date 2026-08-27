@@ -41,6 +41,12 @@ func _run() -> void:
 		errors.append("haunt_bed.wav missing")
 	if not FileAccess.file_exists("res://audio/shotgun_fire.wav"):
 		errors.append("shotgun_fire.wav missing")
+	for wav_name in ["shotgun_blast.wav", "shotgun_cocking.wav", "shotgun_reloading.wav"]:
+		var wav_path := "res://audio/%s" % wav_name
+		if not FileAccess.file_exists(wav_path):
+			errors.append("%s missing" % wav_name)
+		if not FileAccess.file_exists(wav_path + ".import"):
+			errors.append("%s.import missing — web export will skip this wav" % wav_name)
 	if not FileAccess.file_exists("res://textures/gen/blood_smear.png"):
 		errors.append("blood_smear.png missing")
 	if not FileAccess.file_exists("res://textures/hero/blood-spray-hq.png"):
@@ -235,6 +241,16 @@ func _run() -> void:
 	var title_play := FileAccess.get_file_as_string("res://scripts/title.gd")
 	if not title_play.contains("volume_db = -80"):
 		errors.append("title Play must unlock Web Audio at -80 dB before change_scene")
+	if title_play.contains("FileAccess.file_exists"):
+		errors.append("title web-unlock must load() without FileAccess.file_exists")
+	var haunt_src := FileAccess.get_file_as_string("res://scripts/level.gd")
+	var haunt_fn := haunt_src.find("func _setup_haunt_bed")
+	if haunt_fn < 0:
+		errors.append("_setup_haunt_bed missing")
+	else:
+		var haunt_chunk := haunt_src.substr(haunt_fn, 520)
+		if haunt_chunk.contains("FileAccess.file_exists"):
+			errors.append("haunt bed must load() without FileAccess.file_exists")
 	var player_src := FileAccess.get_file_as_string("res://scripts/player.gd")
 	if not player_src.contains("shotgun_blast.wav"):
 		errors.append("player must reference audio/shotgun_blast.wav")

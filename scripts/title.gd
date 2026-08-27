@@ -17,10 +17,9 @@ func _ready() -> void:
 
 func _on_play() -> void:
 	# Unlock Web Audio on the Play gesture so the level haunt bed can start.
-	var stream: AudioStream = null
-	if FileAccess.file_exists("res://audio/under_broken_steel.mp3"):
-		stream = load("res://audio/under_broken_steel.mp3")
-	if stream == null and FileAccess.file_exists("res://audio/haunt_bed.wav"):
+	# load() only — HTML5 packed-res probes often miss remapped audio.
+	var stream: AudioStream = load("res://audio/under_broken_steel.mp3")
+	if stream == null:
 		stream = load("res://audio/haunt_bed.wav")
 	if stream:
 		var unlock := AudioStreamPlayer.new()

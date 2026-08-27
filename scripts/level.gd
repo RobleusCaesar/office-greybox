@@ -52,12 +52,9 @@ func _process(delta: float) -> void:
 
 
 func _setup_haunt_bed() -> void:
-	var stream: AudioStream = null
-	if FileAccess.file_exists("res://audio/under_broken_steel.mp3"):
-		stream = load("res://audio/under_broken_steel.mp3")
+	# HTML5 packed-res probes often miss remapped audio. load() follows the remap.
+	var stream: AudioStream = load("res://audio/under_broken_steel.mp3")
 	if stream == null:
-		if not FileAccess.file_exists("res://audio/haunt_bed.wav"):
-			return
 		stream = load("res://audio/haunt_bed.wav")
 	if stream == null:
 		return

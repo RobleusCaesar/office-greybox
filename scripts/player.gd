@@ -522,11 +522,12 @@ func _build_hud() -> void:
 
 
 func _load_real_wav(path: String) -> AudioStream:
-	if not FileAccess.file_exists(path):
-		return null
-	var f := FileAccess.open(path, FileAccess.READ)
-	if f == null or f.get_length() <= 1024:
-		return null
+	# Prefer load() so HTML5 can resolve the import remap inside the pck.
+	# Keep the tiny-stub guard only when the raw file is readable (desktop).
+	if FileAccess.file_exists(path):
+		var f := FileAccess.open(path, FileAccess.READ)
+		if f == null or f.get_length() <= 1024:
+			return null
 	return load(path) as AudioStream
 
 
