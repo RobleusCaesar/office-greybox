@@ -14,6 +14,7 @@ Luxury office. Denver is on fire. Nolan dread. Title `res://scenes/title.tscn` i
 | **R** | Reload |
 | **E** | Take ammo (crate mesh disappears) |
 | **Space** | Crouch (no jump) |
+| **C** | Crawl (toggle; fits the kitchen → IntroCloset vent) |
 | **1 / 2** or scroll | Shotgun / pistol |
 | **Esc** | Release mouse (title too) |
 
