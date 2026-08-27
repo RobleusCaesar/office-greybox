@@ -3,9 +3,21 @@ extends RefCounted
 
 
 func apply(level: Node3D) -> void:
+	apply_near(level)
+	apply_far(level)
+
+
+func apply_near(level: Node3D) -> void:
+	# Closet + mop + painted architecture. Enough for Play / first frame.
 	_texture_existing(level)
-	_breakroom(level)
 	_intro_closet(level)
+	_flush_hall(level)
+
+
+func apply_far(level: Node3D) -> void:
+	# CEO / ember-adjacent / couches / bath Meshy / elevator / break-room GLBs.
+	_breakroom(level)
+	_reception(level)
 	_bathroom(level)
 	_dread(level)
 	_ceo(level)
@@ -14,7 +26,6 @@ func apply(level: Node3D) -> void:
 	_ammo(level)
 	_emergency(level)
 	_locked_doors(level)
-	_flush_hall(level)
 
 
 func _mat(path: String) -> Material:
@@ -73,6 +84,49 @@ func _quad(parent: Node, name: String, size: Vector2, pos: Vector3, rot: Vector3
 func _set_csg_mat(n: Node, mat: Material) -> void:
 	if n is CSGPrimitive3D:
 		(n as CSGPrimitive3D).material = mat
+	elif n is MeshInstance3D:
+		var mi := n as MeshInstance3D
+		mi.material_override = mat
+		if mi.mesh is PrimitiveMesh:
+			(mi.mesh as PrimitiveMesh).material = mat
+
+
+func _box_size(n: Node) -> Vector3:
+	if n == null:
+		return Vector3.ZERO
+	if n is CSGBox3D:
+		return (n as CSGBox3D).size
+	if n.has_meta("csg_size"):
+		return n.get_meta("csg_size")
+	if n is MeshInstance3D and (n as MeshInstance3D).mesh is BoxMesh:
+		return ((n as MeshInstance3D).mesh as BoxMesh).size
+	return Vector3.ZERO
+
+
+func _set_box_size(n: Node, s: Vector3) -> void:
+	if n == null:
+		return
+	n.set_meta("csg_size", s)
+	if n is CSGBox3D:
+		(n as CSGBox3D).size = s
+		return
+	if n is MeshInstance3D:
+		var mi := n as MeshInstance3D
+		if mi.mesh is BoxMesh:
+			var bm := (mi.mesh as BoxMesh).duplicate() as BoxMesh
+			bm.size = s
+			mi.mesh = bm
+		_sync_box_collision(mi, s)
+
+
+func _sync_box_collision(mi: MeshInstance3D, s: Vector3) -> void:
+	for c in mi.get_children():
+		if c is StaticBody3D:
+			for cc in c.get_children():
+				if cc is CollisionShape3D and (cc as CollisionShape3D).shape is BoxShape3D:
+					var sh := ((cc as CollisionShape3D).shape as BoxShape3D).duplicate() as BoxShape3D
+					sh.size = s
+					(cc as CollisionShape3D).shape = sh
 
 
 func _find(level: Node, path: String) -> Node:
@@ -163,11 +217,13 @@ func _texture_existing(level: Node3D) -> void:
 	var win := _find(level, "FutureAssetSlots/CEOOffice/MoneyShotWindow")
 	if win:
 		for n in ["Pane_01", "Pane_02", "Pane_03"]:
-			var pane := win.get_node_or_null(n) as CSGBox3D
+			var pane := win.get_node_or_null(n)
 			if pane:
-				pane.material = glass
-				pane.visible = true
-				pane.use_collision = true
+				_set_csg_mat(pane, glass)
+				if pane is Node3D:
+					(pane as Node3D).visible = true
+				if pane is CSGBox3D:
+					(pane as CSGBox3D).use_collision = true
 		var mull := _mat("res://materials/mat_mullion.tres")
 		for n in ["Mullion_Left", "Mullion_01", "Mullion_02", "Mullion_Right", "Sill", "Head"]:
 			_set_csg_mat(win.get_node_or_null(n), mull)
@@ -226,7 +282,6 @@ func _texture_existing(level: Node3D) -> void:
 	_hide_visual(_find(level, "FutureAssetSlots/BreakRoom/FridgeHandle"))
 	_hide_visual(_find(level, "FutureAssetSlots/BreakRoom/BreakRoomTable"))
 	_hide_visual(_find(level, "FutureAssetSlots/BreakRoom/TablePedestal"))
-	_reception(level)
 	_paint_remaining(level)
 
 
@@ -237,6 +292,12 @@ func _hide_csg(level: Node3D, paths: Array) -> void:
 			var c := n as CSGPrimitive3D
 			c.visible = false
 			c.use_collision = false
+		elif n is GeometryInstance3D:
+			(n as GeometryInstance3D).visible = false
+			for ch in n.get_children():
+				if ch is CollisionObject3D:
+					(ch as CollisionObject3D).collision_layer = 0
+					(ch as CollisionObject3D).collision_mask = 0
 
 
 func _hide_visual(n: Node) -> void:
@@ -1342,40 +1403,44 @@ func _box_collision(parent: Node3D, size: Vector3, pos: Vector3) -> void:
 
 func _fix_floors(level: Node3D) -> void:
 	# Bathroom stone used to overlap hall carpet at the doorway (black band / flicker).
-	var bath := _find(level, "Architecture/Floors/BathroomFloor") as CSGBox3D
-	if bath:
-		var west := bath.position.x - bath.size.x * 0.5
+	var bath := _find(level, "Architecture/Floors/BathroomFloor")
+	if bath is Node3D:
+		var bath3 := bath as Node3D
+		var bsz := _box_size(bath)
+		var west := bath3.position.x - bsz.x * 0.5
 		# Meet the hall carpet at X=2.00 — a 6 cm gap read as a black band.
-		bath.size.x = 2.00 - west
-		bath.position.x = (west + 2.00) * 0.5
+		_set_box_size(bath, Vector3(2.00 - west, bsz.y, bsz.z))
+		bath3.position.x = (west + 2.00) * 0.5
 		# Light porcelain so the opening does not read as a void against the taupe carpet.
 		var tile := _tex_mat("res://textures/tex_porcelain.png", Color(0.88, 0.88, 0.86), 0.38, 0.02)
 		tile.uv1_triplanar = true
 		tile.uv1_world_triplanar = true
 		tile.uv1_scale = Vector3(0.55, 0.55, 0.55)
 		_set_csg_mat(bath, tile)
-	var nh := _find(level, "Architecture/Floors/NorthHallFloor") as CSGBox3D
-	if nh:
+	var nh := _find(level, "Architecture/Floors/NorthHallFloor")
+	if nh is Node3D:
 		# X 2.00–5.00 (3.0 m), Z 6.52–10.50. No overlap with bathroom or corner.
-		nh.position = Vector3(3.50, -0.1000, 8.51)
-		nh.size = Vector3(3.00, 0.2000, 3.98)
-	var cf := _find(level, "Architecture/Floors/CornerFloor") as CSGBox3D
-	if cf:
-		cf.position = Vector3(3.50, -0.1000, 12.00)
-		cf.size = Vector3(3.00, 0.2000, 3.00)
-	var eh := _find(level, "Architecture/Floors/EastHallFloor") as CSGBox3D
-	if eh:
+		(nh as Node3D).position = Vector3(3.50, -0.1000, 8.51)
+		_set_box_size(nh, Vector3(3.00, 0.2000, 3.98))
+	var cf := _find(level, "Architecture/Floors/CornerFloor")
+	if cf is Node3D:
+		(cf as Node3D).position = Vector3(3.50, -0.1000, 12.00)
+		_set_box_size(cf, Vector3(3.00, 0.2000, 3.00))
+	var eh := _find(level, "Architecture/Floors/EastHallFloor")
+	if eh is Node3D:
 		# Meet the corner at X=5.00. Z span stays 3.0 m.
-		eh.position = Vector3(11.50, -0.1000, 12.00)
-		eh.size = Vector3(13.00, 0.2000, 3.00)
+		(eh as Node3D).position = Vector3(11.50, -0.1000, 12.00)
+		_set_box_size(eh, Vector3(13.00, 0.2000, 3.00))
 	var carpet := _office_carpet()
 	# Carpet doormat in the 1.2 m opening. Covers the hall/bath edge and the wall-foot z-fight.
 	_box(level, "BathDoorThreshold", Vector3(0.62, 0.036, 1.28), Vector3(1.92, 0.019, 9.00), carpet)
-	var sf := _find(level, "Architecture/Floors/SupplyClosetFloor") as CSGBox3D
-	if sf:
-		var se := sf.position.x + sf.size.x * 0.5
-		sf.size.x = se - 5.08
-		sf.position.x = (5.08 + se) * 0.5
+	var sf := _find(level, "Architecture/Floors/SupplyClosetFloor")
+	if sf is Node3D:
+		var sf3 := sf as Node3D
+		var ssz := _box_size(sf)
+		var se := sf3.position.x + ssz.x * 0.5
+		_set_box_size(sf, Vector3(se - 5.08, ssz.y, ssz.z))
+		sf3.position.x = (5.08 + se) * 0.5
 		_set_csg_mat(sf, carpet)
 
 
@@ -1383,11 +1448,13 @@ func _flush_hall(level: Node3D) -> void:
 	# Baked into level.tscn (BathroomSouth/North end at X=1.92, conference at Z=10.50).
 	# Keep this as a fail-safe so a stale scene cannot grow a hall ridge again.
 	for p in ["Architecture/Walls/BathroomSouth", "Architecture/Walls/BathroomNorth"]:
-		var w := _find(level, p) as CSGBox3D
-		if w:
-			var west := w.position.x - w.size.x * 0.5
-			w.size.x = 1.92 - west
-			w.position.x = (west + 1.92) * 0.5
+		var w := _find(level, p)
+		if w is Node3D:
+			var w3 := w as Node3D
+			var wsz := _box_size(w)
+			var west := w3.position.x - wsz.x * 0.5
+			_set_box_size(w, Vector3(1.92 - west, wsz.y, wsz.z))
+			w3.position.x = (west + 1.92) * 0.5
 	# Conference door + glass sat at Z=11.0 (0.5 m into the east-hall lane).
 	var door := _find(level, "FutureAssetSlots/EastHall/LockedDoor_DeadOffice") as Node3D
 	if door:

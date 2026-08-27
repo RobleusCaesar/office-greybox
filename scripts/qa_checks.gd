@@ -73,6 +73,7 @@ func _run() -> void:
 		"closed_elevator.glb", "mop_and_bucket.glb",
 		"broken_door.glb", "CEO_couch_coffee_table.glb",
 		"blood_decal_1.glb", "blood_decal_2.glb",
+		"abyssal_stalker.glb", "ember_demon.glb",
 	]:
 		if not FileAccess.file_exists("res://models/%s" % glb_name):
 			errors.append("%s missing" % glb_name)
@@ -144,11 +145,11 @@ func _run() -> void:
 		errors.append("break room TV missing")
 	if level.get_node_or_null("FutureAssetSlots/IntroCloset") == null:
 		errors.append("IntroCloset missing")
-	var ic_floor := level.get_node_or_null("Architecture/Floors/IntroClosetFloor") as CSGBox3D
+	var ic_floor := level.get_node_or_null("Architecture/Floors/IntroClosetFloor") as Node3D
 	if ic_floor == null:
 		errors.append("IntroCloset floor missing")
 	else:
-		if ic_floor.size.x < 6.0 or ic_floor.size.z < 6.0:
+		if _box_size(ic_floor).x < 6.0 or _box_size(ic_floor).z < 6.0:
 			errors.append("IntroCloset floor too small to walk a loop (%s)" % ic_floor.size)
 		if ic_floor.position.x > -5.5:
 			errors.append("IntroCloset must sit west of the vent gap, got X=%s" % ic_floor.position.x)
@@ -156,8 +157,8 @@ func _run() -> void:
 		errors.append("IntroCloset ceiling missing")
 	if level.get_node_or_null("Architecture/Walls/IntroClosetWest") == null:
 		errors.append("IntroCloset west wall missing")
-	var ic_east := level.get_node_or_null("Architecture/Walls/IntroClosetEast") as CSGBox3D
-	var br_west := level.get_node_or_null("Architecture/Walls/BreakRoomWest") as CSGBox3D
+	var ic_east := level.get_node_or_null("Architecture/Walls/IntroClosetEast") as Node3D
+	var br_west := level.get_node_or_null("Architecture/Walls/BreakRoomWest") as Node3D
 	if ic_east == null:
 		errors.append("IntroClosetEast missing — closet must not share BreakRoomWest")
 	elif absf(ic_east.position.x + 2.66) > 0.08:
@@ -165,13 +166,13 @@ func _run() -> void:
 	if ic_east and br_west:
 		if absf(ic_east.position.x - br_west.position.x) < 2.0:
 			errors.append("closet east wall still shares BreakRoomWest (X %s vs %s)" % [ic_east.position.x, br_west.position.x])
-		var kitchen_west_face := br_west.position.x - br_west.size.x * 0.5
-		var closet_east_face := ic_east.position.x + ic_east.size.x * 0.5
+		var kitchen_west_face := br_west.position.x - _box_size(br_west).x * 0.5
+		var closet_east_face := ic_east.position.x + _box_size(ic_east).x * 0.5
 		var gap := kitchen_west_face - closet_east_face
 		if gap < 2.30 or gap > 2.80:
 			errors.append("vent gap %.2f m, expected ~2.50 between facing plaster faces" % gap)
 		if ic_floor:
-			var floor_east := ic_floor.position.x + ic_floor.size.x * 0.5
+			var floor_east := ic_floor.position.x + _box_size(ic_floor).x * 0.5
 			if floor_east > closet_east_face + 0.12:
 				errors.append("closet floor still reaches the kitchen (east edge %s)" % floor_east)
 	if level.get_node_or_null("Architecture/Walls/IntroClosetEast/VentCut") == null:
@@ -184,13 +185,13 @@ func _run() -> void:
 		errors.append("BreakRoomWindowHead must be gone")
 	if level.get_node_or_null("Architecture/Walls/BreakRoomWest/WindowCut") != null:
 		errors.append("BreakRoomWest WindowCut must be gone")
-	var vent_cut := level.get_node_or_null("Architecture/Walls/BreakRoomWest/VentCut") as CSGBox3D
+	var vent_cut := level.get_node_or_null("Architecture/Walls/BreakRoomWest/VentCut") as Node3D
 	if vent_cut == null:
 		errors.append("BreakRoomWest VentCut missing")
 	else:
-		if vent_cut.operation != 2:
+		if _box_op(vent_cut) != 2:
 			errors.append("VentCut must subtract")
-		var west := level.get_node_or_null("Architecture/Walls/BreakRoomWest") as CSGBox3D
+		var west := level.get_node_or_null("Architecture/Walls/BreakRoomWest") as Node3D
 		if west:
 			var vent_y := west.position.y + vent_cut.position.y
 			if vent_y > 1.15:
@@ -226,8 +227,8 @@ func _run() -> void:
 		var door := level.get_node_or_null("FutureAssetSlots/IntroCloset/ChaosDoor") as Node3D
 		if door and absf(door.position.x + 9.66) > 0.12:
 			errors.append("chaos door not recentered on the new west wall (X %s)" % door.position.x)
-	var sc_floor := level.get_node_or_null("Architecture/Floors/SupplyClosetFloor") as CSGBox3D
-	if sc_floor and (sc_floor.size.x > 3.2 or sc_floor.size.z > 3.2):
+	var sc_floor := level.get_node_or_null("Architecture/Floors/SupplyClosetFloor") as Node3D
+	if sc_floor and (_box_size(sc_floor).x > 3.2 or _box_size(sc_floor).z > 3.2):
 		errors.append("existing locked SupplyCloset must stay small")
 	var spawn := level.get_node_or_null("Player") as Node3D
 	if spawn:
@@ -450,10 +451,10 @@ func _run() -> void:
 			errors.append("kitchen lunch table moved to %s — leave it and its two chairs" % lunch.position)
 		if absf(lunch.scale.x - 0.72) > 0.02:
 			errors.append("kitchen lunch table scale %s, expected 0.72" % lunch.scale)
-	var fridge_csg := level.get_node_or_null("FutureAssetSlots/BreakRoom/Fridge") as CSGBox3D
+	var fridge_csg := level.get_node_or_null("FutureAssetSlots/BreakRoom/Fridge") as Node3D
 	if fridge_csg and fridge_csg.visible:
 		errors.append("old CSG fridge must be hidden")
-	var table_csg := level.get_node_or_null("FutureAssetSlots/BreakRoom/BreakRoomTable") as CSGBox3D
+	var table_csg := level.get_node_or_null("FutureAssetSlots/BreakRoom/BreakRoomTable") as Node3D
 	if table_csg and table_csg.visible:
 		errors.append("old CSG break-room table must be hidden")
 	if level.get_node_or_null("FutureAssetSlots/SupplyCloset/LockedDoor_Supply/ClosedElevator") == null:
@@ -550,25 +551,26 @@ func _run() -> void:
 	var win_l := level.get_node_or_null("Lights/WindowLight") as OmniLight3D
 	if win_l and absf(win_l.light_energy - 8.8) > 0.20:
 		errors.append("WindowLight energy %s, expected 8.8" % win_l.light_energy)
-	if ic_floor and ic_floor.material is StandardMaterial3D:
-		var fm := ic_floor.material as StandardMaterial3D
+	var ic_mat := _box_mat(ic_floor)
+	if ic_floor and ic_mat is StandardMaterial3D:
+		var fm := ic_mat as StandardMaterial3D
 		var ftp := fm.albedo_texture.resource_path if fm.albedo_texture else ""
 		if not ftp.contains("carpet"):
 			errors.append("closet floor is %s, expected beige carpet" % ftp)
-	var nh := level.get_node_or_null("Architecture/Floors/NorthHallFloor") as CSGBox3D
-	if nh == null or nh.size.x < 2.95:
+	var nh := level.get_node_or_null("Architecture/Floors/NorthHallFloor") as Node3D
+	if nh == null or _box_size(nh).x < 2.95:
 		errors.append("north hall is not 3.0 m wide")
-	var eh := level.get_node_or_null("Architecture/Floors/EastHallFloor") as CSGBox3D
-	if eh == null or eh.size.z < 2.95:
+	var eh := level.get_node_or_null("Architecture/Floors/EastHallFloor") as Node3D
+	if eh == null or _box_size(eh).z < 2.95:
 		errors.append("east hall is not 3.0 m wide")
-	var div := level.get_node_or_null("Architecture/Walls/ReceptionCEODivider") as CSGBox3D
+	var div := level.get_node_or_null("Architecture/Walls/ReceptionCEODivider") as Node3D
 	if div == null:
 		errors.append("ReceptionCEODivider missing")
 	else:
 		if absf(div.position.x - 26.0) > 0.05:
 			errors.append("divider X is %s, expected 26" % div.position.x)
-		var z0 := div.position.z - div.size.z * 0.5
-		var z1 := div.position.z + div.size.z * 0.5
+		var z0 := div.position.z - _box_size(div).z * 0.5
+		var z1 := div.position.z + _box_size(div).z * 0.5
 		if z0 > 8.60 or z1 < 14.40:
 			errors.append("divider Z span %s–%s, expected 8.53–14.48" % [z0, z1])
 	var rec_desk := level.get_node_or_null("FutureAssetSlots/Reception/ReceptionDesk2") as Node3D
@@ -677,6 +679,8 @@ func _run() -> void:
 	var export_cfg := FileAccess.get_file_as_string("res://export_presets.cfg")
 	if not export_cfg.contains("models/ceo_dead.glb"):
 		errors.append("unused ceo_dead.glb must be excluded from the web pack")
+	if not export_cfg.contains("tools/*"):
+		errors.append("tools/ must be excluded from the web pack")
 	if not vm_src.contains("_show_hands"):
 		errors.append("hero_shotgun must keep hands visible on the Meshy mesh")
 	var player_src_vm := FileAccess.get_file_as_string("res://scripts/player.gd")
@@ -688,9 +692,10 @@ func _run() -> void:
 		errors.append("weapon root y=-0.20 puts the hands under the 75° vertical FOV")
 	if FileAccess.file_exists("res://scenes/_check_audio.tscn") or FileAccess.file_exists("res://scenes/_ceo_rot_proof.tscn"):
 		errors.append("debug helper scenes must not ship")
-	var pane := level.get_node_or_null("FutureAssetSlots/CEOOffice/MoneyShotWindow/Pane_02") as CSGBox3D
-	if pane and pane.material is StandardMaterial3D:
-		if (pane.material as StandardMaterial3D).albedo_color.a > 0.35:
+	var pane := level.get_node_or_null("FutureAssetSlots/CEOOffice/MoneyShotWindow/Pane_02") as Node3D
+	var pane_mat := _box_mat(pane)
+	if pane and pane_mat is StandardMaterial3D:
+		if (pane_mat as StandardMaterial3D).albedo_color.a > 0.35:
 			errors.append("window pane is not transparent glass")
 	if not FileAccess.file_exists("res://models/executive_desk.glb"):
 		errors.append("executive_desk.glb missing")
@@ -856,21 +861,21 @@ func _run() -> void:
 
 
 func _check_vent_flush(level: Node, errors: PackedStringArray) -> void:
-	var west := level.get_node_or_null("Architecture/Walls/BreakRoomWest") as CSGBox3D
-	var east := level.get_node_or_null("Architecture/Walls/IntroClosetEast") as CSGBox3D
-	var duct := level.get_node_or_null("Architecture/VentDuct/DuctFloor") as CSGBox3D
-	var kitchen_lip := level.get_node_or_null("Architecture/VentDuct/KitchenLip_L") as CSGBox3D
-	var closet_lip := level.get_node_or_null("Architecture/VentDuct/ClosetLip_L") as CSGBox3D
+	var west := level.get_node_or_null("Architecture/Walls/BreakRoomWest") as Node3D
+	var east := level.get_node_or_null("Architecture/Walls/IntroClosetEast") as Node3D
+	var duct := level.get_node_or_null("Architecture/VentDuct/DuctFloor") as Node3D
+	var kitchen_lip := level.get_node_or_null("Architecture/VentDuct/KitchenLip_L") as Node3D
+	var closet_lip := level.get_node_or_null("Architecture/VentDuct/ClosetLip_L") as Node3D
 	var kitchen_mouth := level.get_node_or_null("Architecture/VentDuct/KitchenOpening") as Node3D
 	var closet_mouth := level.get_node_or_null("Architecture/VentDuct/ClosetOpening") as Node3D
 	if west == null or east == null or duct == null:
 		return
-	var kitchen_east_face := west.position.x + west.size.x * 0.5
-	var kitchen_west_face := west.position.x - west.size.x * 0.5
-	var closet_east_face := east.position.x + east.size.x * 0.5
-	var closet_west_face := east.position.x - east.size.x * 0.5
-	var duct_min := duct.position.x - duct.size.x * 0.5
-	var duct_max := duct.position.x + duct.size.x * 0.5
+	var kitchen_east_face := west.position.x + _box_size(west).x * 0.5
+	var kitchen_west_face := west.position.x - _box_size(west).x * 0.5
+	var closet_east_face := east.position.x + _box_size(east).x * 0.5
+	var closet_west_face := east.position.x - _box_size(east).x * 0.5
+	var duct_min := duct.position.x - _box_size(duct).x * 0.5
+	var duct_max := duct.position.x + _box_size(duct).x * 0.5
 	# Duct body stays in the gap. A couple cm into wall thickness is OK; rooms are not.
 	if duct_max > kitchen_east_face + 0.04:
 		errors.append("VentDuct occupies kitchen walkable floor (duct max X %s)" % duct_max)
@@ -913,9 +918,9 @@ func _check_vent_flush(level: Node, errors: PackedStringArray) -> void:
 
 func _check_playtest_pass(level: Node, errors: PackedStringArray) -> void:
 	# Stalker chase: no solid blocker on the straight line from the SE hide to the cubicle aisle.
-	var part := level.get_node_or_null("FutureAssetSlots/EastHall/CubiclePartition") as CSGBox3D
+	var part := level.get_node_or_null("FutureAssetSlots/EastHall/CubiclePartition") as Node3D
 	if part:
-		var part_east := part.position.x + part.size.x * 0.5
+		var part_east := part.position.x + _box_size(part).x * 0.5
 		if part_east > 8.90:
 			errors.append("cubicle partition still spans the chase lane (east X %s)" % part_east)
 	if level.get_node_or_null("MensDoorAjar") != null:
@@ -979,26 +984,26 @@ func _check_playtest_pass(level: Node, errors: PackedStringArray) -> void:
 				var tex := (mat as StandardMaterial3D).albedo_texture
 				if tex and (tex.resource_path.contains("certificate") or tex.resource_path.contains("diploma")):
 					errors.append("diploma texture still on wall node %s" % mi.name)
-	var west := level.get_node_or_null("Architecture/Walls/BreakRoomWest") as CSGBox3D
-	var east := level.get_node_or_null("Architecture/Walls/IntroClosetEast") as CSGBox3D
-	var duct := level.get_node_or_null("Architecture/VentDuct/DuctFloor") as CSGBox3D
-	var k_lip := level.get_node_or_null("Architecture/VentDuct/KitchenLip_L") as CSGBox3D
-	var c_lip := level.get_node_or_null("Architecture/VentDuct/ClosetLip_L") as CSGBox3D
+	var west := level.get_node_or_null("Architecture/Walls/BreakRoomWest") as Node3D
+	var east := level.get_node_or_null("Architecture/Walls/IntroClosetEast") as Node3D
+	var duct := level.get_node_or_null("Architecture/VentDuct/DuctFloor") as Node3D
+	var k_lip := level.get_node_or_null("Architecture/VentDuct/KitchenLip_L") as Node3D
+	var c_lip := level.get_node_or_null("Architecture/VentDuct/ClosetLip_L") as Node3D
 	if west and east and duct:
-		var k_west := west.position.x - west.size.x * 0.5
-		var k_east := west.position.x + west.size.x * 0.5
-		var c_east := east.position.x + east.size.x * 0.5
-		var c_west := east.position.x - east.size.x * 0.5
-		var d_min := duct.position.x - duct.size.x * 0.5
-		var d_max := duct.position.x + duct.size.x * 0.5
+		var k_west := west.position.x - _box_size(west).x * 0.5
+		var k_east := west.position.x + _box_size(west).x * 0.5
+		var c_east := east.position.x + _box_size(east).x * 0.5
+		var c_west := east.position.x - _box_size(east).x * 0.5
+		var d_min := duct.position.x - _box_size(duct).x * 0.5
+		var d_max := duct.position.x + _box_size(duct).x * 0.5
 		if absf(d_max - k_west) < 0.008 or absf(d_min - c_east) < 0.008:
 			errors.append("vent duct shares a plaster plane (z-fight)")
 		if k_lip:
-			var lip_e := k_lip.position.x + k_lip.size.x * 0.5
+			var lip_e := k_lip.position.x + _box_size(k_lip).x * 0.5
 			if absf(lip_e - k_east) < 0.008:
 				errors.append("kitchen vent lip shares the plaster plane")
 		if c_lip:
-			var lip_w := c_lip.position.x - c_lip.size.x * 0.5
+			var lip_w := c_lip.position.x - _box_size(c_lip).x * 0.5
 			if absf(lip_w - c_west) < 0.008:
 				errors.append("closet vent lip shares the plaster plane")
 	var space: PhysicsDirectSpaceState3D = level.get_world_3d().direct_space_state
@@ -1062,13 +1067,14 @@ func _check_playtest_pass(level: Node, errors: PackedStringArray) -> void:
 
 
 func _check_playtest_fix2(level: Node, errors: PackedStringArray) -> void:
-	var bath_fl := level.get_node_or_null("Architecture/Floors/BathroomFloor") as CSGBox3D
+	var bath_fl := level.get_node_or_null("Architecture/Floors/BathroomFloor") as Node3D
 	if bath_fl:
-		var east := bath_fl.position.x + bath_fl.size.x * 0.5
+		var east := bath_fl.position.x + _box_size(bath_fl).x * 0.5
 		if east > 2.02:
 			errors.append("bathroom floor still overlaps the hall (east X %s)" % east)
-		if bath_fl.material is StandardMaterial3D:
-			var bm := bath_fl.material as StandardMaterial3D
+		var bath_mat := _box_mat(bath_fl)
+		if bath_mat is StandardMaterial3D:
+			var bm := bath_mat as StandardMaterial3D
 			if bm.albedo_color.r < 0.55 or bm.albedo_color.g < 0.55:
 				errors.append("bathroom floor still reads as dark stone / void (albedo %s)" % bm.albedo_color)
 	var thresh := level.get_node_or_null("BathDoorThreshold") as MeshInstance3D
@@ -1078,14 +1084,14 @@ func _check_playtest_fix2(level: Node, errors: PackedStringArray) -> void:
 		var ts: Vector3 = (thresh.mesh as BoxMesh).size
 		if ts.x < 0.38:
 			errors.append("bathroom threshold too narrow (%.2f) — need a carpet lip across X 1.80–2.20" % ts.x)
-	var bs := level.get_node_or_null("Architecture/Walls/BathroomSouth") as CSGBox3D
+	var bs := level.get_node_or_null("Architecture/Walls/BathroomSouth") as Node3D
 	if bs:
-		var be := bs.position.x + bs.size.x * 0.5
+		var be := bs.position.x + _box_size(bs).x * 0.5
 		if be > 2.00:
 			errors.append("BathroomSouth still juts into the hall (east X %s)" % be)
-	var bn := level.get_node_or_null("Architecture/Walls/BathroomNorth") as CSGBox3D
+	var bn := level.get_node_or_null("Architecture/Walls/BathroomNorth") as Node3D
 	if bn:
-		var bne := bn.position.x + bn.size.x * 0.5
+		var bne := bn.position.x + _box_size(bn).x * 0.5
 		if bne > 2.00:
 			errors.append("BathroomNorth still juts into the hall (east X %s)" % bne)
 	var conf := level.get_node_or_null("FutureAssetSlots/EastHall/LockedDoor_DeadOffice") as Node3D
@@ -1094,14 +1100,14 @@ func _check_playtest_fix2(level: Node, errors: PackedStringArray) -> void:
 	var glass := level.get_node_or_null("FutureAssetSlots/EastHall/DeadOfficeGlass") as Node3D
 	if glass and absf(glass.position.z - 10.50) > 0.08:
 		errors.append("conference glass at Z %s still leaks into the hall" % glass.position.z)
-	var cub_cut := level.get_node_or_null("Architecture/Walls/EastHallSouth/CubicleOpeningCut") as CSGBox3D
-	if cub_cut == null or cub_cut.operation != 2:
+	var cub_cut := level.get_node_or_null("Architecture/Walls/EastHallSouth/CubicleOpeningCut") as Node3D
+	if cub_cut == null or _box_op(cub_cut) != 2:
 		errors.append("cubicle alcove cut missing or not a hole")
-	var copy_cut := level.get_node_or_null("Architecture/Walls/EastHallNorth/CopyOpeningCut") as CSGBox3D
-	if copy_cut == null or copy_cut.operation != 2:
+	var copy_cut := level.get_node_or_null("Architecture/Walls/EastHallNorth/CopyOpeningCut") as Node3D
+	if copy_cut == null or _box_op(copy_cut) != 2:
 		errors.append("copy alcove cut missing or not a hole")
-	var bath_cut := level.get_node_or_null("Architecture/Walls/NorthHallWest/BathroomDoorCut") as CSGBox3D
-	if bath_cut == null or bath_cut.operation != 2:
+	var bath_cut := level.get_node_or_null("Architecture/Walls/NorthHallWest/BathroomDoorCut") as Node3D
+	if bath_cut == null or _box_op(bath_cut) != 2:
 		errors.append("bathroom hall doorway cut missing — opening must stay an opening")
 	var hall_map := level.get_node_or_null("WallDressing/HallMapFrame") as Node3D
 	if hall_map and hall_map.global_position.z > 10.70:
@@ -1192,6 +1198,48 @@ func _action_has_key(action: String, key: Key) -> bool:
 	return false
 
 
+func _box_size(n: Node) -> Vector3:
+	if n == null:
+		return Vector3.ZERO
+	if n is CSGBox3D:
+		return (n as CSGBox3D).size
+	if n.has_meta("csg_size"):
+		return n.get_meta("csg_size")
+	if n is MeshInstance3D and (n as MeshInstance3D).mesh is BoxMesh:
+		return ((n as MeshInstance3D).mesh as BoxMesh).size
+	return Vector3.ZERO
+
+
+func _box_mat(n: Node) -> Material:
+	if n == null:
+		return null
+	if n is CSGPrimitive3D:
+		return (n as CSGPrimitive3D).material
+	if n is MeshInstance3D:
+		var mi := n as MeshInstance3D
+		if mi.material_override:
+			return mi.material_override
+		if mi.mesh is PrimitiveMesh:
+			var pm := mi.mesh as PrimitiveMesh
+			if pm.material:
+				return pm.material
+		if mi.mesh and mi.mesh.get_surface_count() > 0:
+			var sm: Material = mi.mesh.surface_get_material(0)
+			if sm:
+				return sm
+		if mi.get_surface_override_material_count() > 0:
+			return mi.get_surface_override_material(0)
+	return null
+
+
+func _box_op(n: Node) -> int:
+	if n is CSGShape3D:
+		return (n as CSGShape3D).operation
+	if n and n.has_meta("csg_operation"):
+		return int(n.get_meta("csg_operation"))
+	return 0
+
+
 func _press_c(player: Node) -> void:
 	var ev := InputEventKey.new()
 	ev.pressed = true
@@ -1217,20 +1265,20 @@ func _check_crawl(level: Node, player: Node, errors: PackedStringArray) -> void:
 		return
 	var crawl_h: float = float(player.CRAWL_CAP)
 	var crouch_h: float = float(player.CROUCH_CAP)
-	var vent_cut := level.get_node_or_null("Architecture/Walls/BreakRoomWest/VentCut") as CSGBox3D
+	var vent_cut := level.get_node_or_null("Architecture/Walls/BreakRoomWest/VentCut") as Node3D
 	if vent_cut == null:
 		errors.append("VentCut missing for crawl fit")
 		return
-	if crawl_h >= vent_cut.size.y:
-		errors.append("crawl capsule %.2f does not fit VentCut height %.2f" % [crawl_h, vent_cut.size.y])
+	if crawl_h >= _box_size(vent_cut).y:
+		errors.append("crawl capsule %.2f does not fit VentCut height %.2f" % [crawl_h, _box_size(vent_cut).y])
 	if crawl_h >= crouch_h:
 		errors.append("crawl capsule %.2f is not lower than crouch %.2f" % [crawl_h, crouch_h])
 	var radius := 0.32
 	var pcol := player.get_node_or_null("CollisionShape3D") as CollisionShape3D
 	if pcol and pcol.shape is CapsuleShape3D:
 		radius = (pcol.shape as CapsuleShape3D).radius
-	if radius * 2.0 >= vent_cut.size.z:
-		errors.append("crawl capsule diameter %.2f does not fit VentCut width %.2f" % [radius * 2.0, vent_cut.size.z])
+	if radius * 2.0 >= _box_size(vent_cut).z:
+		errors.append("crawl capsule diameter %.2f does not fit VentCut width %.2f" % [radius * 2.0, _box_size(vent_cut).z])
 	var spawn := level.get_node_or_null("Player") as Node3D
 	if spawn == null or spawn.position.x > -4.20 or spawn.position.x < -8.80:
 		errors.append("player spawn %s is not in IntroCloset" % (spawn.position if spawn else "?"))

@@ -1,0 +1,23 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bi1so7wcj230m"]
+
+[ext_resource type="Texture2D" uid="uid://32ttiaclu41x" path="res://models/bathroom_vanity_base_color.jpg" id="1_0xxan"]
+[ext_resource type="Texture2D" uid="uid://bei81rsa2l01i" path="res://models/bathroom_vanity_emissive.jpg" id="2_qcpry"]
+[ext_resource type="Texture2D" uid="uid://bwe2140vi7bda" path="res://models/bathroom_vanity_metallic_roughness.jpg" id="3_3o4nv"]
+[ext_resource type="Texture2D" uid="uid://4pt01os3pqw4" path="res://models/bathroom_vanity_normal.jpg" id="4_vukho"]
+
+[resource]
+resource_name = "material"
+cull_mode = 2
+albedo_texture = ExtResource("1_0xxan")
+metallic = 1.0
+metallic_texture = ExtResource("3_3o4nv")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("3_3o4nv")
+roughness_texture_channel = 1
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_operator = 1
+emission_texture = ExtResource("2_qcpry")
+normal_enabled = true
+normal_texture = ExtResource("4_vukho")
+metadata/_gltf_primary_texture_coord = 0

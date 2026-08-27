@@ -1,0 +1,102 @@
+{
+	"Architecture/Walls/BreakRoomNorth": {
+		"col": "res://scenes/baked/Architecture_Walls_BreakRoomNorth_col.res",
+		"mesh": "res://scenes/baked/Architecture_Walls_BreakRoomNorth_mesh.res",
+		"size": [
+			7.15999984741211,
+			3.0,
+			0.159999996423721
+		],
+		"surfaces": 2
+	},
+	"Architecture/Walls/BreakRoomWest": {
+		"col": "res://scenes/baked/Architecture_Walls_BreakRoomWest_col.res",
+		"mesh": "res://scenes/baked/Architecture_Walls_BreakRoomWest_mesh.res",
+		"size": [
+			0.159999996423721,
+			3.0,
+			6.65999984741211
+		],
+		"surfaces": 2
+	},
+	"Architecture/Walls/CEOEast": {
+		"col": "res://scenes/baked/Architecture_Walls_CEOEast_col.res",
+		"mesh": "res://scenes/baked/Architecture_Walls_CEOEast_mesh.res",
+		"size": [
+			0.159999996423721,
+			3.0,
+			10.1599998474121
+		],
+		"surfaces": 2
+	},
+	"Architecture/Walls/EastHallNorth": {
+		"col": "res://scenes/baked/Architecture_Walls_EastHallNorth_col.res",
+		"mesh": "res://scenes/baked/Architecture_Walls_EastHallNorth_mesh.res",
+		"size": [
+			13.6599998474121,
+			3.0,
+			0.159999996423721
+		],
+		"surfaces": 2
+	},
+	"Architecture/Walls/EastHallSouth": {
+		"col": "res://scenes/baked/Architecture_Walls_EastHallSouth_col.res",
+		"mesh": "res://scenes/baked/Architecture_Walls_EastHallSouth_mesh.res",
+		"size": [
+			13.6599998474121,
+			3.0,
+			0.159999996423721
+		],
+		"surfaces": 2
+	},
+	"Architecture/Walls/IntroClosetEast": {
+		"col": "res://scenes/baked/Architecture_Walls_IntroClosetEast_col.res",
+		"mesh": "res://scenes/baked/Architecture_Walls_IntroClosetEast_mesh.res",
+		"size": [
+			0.159999996423721,
+			3.0,
+			6.5
+		],
+		"surfaces": 2
+	},
+	"Architecture/Walls/IntroClosetWest": {
+		"col": "res://scenes/baked/Architecture_Walls_IntroClosetWest_col.res",
+		"mesh": "res://scenes/baked/Architecture_Walls_IntroClosetWest_mesh.res",
+		"size": [
+			0.159999996423721,
+			3.0,
+			6.5
+		],
+		"surfaces": 2
+	},
+	"Architecture/Walls/NorthHallEast": {
+		"col": "res://scenes/baked/Architecture_Walls_NorthHallEast_col.res",
+		"mesh": "res://scenes/baked/Architecture_Walls_NorthHallEast_mesh.res",
+		"size": [
+			0.159999996423721,
+			3.0,
+			4.5
+		],
+		"surfaces": 2
+	},
+	"Architecture/Walls/NorthHallWest": {
+		"col": "res://scenes/baked/Architecture_Walls_NorthHallWest_col.res",
+		"mesh": "res://scenes/baked/Architecture_Walls_NorthHallWest_mesh.res",
+		"size": [
+			0.159999996423721,
+			3.0,
+			4.5
+		],
+		"surfaces": 2
+	},
+	"Architecture/Walls/ReceptionWest": {
+		"col": "res://scenes/baked/Architecture_Walls_ReceptionWest_col.res",
+		"mesh": "res://scenes/baked/Architecture_Walls_ReceptionWest_mesh.res",
+		"size": [
+			0.159999996423721,
+			3.0,
+			10.1599998474121
+		],
+		"surfaces": 2
+	}
+}

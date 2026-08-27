@@ -260,6 +260,8 @@ func give_shotgun() -> void:
 		return
 	_has_gun = true
 	_weapon = SHOTGUN
+	if _hero_shotgun and _hero_shotgun.has_method("ensure_meshy_visual"):
+		_hero_shotgun.ensure_meshy_visual()
 	if _weapon_root:
 		_weapon_root.visible = true
 	if _shotgun_mesh:

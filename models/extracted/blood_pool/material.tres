@@ -1,0 +1,18 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bn60ymnmku378"]
+
+[ext_resource type="Texture2D" uid="uid://cvffwomabp2q6" path="res://models/blood_pool_base_color.jpg" id="1_8d0j8"]
+[ext_resource type="Texture2D" uid="uid://71l0jtdbbcj6" path="res://models/blood_pool_metallic_roughness.jpg" id="2_n67jc"]
+[ext_resource type="Texture2D" uid="uid://dtlj8cscwr2cf" path="res://models/blood_pool_normal.jpg" id="3_x1k2a"]
+
+[resource]
+resource_name = "material"
+cull_mode = 2
+albedo_texture = ExtResource("1_8d0j8")
+metallic = 1.0
+metallic_texture = ExtResource("2_n67jc")
+metallic_texture_channel = 2
+roughness_texture = ExtResource("2_n67jc")
+roughness_texture_channel = 1
+normal_enabled = true
+normal_texture = ExtResource("3_x1k2a")
+metadata/_gltf_primary_texture_coord = 0
