@@ -340,8 +340,20 @@ func _intro_closet(level: Node3D) -> void:
 	var door := ic.get_node_or_null("ChaosDoor")
 	if door:
 		var furn_metal := _mat("res://materials/mat_metal_furn.tres")
-		_box(door, "HandleRose", Vector3(0.02, 0.12, 0.12), Vector3(0.07, 1.00, 0.32), furn_metal, Vector3.ZERO, false)
-		_box(door, "HandleLever", Vector3(0.03, 0.03, 0.16), Vector3(0.10, 1.00, 0.24), furn_metal, Vector3.ZERO, false)
+		var slab_mat := _tex_mat("res://textures/tex_walnut.png", Color(0.38, 0.24, 0.14), 0.58)
+		slab_mat.uv1_triplanar = true
+		slab_mat.uv1_world_triplanar = true
+		slab_mat.uv1_scale = Vector3(1.1, 1.8, 1.1)
+		_set_csg_mat(door.get_node_or_null("Slab"), slab_mat)
+		var frame_mat := _tex_mat("res://textures/tex_walnut.png", Color(0.48, 0.32, 0.18), 0.62)
+		frame_mat.uv1_triplanar = true
+		frame_mat.uv1_world_triplanar = true
+		for fn in ["Frame_L", "Frame_R", "Frame_Head"]:
+			_set_csg_mat(door.get_node_or_null(fn), frame_mat)
+		_box(door, "HandleRose", Vector3(0.03, 0.14, 0.14), Vector3(0.08, 1.00, 0.30), furn_metal, Vector3.ZERO, false)
+		_box(door, "HandleLever", Vector3(0.045, 0.045, 0.22), Vector3(0.12, 1.00, 0.20), furn_metal, Vector3.ZERO, false)
+		_box(door, "LockCylinder", Vector3(0.04, 0.04, 0.04), Vector3(0.09, 1.00, 0.14), furn_metal, Vector3.ZERO, false)
+		_box(door, "KickPlate", Vector3(0.02, 0.16, 0.86), Vector3(0.06, 0.12, 0.0), furn_metal, Vector3.ZERO, false)
 
 
 func _shelf_run(parent: Node, stem: String, origin: Vector3, along: Vector3, inward: Vector3, length: float, n_bays: int) -> void:

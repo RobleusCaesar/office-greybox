@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c111eddf16d90"
-path="res://.godot/imported/tex_cardboard_tape.png-pending.ctex"
+uid="uid://c111eddf16ea0"
+path="res://.godot/imported/tex_cardboard_tape.png-ce1ddb40a3e1ddbc9af2631ee594035a.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://textures/tex_cardboard_tape.png"
-dest_files=["res://.godot/imported/tex_cardboard_tape.png-pending.ctex"]
+dest_files=["res://.godot/imported/tex_cardboard_tape.png-ce1ddb40a3e1ddbc9af2631ee594035a.ctex"]
 
 [params]
 
