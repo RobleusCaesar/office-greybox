@@ -3,12 +3,15 @@ extends CharacterBody3D
 
 const SPEED := 4.5
 const CROUCH_SPEED := 2.2
+const CRAWL_SPEED := 1.35
 const MOUSE_SENS := 0.0024
 const MAX_HP := 100.0
 const STAND_EYE := 1.7
 const CROUCH_EYE := 1.05
+const CRAWL_EYE := 0.52
 const STAND_CAP := 1.8
 const CROUCH_CAP := 1.15
+const CRAWL_CAP := 0.72
 
 const SHOTGUN := 0
 const PISTOL := 1
@@ -61,6 +64,7 @@ var _shotgun_mesh: Node3D
 var _pistol_mesh: Node3D
 var _hero_shotgun: Node3D
 var crouched: bool = false
+var crawling: bool = false
 var _hud_health: Label
 var _hud_ammo: Label
 var _hud_weapon: Label
@@ -138,21 +142,76 @@ func _unhandled_input(event: InputEvent) -> void:
 		_start_reload()
 	elif event.is_action_pressed("interact"):
 		_try_interact()
+	elif event.is_action_pressed("crawl"):
+		_toggle_crawl()
+
+
+func _toggle_crawl() -> void:
+	if dead or input_locked:
+		return
+	if crawling:
+		if _can_leave_crawl():
+			crawling = false
+	else:
+		crawling = true
+
+
+func _can_leave_crawl() -> bool:
+	var want := CROUCH_CAP if Input.is_action_pressed("crouch") else STAND_CAP
+	return not _headroom_blocked(want)
+
+
+func _headroom_blocked(height: float) -> bool:
+	if height <= CRAWL_CAP + 0.02:
+		return false
+	var world := get_world_3d()
+	if world == null:
+		return true
+	var space := world.direct_space_state
+	if space == null:
+		return true
+	var radius := 0.30
+	if _col and _col.shape is CapsuleShape3D:
+		radius = minf(0.30, (_col.shape as CapsuleShape3D).radius)
+	var sphere := SphereShape3D.new()
+	sphere.radius = radius
+	var cy := maxf(CRAWL_CAP + radius + 0.02, height - radius)
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = sphere
+	q.transform = Transform3D(Basis(), global_position + Vector3(0.0, cy, 0.0))
+	q.collision_mask = collision_mask
+	q.exclude = [get_rid()]
+	q.margin = 0.02
+	return not space.intersect_shape(q, 1).is_empty()
+
+
+func _apply_stance(delta: float) -> float:
+	crouched = (not dead and not input_locked and Input.is_action_pressed("crouch"))
+	var eye := STAND_EYE
+	var h := STAND_CAP
+	var speed := SPEED
+	if crawling and not dead:
+		eye = CRAWL_EYE
+		h = CRAWL_CAP
+		speed = CRAWL_SPEED
+	elif crouched:
+		eye = CROUCH_EYE
+		h = CROUCH_CAP
+		speed = CROUCH_SPEED
+	if _head:
+		_head.position.y = lerpf(_head.position.y, eye, clampf(delta * 10.0, 0.0, 1.0))
+	if _col and _col.shape is CapsuleShape3D:
+		var cap := _col.shape as CapsuleShape3D
+		cap.height = h
+		_col.position.y = h * 0.5
+	return speed
 
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
 
-	crouched = (not dead and not input_locked and Input.is_action_pressed("crouch"))
-	var eye := CROUCH_EYE if crouched else STAND_EYE
-	_head.position.y = lerpf(_head.position.y, eye, clampf(delta * 10.0, 0.0, 1.0))
-	if _col and _col.shape is CapsuleShape3D:
-		var cap := _col.shape as CapsuleShape3D
-		var h := CROUCH_CAP if crouched else STAND_CAP
-		cap.height = h
-		_col.position.y = h * 0.5
-	var speed := CROUCH_SPEED if crouched else SPEED
+	var speed := _apply_stance(delta)
 
 	var input_dir := Vector2.ZERO
 	if not dead and not input_locked:
@@ -493,7 +552,7 @@ func _build_hud() -> void:
 	_hud_weapon = _label(root, "SHOTGUN", Vector2(0, 0), Vector2(280, 28), 16, HORIZONTAL_ALIGNMENT_RIGHT)
 	_dock(root, _hud_weapon, false, -96, 16)
 
-	var hint := _label(root, "WASD move · Mouse look · LMB fire · R reload · 1 shotgun · 2 pistol · Space crouch · E use · Esc release", Vector2(24, 16), Vector2(980, 28), 14, HORIZONTAL_ALIGNMENT_LEFT)
+	var hint := _label(root, "WASD move · Mouse look · LMB fire · R reload · 1 shotgun · 2 pistol · Space crouch · C crawl · E use · Esc release", Vector2(24, 16), Vector2(1040, 28), 14, HORIZONTAL_ALIGNMENT_LEFT)
 	hint.modulate = Color(1, 1, 1, 0.7)
 	var mark := _label(root, "HELLFALL", Vector2(0, 0), Vector2(280, 28), 16, HORIZONTAL_ALIGNMENT_RIGHT)
 	mark.name = "TitleMark"

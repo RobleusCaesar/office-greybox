@@ -16,6 +16,14 @@ func _run() -> void:
 		errors.append("renderer is %s, expected gl_compatibility" % renderer)
 	if not InputMap.has_action("crouch"):
 		errors.append("missing crouch action")
+	if not InputMap.has_action("crawl"):
+		errors.append("missing crawl action")
+	elif not _action_has_key("crawl", KEY_C):
+		errors.append("C must toggle crawl")
+	if _action_has_key("crouch", KEY_C) or _action_has_key("reload", KEY_C) or _action_has_key("interact", KEY_C):
+		errors.append("C stole an existing action")
+	if InputMap.has_action("crouch") and not _action_has_key("crouch", KEY_SPACE):
+		errors.append("Space must remain crouch")
 	if InputMap.has_action("jump"):
 		errors.append("jump action still present")
 	if not InputMap.has_action("interact"):
@@ -460,6 +468,7 @@ func _run() -> void:
 	var sealed_hit := space.intersect_ray(sealed)
 	if sealed_hit.is_empty() or sealed_hit.position.x < -0.15:
 		errors.append("old window hole is not sealed")
+	_check_crawl(level, level.get_node_or_null("Player"), errors)
 	var window := Vector3(38.1, 1.7, 11.5)
 	for origin in [Vector3(8.5, 1.7, 12.0), Vector3(17.4, 1.7, 12.0), Vector3(3.5, 1.7, 8.8), Vector3(3.5, 1.7, 2.1)]:
 		var q := PhysicsRayQueryParameters3D.create(origin, window)
@@ -515,6 +524,168 @@ func _run() -> void:
 			errors.append("player did not die")
 
 	_finish(errors)
+
+
+func _action_has_key(action: String, key: Key) -> bool:
+	if not InputMap.has_action(action):
+		return false
+	for ev in InputMap.action_get_events(action):
+		if ev is InputEventKey and (ev.physical_keycode == key or ev.keycode == key):
+			return true
+	return false
+
+
+func _press_c(player: Node) -> void:
+	var ev := InputEventKey.new()
+	ev.pressed = true
+	ev.keycode = KEY_C
+	ev.physical_keycode = KEY_C
+	ev.unicode = 99
+	player._unhandled_input(ev)
+
+
+func _check_crawl(level: Node, player: Node, errors: PackedStringArray) -> void:
+	# Fail-closed: missing crawl plumbing is a hard fail, not a skip.
+	if player == null:
+		errors.append("player missing for crawl QA")
+		return
+	if player.get("CRAWL_CAP") == null:
+		errors.append("player missing CRAWL_CAP")
+		return
+	if player.get("crawling") == null:
+		errors.append("player missing crawling state")
+		return
+	if not player.has_method("_toggle_crawl") or not player.has_method("_unhandled_input") or not player.has_method("_apply_stance"):
+		errors.append("player missing crawl toggle / stance")
+		return
+	var crawl_h: float = float(player.CRAWL_CAP)
+	var crouch_h: float = float(player.CROUCH_CAP)
+	var vent_cut := level.get_node_or_null("Architecture/Walls/BreakRoomWest/VentCut") as CSGBox3D
+	if vent_cut == null:
+		errors.append("VentCut missing for crawl fit")
+		return
+	if crawl_h >= vent_cut.size.y:
+		errors.append("crawl capsule %.2f does not fit VentCut height %.2f" % [crawl_h, vent_cut.size.y])
+	if crawl_h >= crouch_h:
+		errors.append("crawl capsule %.2f is not lower than crouch %.2f" % [crawl_h, crouch_h])
+	var radius := 0.32
+	var pcol := player.get_node_or_null("CollisionShape3D") as CollisionShape3D
+	if pcol and pcol.shape is CapsuleShape3D:
+		radius = (pcol.shape as CapsuleShape3D).radius
+	if radius * 2.0 >= vent_cut.size.z:
+		errors.append("crawl capsule diameter %.2f does not fit VentCut width %.2f" % [radius * 2.0, vent_cut.size.z])
+	var spawn := level.get_node_or_null("Player") as Node3D
+	if spawn == null or absf(spawn.position.x - 3.5) > 0.08 or absf(spawn.position.z - 2.1) > 0.08:
+		errors.append("player spawn moved to %s, expected (3.5, 0, 2.1)" % (spawn.position if spawn else "?"))
+
+	var was_processing: bool = player.is_physics_processing()
+	player.set_physics_process(false)
+	player.global_position = Vector3(3.5, 0.0, 2.1)
+	player.crawling = false
+	player._apply_stance(1.0)
+	_press_c(player)
+	if not player.crawling:
+		errors.append("C did not toggle crawl on")
+	player._apply_stance(1.0)
+	if pcol and pcol.shape is CapsuleShape3D:
+		var cap_on := pcol.shape as CapsuleShape3D
+		if absf(cap_on.height - crawl_h) > 0.03:
+			errors.append("C crawl capsule height %.2f, expected %.2f" % [cap_on.height, crawl_h])
+	_press_c(player)
+	if player.crawling:
+		errors.append("C did not toggle crawl off in the kitchen")
+
+	var space: PhysicsDirectSpaceState3D = level.get_world_3d().direct_space_state
+	if space == null:
+		errors.append("no physics space for crawl fit")
+		player.set_physics_process(was_processing)
+		return
+	var probe := CapsuleShape3D.new()
+	probe.radius = radius
+	probe.height = crawl_h
+	var q := PhysicsShapeQueryParameters3D.new()
+	q.shape = probe
+	q.collision_mask = 1
+	q.exclude = [player.get_rid()]
+	q.margin = 0.01
+	for sample in [Vector3(0.40, 0.08, 3.20), Vector3(0.00, 0.08, 3.20), Vector3(-1.18, 0.08, 3.20), Vector3(-2.40, 0.08, 3.20)]:
+		q.transform = Transform3D(Basis(), sample + Vector3(0.0, crawl_h * 0.5 + 0.015, 0.0))
+		var hits := space.intersect_shape(q, 6)
+		for hit in hits:
+			var col: Object = hit.get("collider")
+			var nm := String(col.name) if col is Node else str(col)
+			var path := (col as Node).get_path() if col is Node else NodePath()
+			var pth := String(path)
+			if nm.contains("Floor") or pth.contains("DuctFloor") or pth.contains("Floors"):
+				continue
+			errors.append("crawl capsule does not fit VentCut at %s (hit %s)" % [sample, nm])
+			break
+
+	player.global_position = Vector3(-1.18, 0.08, 3.20)
+	player.crawling = true
+	player._apply_stance(1.0)
+	_press_c(player)
+	if not player.crawling:
+		errors.append("crawl-to-stand inside the duct")
+
+	player.global_position = Vector3(-3.50, 0.0, 1.85)
+	player.crawling = true
+	player._apply_stance(1.0)
+	_press_c(player)
+	if player.crawling:
+		errors.append("cannot stand in the closet aisle")
+
+	player.global_position = Vector3(3.5, 0.0, 2.1)
+	player.crawling = true
+	player._apply_stance(1.0)
+	_press_c(player)
+	if player.crawling:
+		errors.append("cannot stand in the kitchen")
+
+	_crawl_along(player, Vector3(0.55, 0.0, 3.20), Vector3(-2.80, 0.0, 3.20), "kitchen → IntroCloset", errors)
+	_crawl_along(player, Vector3(-2.80, 0.0, 3.20), Vector3(0.55, 0.0, 3.20), "IntroCloset → kitchen", errors)
+
+	player.global_position = Vector3(3.5, 0.0, 2.1)
+	player.velocity = Vector3.ZERO
+	player.crawling = false
+	player._apply_stance(1.0)
+	player.set_physics_process(was_processing)
+
+
+func _crawl_along(player: Node, from: Vector3, to: Vector3, label: String, errors: PackedStringArray) -> void:
+	if not player is CharacterBody3D:
+		errors.append("player is not a CharacterBody3D")
+		return
+	var body := player as CharacterBody3D
+	body.global_position = from
+	body.velocity = Vector3.ZERO
+	body.crawling = true
+	body._apply_stance(1.0)
+	var speed: float = float(body.CRAWL_SPEED)
+	var reached := false
+	var stuck := 0
+	var last := body.global_position
+	for _i in 160:
+		var flat := to - body.global_position
+		flat.y = 0.0
+		if flat.length() < 0.42:
+			reached = true
+			break
+		if not body.is_on_floor():
+			body.velocity.y -= 9.8 * (1.0 / 60.0)
+		var dir := flat.normalized()
+		body.velocity.x = dir.x * speed
+		body.velocity.z = dir.z * speed
+		body.move_and_slide()
+		if body.global_position.distance_to(last) < 0.002:
+			stuck += 1
+			if stuck >= 12:
+				break
+		else:
+			stuck = 0
+		last = body.global_position
+	if not reached:
+		errors.append("cannot crawl %s (ended at %s)" % [label, body.global_position])
 
 
 func _check_stalker(d1: Node, errors: PackedStringArray) -> void:
@@ -579,7 +750,7 @@ func _check_material_1(n: Node, errors: PackedStringArray) -> void:
 
 func _finish(errors: PackedStringArray) -> void:
 	if errors.is_empty():
-		print("QA_OK title, crouch, hero shotgun, one Abyssal Stalker 3-5 shells, diorama, LOS, death")
+		print("QA_OK title, crouch, crawl, hero shotgun, one Abyssal Stalker 3-5 shells, diorama, LOS, death")
 		quit(0)
 	else:
 		for e in errors:
