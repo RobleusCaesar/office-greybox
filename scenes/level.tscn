@@ -4,7 +4,7 @@
 ; ReceptionCEODivider is a SOLID wall behind the desk covering window Z 8.8–14.2.
 ; Player enters CEO from the SIDE (south or north opening at X=26), then turns east.
 
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://scripts/level.gd" id="11_level"]
@@ -18,6 +18,7 @@
 [ext_resource type="Material" path="res://materials/mat_clear_glass.tres" id="8_win"]
 [ext_resource type="Material" path="res://materials/mat_dim_glass.tres" id="9_dim"]
 [ext_resource type="Material" path="res://materials/mat_demon.tres" id="10_demon"]
+[ext_resource type="Material" path="res://materials/mat_sheet_metal.tres" id="12_duct"]
 
 ; Environment: dim interior. Money-shot window is the only bright ember.
 [sub_resource type="Environment" id="Environment_main"]
@@ -65,7 +66,7 @@ editor_description = "FUTURE-ASSET SLOTS — primitive stand-ins. Replace with r
 
 [node name="BreakRoom" type="Node3D" parent="FutureAssetSlots"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
-editor_description = "Break room furniture + small dim window. Not the money shot."
+editor_description = "Break room furniture. West wall vent into IntroCloset. Not the money shot."
 
 [node name="Bathroom" type="Node3D" parent="FutureAssetSlots"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
@@ -73,7 +74,11 @@ editor_description = "Enterable bathroom ~8.5 x 6.4 m. Four stall volumes + sink
 
 [node name="SupplyCloset" type="Node3D" parent="FutureAssetSlots"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
-editor_description = "Closed supply closet. Locked slab. Cannot enter."
+editor_description = "Closed supply closet. Locked slab. Cannot enter. Do not enlarge."
+
+[node name="IntroCloset" type="Node3D" parent="FutureAssetSlots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "INTRO CLOSET — kitchen-sized supply west of the break room. Enter later via the vent. Chaos door sealed."
 
 [node name="EastHall" type="Node3D" parent="FutureAssetSlots"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
@@ -103,6 +108,15 @@ collision_layer = 1
 collision_mask = 1
 material = ExtResource("1_floor")
 editor_description = "ARCHITECTURE — break room floor 7.0 x 6.5 m"
+
+[node name="IntroClosetFloor" type="CSGBox3D" parent="Architecture/Floors"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5000, -0.1000, 3.2500)
+size = Vector3(7.2000, 0.2000, 6.5000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("1_floor")
+editor_description = "ARCHITECTURE — intro closet floor ~7.0 x 6.5 m (X -7.1–0.1, Z 0.0–6.5). Shares break-room west wall."
 
 [node name="NorthHallFloor" type="CSGBox3D" parent="Architecture/Floors"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, -0.1000, 8.7500)
@@ -202,6 +216,15 @@ collision_layer = 1
 collision_mask = 1
 material = ExtResource("3_ceil")
 
+[node name="IntroClosetCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5000, 3.1000, 3.2500)
+size = Vector3(7.4000, 0.2000, 6.7000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("3_ceil")
+editor_description = "ARCHITECTURE — intro closet ceiling at Y=3.1."
+
 [node name="NorthHallCeiling" type="CSGBox3D" parent="Architecture/Ceilings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 3.1000, 8.7500)
 size = Vector3(3.4000, 0.2000, 4.9000)
@@ -298,14 +321,48 @@ use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("2_wall")
-editor_description = "ARCHITECTURE — break room west wall. Small dim window cut. NOT the money shot."
+editor_description = "ARCHITECTURE — break room west wall. Shared with IntroCloset. Low vent cut. NOT the money shot."
 
-[node name="WindowCut" type="CSGBox3D" parent="Architecture/Walls/BreakRoomWest"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0500, -0.0500)
+[node name="VentCut" type="CSGBox3D" parent="Architecture/Walls/BreakRoomWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, -0.9850, -0.0500)
 operation = 2
-size = Vector3(0.4000, 1.1000, 1.3000)
+size = Vector3(0.4000, 0.8700, 0.8000)
 use_collision = false
-editor_description = "Small west window opening."
+editor_description = "Vent opening Y 0.08–0.95, Z ~3.2, width 0.80. Beneath the old window. Punches through to IntroCloset."
+
+[node name="IntroClosetSouth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5000, 1.5000, 0.0000)
+size = Vector3(7.1600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — intro closet south wall. Continues the break-room south run west."
+
+[node name="IntroClosetNorth" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5000, 1.5000, 6.4200)
+size = Vector3(7.1600, 3.0000, 0.1600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — intro closet north wall. Sits just south of BathroomSouth."
+
+[node name="IntroClosetWest" type="CSGBox3D" parent="Architecture/Walls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.0000, 1.5000, 3.2500)
+size = Vector3(0.1600, 3.0000, 6.5000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("2_wall")
+editor_description = "ARCHITECTURE — intro closet west wall. Sealed chaos door. No window."
+
+[node name="ChaosDoorCut" type="CSGBox3D" parent="Architecture/Walls/IntroClosetWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, -0.4500, 0.0000)
+operation = 2
+size = Vector3(0.4000, 2.1500, 1.0500)
+use_collision = false
+editor_description = "Chaos door cut. Plugged by ChaosDoor slab. Cannot open."
 
 [node name="BreakRoomEast" type="CSGBox3D" parent="Architecture/Walls"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.0000, 1.5000, 3.2500)
@@ -854,6 +911,113 @@ collision_layer = 1
 collision_mask = 1
 material = ExtResource("7_frame")
 
+[node name="VentDuct" type="Node3D" parent="Architecture"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 0.0000, 0.0000)
+editor_description = "Sheet-metal crawl duct. Kitchen mouth at X~0.12, closet mouth at X~-2.50. Collision on. Not a porthole."
+
+[node name="DuctFloor" type="CSGBox3D" parent="Architecture/VentDuct"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1800, 0.0550, 3.2000)
+size = Vector3(2.6400, 0.0500, 0.9000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("12_duct")
+editor_description = "Duct floor. Top at Y=0.08. Keeps the player in the world."
+
+[node name="DuctCeiling" type="CSGBox3D" parent="Architecture/VentDuct"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1800, 0.9750, 3.2000)
+size = Vector3(2.6400, 0.0500, 0.9000)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("12_duct")
+editor_description = "Duct ceiling. Bottom at Y=0.95."
+
+[node name="DuctSouth" type="CSGBox3D" parent="Architecture/VentDuct"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1800, 0.5150, 2.7750)
+size = Vector3(2.6400, 0.8700, 0.0500)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("12_duct")
+
+[node name="DuctNorth" type="CSGBox3D" parent="Architecture/VentDuct"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1800, 0.5150, 3.6250)
+size = Vector3(2.6400, 0.8700, 0.0500)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("12_duct")
+
+[node name="KitchenLip_L" type="CSGBox3D" parent="Architecture/VentDuct"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1200, 0.5150, 2.7400)
+size = Vector3(0.0800, 0.9800, 0.0600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("12_duct")
+editor_description = "Kitchen-side metal lip. Cover removed."
+
+[node name="KitchenLip_R" type="CSGBox3D" parent="Architecture/VentDuct"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1200, 0.5150, 3.6600)
+size = Vector3(0.0800, 0.9800, 0.0600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("12_duct")
+
+[node name="KitchenLip_T" type="CSGBox3D" parent="Architecture/VentDuct"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1200, 1.0100, 3.2000)
+size = Vector3(0.0800, 0.0800, 0.9800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("12_duct")
+
+[node name="KitchenLip_B" type="CSGBox3D" parent="Architecture/VentDuct"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1200, 0.0400, 3.2000)
+size = Vector3(0.0800, 0.0800, 0.9800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("12_duct")
+
+[node name="ClosetOpening" type="Node3D" parent="Architecture/VentDuct"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5000, 0.5150, 3.2000)
+editor_description = "Closet-side duct mouth. Matching opening on the closet east / shared wall run."
+
+[node name="ClosetLip_L" type="CSGBox3D" parent="Architecture/VentDuct"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5000, 0.5150, 2.7400)
+size = Vector3(0.0800, 0.9800, 0.0600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("12_duct")
+
+[node name="ClosetLip_R" type="CSGBox3D" parent="Architecture/VentDuct"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5000, 0.5150, 3.6600)
+size = Vector3(0.0800, 0.9800, 0.0600)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("12_duct")
+
+[node name="ClosetLip_T" type="CSGBox3D" parent="Architecture/VentDuct"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5000, 1.0100, 3.2000)
+size = Vector3(0.0800, 0.0800, 0.9800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("12_duct")
+
+[node name="ClosetLip_B" type="CSGBox3D" parent="Architecture/VentDuct"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5000, 0.0400, 3.2000)
+size = Vector3(0.0800, 0.0800, 0.9800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("12_duct")
+
 [node name="KitchenetteCounter" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.1000, 0.4500, 0.4200)
 size = Vector3(5.2000, 0.9000, 0.6400)
@@ -1033,31 +1197,6 @@ use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("5_furn")
-
-[node name="BreakRoomWindow" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0200, 1.5500, 3.2000)
-size = Vector3(0.0600, 1.0000, 1.2200)
-use_collision = true
-collision_layer = 1
-collision_mask = 1
-material = ExtResource("9_dim")
-editor_description = "FUTURE-ASSET — small dim west window. Not the money shot. Not emissive ember."
-
-[node name="BreakRoomWindowSill" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0800, 1.0200, 3.2000)
-size = Vector3(0.1400, 0.0600, 1.3000)
-use_collision = true
-collision_layer = 1
-collision_mask = 1
-material = ExtResource("7_frame")
-
-[node name="BreakRoomWindowHead" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0800, 2.0800, 3.2000)
-size = Vector3(0.1400, 0.0600, 1.3000)
-use_collision = true
-collision_layer = 1
-collision_mask = 1
-material = ExtResource("7_frame")
 
 [node name="TrashBin" type="CSGBox3D" parent="FutureAssetSlots/BreakRoom"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4000, 0.3200, 5.7000)
@@ -1328,6 +1467,51 @@ use_collision = true
 collision_layer = 1
 collision_mask = 1
 material = ExtResource("5_furn")
+
+[node name="ChaosDoor" type="Node3D" parent="FutureAssetSlots/IntroCloset"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.0000, 0.0000, 3.2500)
+editor_description = "Sealed chaos door. Slab + frame + handle. Collision ON. Cannot open. Coworker dies through this later."
+
+[node name="Frame_L" type="CSGBox3D" parent="FutureAssetSlots/IntroCloset/ChaosDoor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.0500, -0.5000)
+size = Vector3(0.1800, 2.1000, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Frame_R" type="CSGBox3D" parent="FutureAssetSlots/IntroCloset/ChaosDoor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.0500, 0.5000)
+size = Vector3(0.1800, 2.1000, 0.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Frame_Head" type="CSGBox3D" parent="FutureAssetSlots/IntroCloset/ChaosDoor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 2.1400, 0.0000)
+size = Vector3(0.1800, 0.1000, 1.0800)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
+
+[node name="Slab" type="CSGBox3D" parent="FutureAssetSlots/IntroCloset/ChaosDoor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0000, 1.0500, 0.0000)
+size = Vector3(0.1000, 2.0400, 0.9200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("6_door")
+editor_description = "Locked charcoal slab. Collision ON. Cannot open."
+
+[node name="Handle" type="CSGBox3D" parent="FutureAssetSlots/IntroCloset/ChaosDoor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0800, 1.0000, 0.3200)
+size = Vector3(0.0400, 0.0800, 0.1200)
+use_collision = true
+collision_layer = 1
+collision_mask = 1
+material = ExtResource("7_frame")
 
 [node name="CubiclePartition" type="CSGBox3D" parent="FutureAssetSlots/EastHall"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2500, 0.7500, 9.1500)
@@ -2093,6 +2277,46 @@ light_specular = 0.30
 shadow_enabled = false
 omni_range = 4.000
 omni_attenuation = 1.150
+
+[node name="IntroClosetLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5000, 2.5500, 3.2500)
+editor_description = "Dim closet work light. No west-window glow."
+light_color = Color(0.82, 0.74, 0.62, 1)
+light_energy = 0.580
+light_specular = 0.18
+shadow_enabled = false
+omni_range = 6.200
+omni_attenuation = 1.350
+
+[node name="IntroClosetLight_02" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5000, 2.5000, 5.1500)
+editor_description = "Second dim fill in the north aisle."
+light_color = Color(0.78, 0.72, 0.60, 1)
+light_energy = 0.320
+light_specular = 0.12
+shadow_enabled = false
+omni_range = 5.000
+omni_attenuation = 1.350
+
+[node name="VentDuctLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2000, 0.5000, 3.2000)
+editor_description = "Duct interior. Metal must read, not an unlit void."
+light_color = Color(0.78, 0.82, 0.88, 1)
+light_energy = 0.720
+light_specular = 0.40
+shadow_enabled = false
+omni_range = 2.600
+omni_attenuation = 1.200
+
+[node name="VentMouthLight" type="OmniLight3D" parent="Lights"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2800, 0.4800, 3.2000)
+editor_description = "Kitchen vent mouth so the empty opening reads."
+light_color = Color(0.80, 0.78, 0.70, 1)
+light_energy = 0.380
+light_specular = 0.20
+shadow_enabled = false
+omni_range = 1.800
+omni_attenuation = 1.200
 
 [node name="NorthHallLight" type="OmniLight3D" parent="Lights"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5000, 2.6000, 8.8000)

@@ -5,6 +5,7 @@ extends RefCounted
 func apply(level: Node3D) -> void:
 	_texture_existing(level)
 	_breakroom(level)
+	_intro_closet(level)
 	_bathroom(level)
 	_dread(level)
 	_ceo(level)
@@ -284,6 +285,184 @@ func _breakroom(level: Node3D) -> void:
 	tv.add_child(screen)
 	tv.set_script(load("res://scripts/tv.gd"))
 	br.add_child(tv)
+
+
+func _cardboard_mat(path: String, rough: float = 0.84) -> StandardMaterial3D:
+	# Dedicated albedo on BoxMesh / quads — same care as tv.gd, not a CSG wood tint.
+	var m := StandardMaterial3D.new()
+	m.albedo_color = Color(0.94, 0.86, 0.72)
+	m.albedo_texture = load(path)
+	m.roughness = rough
+	m.metallic = 0.0
+	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	return m
+
+
+func _sheet_metal() -> StandardMaterial3D:
+	var m := _tex_mat("res://textures/tex_sheet_metal.png", Color(0.72, 0.74, 0.76), 0.42, 0.78)
+	m.uv1_triplanar = true
+	m.uv1_world_triplanar = true
+	m.uv1_scale = Vector3(1.6, 1.6, 1.6)
+	return m
+
+
+func _intro_closet(level: Node3D) -> void:
+	var ic := _find(level, "FutureAssetSlots/IntroCloset")
+	if ic == null:
+		return
+	var metal := _sheet_metal()
+	for p in [
+		"Architecture/VentDuct/DuctFloor",
+		"Architecture/VentDuct/DuctCeiling",
+		"Architecture/VentDuct/DuctSouth",
+		"Architecture/VentDuct/DuctNorth",
+		"Architecture/VentDuct/KitchenLip_L",
+		"Architecture/VentDuct/KitchenLip_R",
+		"Architecture/VentDuct/KitchenLip_T",
+		"Architecture/VentDuct/KitchenLip_B",
+		"Architecture/VentDuct/ClosetLip_L",
+		"Architecture/VentDuct/ClosetLip_R",
+		"Architecture/VentDuct/ClosetLip_T",
+		"Architecture/VentDuct/ClosetLip_B",
+	]:
+		_set_csg_mat(_find(level, p), metal)
+	# Floor-to-ceiling units on N / S / W. East wall is the vent — no shelves.
+	# Inset so boards never clip plaster or the chaos door.
+	_shelf_run(ic, "South", Vector3(-6.48, 0.0, 0.10), Vector3.RIGHT, Vector3.BACK, 6.16, 5)
+	_shelf_run(ic, "North", Vector3(-6.48, 0.0, 6.32), Vector3.RIGHT, Vector3.FORWARD, 6.16, 5)
+	_shelf_run(ic, "WestS", Vector3(-6.90, 0.0, 0.56), Vector3.BACK, Vector3.RIGHT, 2.06, 2)
+	_shelf_run(ic, "WestN", Vector3(-6.90, 0.0, 3.90), Vector3.BACK, Vector3.RIGHT, 2.24, 2)
+	_floor_cartons(ic)
+	var br := _find(level, "FutureAssetSlots/BreakRoom")
+	if br:
+		_vent_cover(br)
+	# Extra handle rose on the sealed door so it reads as hardware, not a box.
+	var door := ic.get_node_or_null("ChaosDoor")
+	if door:
+		var furn_metal := _mat("res://materials/mat_metal_furn.tres")
+		_box(door, "HandleRose", Vector3(0.02, 0.12, 0.12), Vector3(0.07, 1.00, 0.32), furn_metal, Vector3.ZERO, false)
+		_box(door, "HandleLever", Vector3(0.03, 0.03, 0.16), Vector3(0.10, 1.00, 0.24), furn_metal, Vector3.ZERO, false)
+
+
+func _shelf_run(parent: Node, stem: String, origin: Vector3, along: Vector3, inward: Vector3, length: float, n_bays: int) -> void:
+	var wood := _mat("res://materials/mat_wood.tres")
+	var metal := _mat("res://materials/mat_metal_furn.tres")
+	along = along.normalized()
+	inward = inward.normalized()
+	var depth := 0.44
+	var board_t := 0.028
+	var post_w := 0.034
+	var post_h := 2.80
+	var heights := [0.20, 0.74, 1.28, 1.82, 2.36]
+	var bay := length / float(n_bays)
+	var board_sz: Vector3 = along.abs() * (bay - 0.048) + inward.abs() * (depth - 0.052) + Vector3.UP * board_t
+	for i in n_bays + 1:
+		var base := origin + along * (float(i) * bay)
+		var back := base + inward * 0.018
+		var front := base + inward * (depth - 0.018)
+		back.y = post_h * 0.5
+		front.y = post_h * 0.5
+		_box(parent, "%s_UprightB_%d" % [stem, i], Vector3(post_w, post_h, post_w), back, metal)
+		_box(parent, "%s_UprightF_%d" % [stem, i], Vector3(post_w, post_h, post_w), front, metal)
+	for i in n_bays:
+		var mid := origin + along * ((float(i) + 0.5) * bay) + inward * (depth * 0.5)
+		for hi in heights.size():
+			var pos := mid
+			pos.y = heights[hi]
+			_box(parent, "%s_Board_%d_%d" % [stem, i, hi], board_sz, pos, wood)
+			var rail := mid
+			rail.y = heights[hi] + 0.06
+			rail = origin + along * ((float(i) + 0.5) * bay) + inward * 0.012
+			rail.y = heights[hi] + 0.055
+			var rail_sz: Vector3 = along.abs() * (bay - 0.06) + inward.abs() * 0.012 + Vector3.UP * 0.018
+			_box(parent, "%s_Rail_%d_%d" % [stem, i, hi], rail_sz, rail, metal, Vector3.ZERO, false)
+			_stock_board(parent, stem, i, hi, pos, along, inward, bay - 0.08, depth - 0.08, heights[hi] + board_t * 0.5)
+
+
+func _stock_board(parent: Node, stem: String, bay: int, hi: int, board_pos: Vector3, along: Vector3, inward: Vector3, board_len: float, board_depth: float, board_top: float) -> void:
+	var catalog := [
+		["res://textures/tex_cardboard.png", Vector3(0.28, 0.18, 0.22), 0.84],
+		["res://textures/tex_cardboard_tape.png", Vector3(0.32, 0.20, 0.26), 0.56],
+		["res://textures/tex_cardboard_fragile.png", Vector3(0.30, 0.22, 0.24), 0.82],
+		["res://textures/tex_cardboard_copy.png", Vector3(0.36, 0.16, 0.26), 0.80],
+		["res://textures/tex_cardboard.png", Vector3(0.22, 0.14, 0.18), 0.84],
+		["res://textures/tex_cardboard_tape.png", Vector3(0.26, 0.24, 0.22), 0.56],
+	]
+	var n_boxes := 2 if board_len > 0.85 else 1
+	if hi == 4:
+		n_boxes = 1
+	for k in n_boxes:
+		var spec: Array = catalog[(bay * 7 + hi * 3 + k + stem.length()) % catalog.size()]
+		var tex: String = spec[0]
+		var raw: Vector3 = spec[1]
+		var rough: float = spec[2]
+		# Keep the box on the board: depth along inward, width along the run.
+		var size := along.abs() * minf(raw.x, board_len * 0.42) + Vector3.UP * raw.y + inward.abs() * minf(raw.z, board_depth * 0.82)
+		if size.x < 0.08:
+			size.x = raw.z
+		if size.z < 0.08:
+			size.z = raw.x
+		var t := (float(k) + 0.5) / float(n_boxes) - 0.5
+		var pos := board_pos + along * (t * board_len * 0.72) + inward * (0.03 * float(k - 1))
+		pos.y = board_top + size.y * 0.5
+		var yaw := float(((bay + hi * 2 + k) % 7) - 3) * 4.0
+		_box(parent, "%s_Box_%d_%d_%d" % [stem, bay, hi, k], size, pos, _cardboard_mat(tex, rough), Vector3(0, yaw, 0), false)
+
+
+func _carton(parent: Node, name: String, size: Vector3, pos: Vector3, yaw: float, face_tex: String, collide: bool) -> void:
+	var root := Node3D.new()
+	root.name = name
+	root.position = pos
+	root.rotation_degrees = Vector3(0, yaw, 0)
+	parent.add_child(root)
+	var card := _cardboard_mat("res://textures/tex_cardboard.png")
+	var face := _cardboard_mat(face_tex)
+	var tape := _cardboard_mat("res://textures/tex_cardboard_tape.png", 0.54)
+	var hx := size.x * 0.5
+	var hy := size.y * 0.5
+	var hz := size.z * 0.5
+	_quad(root, "Front", Vector2(size.x, size.y), Vector3(0, 0, hz + 0.001), Vector3(0, 0, 0), face)
+	_quad(root, "Back", Vector2(size.x, size.y), Vector3(0, 0, -hz - 0.001), Vector3(0, 180, 0), card)
+	_quad(root, "Left", Vector2(size.z, size.y), Vector3(-hx - 0.001, 0, 0), Vector3(0, -90, 0), card)
+	_quad(root, "Right", Vector2(size.z, size.y), Vector3(hx + 0.001, 0, 0), Vector3(0, 90, 0), card)
+	_quad(root, "Top", Vector2(size.x, size.z), Vector3(0, hy + 0.001, 0), Vector3(-90, 0, 0), tape)
+	_quad(root, "Bottom", Vector2(size.x, size.z), Vector3(0, -hy - 0.001, 0), Vector3(90, 0, 0), card)
+	var body := _box(root, "Body", size, Vector3.ZERO, card, Vector3.ZERO, collide)
+	body.visible = false
+
+
+func _floor_cartons(ic: Node) -> void:
+	# A few on the floor. Leave the aisle, vent mouth, and chaos door clear.
+	_carton(ic, "Floor_Fragile", Vector3(0.52, 0.40, 0.40), Vector3(-5.85, 0.20, 1.05), 18.0, "res://textures/tex_cardboard_fragile.png", true)
+	_carton(ic, "Floor_Copy", Vector3(0.46, 0.28, 0.36), Vector3(-5.55, 0.14, 1.38), -12.0, "res://textures/tex_cardboard_copy.png", true)
+	_carton(ic, "Floor_Tape", Vector3(0.38, 0.24, 0.32), Vector3(-5.70, 0.12, 5.55), 8.0, "res://textures/tex_cardboard_tape.png", true)
+	_carton(ic, "Floor_Copy2", Vector3(0.42, 0.22, 0.34), Vector3(-5.40, 0.11, 5.22), -22.0, "res://textures/tex_cardboard_copy.png", true)
+	_carton(ic, "Floor_Plain", Vector3(0.34, 0.20, 0.28), Vector3(-1.55, 0.10, 0.88), 14.0, "res://textures/tex_cardboard.png", true)
+	_carton(ic, "Floor_Fragile2", Vector3(0.36, 0.26, 0.30), Vector3(-1.85, 0.13, 5.40), -8.0, "res://textures/tex_cardboard_fragile.png", true)
+
+
+func _vent_cover(br: Node) -> void:
+	var metal := _sheet_metal()
+	var cover := Node3D.new()
+	cover.name = "VentCover"
+	# Leans on the kitchen west wall, south of the empty opening. Cover is off.
+	cover.position = Vector3(0.40, 0.0, 2.08)
+	cover.rotation_degrees = Vector3(0, 8, 18)
+	br.add_child(cover)
+	_box(cover, "Rail_L", Vector3(0.028, 0.90, 0.040), Vector3(0, 0.45, -0.38), metal, Vector3.ZERO, false)
+	_box(cover, "Rail_R", Vector3(0.028, 0.90, 0.040), Vector3(0, 0.45, 0.38), metal, Vector3.ZERO, false)
+	_box(cover, "Rail_T", Vector3(0.028, 0.040, 0.80), Vector3(0, 0.88, 0), metal, Vector3.ZERO, false)
+	_box(cover, "Rail_B", Vector3(0.028, 0.040, 0.80), Vector3(0, 0.04, 0), metal, Vector3.ZERO, false)
+	for i in 7:
+		_box(cover, "Slat_%d" % i, Vector3(0.016, 0.018, 0.72), Vector3(0, 0.14 + i * 0.10, 0), metal, Vector3.ZERO, false)
+	# Empty screw holes on the kitchen flange — cover was unscrewed.
+	var dark := _tex_mat("", Color(0.08, 0.08, 0.09), 0.7, 0.4)
+	var holes := [
+		Vector3(0.165, 0.92, 2.78), Vector3(0.165, 0.92, 3.62),
+		Vector3(0.165, 0.12, 2.78), Vector3(0.165, 0.12, 3.62),
+	]
+	for hi in holes.size():
+		_box(br, "VentScrewHole_%d" % hi, Vector3(0.018, 0.018, 0.018), holes[hi], dark, Vector3.ZERO, false)
 
 
 func _bathroom(level: Node3D) -> void:
@@ -755,10 +934,15 @@ func _walls(level: Node3D) -> void:
 	var scuff := _tex_mat("res://textures/tex_scuff.png", Color(0.50, 0.44, 0.36, 0.62), 0.92)
 	scuff.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	var i := [0]
-	# Break room
+	# Break room — skip the vent on the shared west wall (Z 2.72–3.68)
 	_trim_span(root, i, true, 0.20, 6.80, 0.12, [], trim)
-	_trim_span(root, i, false, 0.20, 6.40, 0.12, [], trim)
+	_trim_span(root, i, false, 0.20, 6.40, 0.12, [[2.72, 3.68]], trim)
 	_trim_span(root, i, false, 0.20, 6.40, 6.88, [], trim)
+	# Intro closet — skip chaos door and the closet-side duct mouth
+	_trim_span(root, i, true, -6.80, -0.22, 0.12, [], trim)
+	_trim_span(root, i, true, -6.80, -0.22, 6.34, [], trim)
+	_trim_span(root, i, false, 0.20, 6.30, -6.92, [[2.70, 3.80]], trim)
+	_trim_span(root, i, false, 0.20, 6.30, -0.12, [[2.72, 3.68]], trim)
 	# North hall west — skip bathroom entry Z 8.39–9.61 @ X ~2
 	_trim_span(root, i, false, 6.58, 13.20, 2.08, [[8.39, 9.61]], trim)
 	# North hall east — skip supply / elevator slab

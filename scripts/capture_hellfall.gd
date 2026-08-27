@@ -87,5 +87,25 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("ceo-back-close.png")
+	# Intro closet: three walls of shelves + boxes, looking west from the duct mouth.
+	_aim(level, Vector3(-2.55, 1.52, 3.25), Vector3(-6.40, 1.15, 3.25))
+	for _j in 10:
+		await process_frame
+	_save("intro-closet-aisle.png")
+	# Corner that reads north + west + south runs.
+	_aim(level, Vector3(-3.15, 1.48, 1.55), Vector3(-6.10, 1.20, 5.40))
+	for _j in 8:
+		await process_frame
+	_save("intro-closet-shelves.png")
+	# Kitchen west wall: sealed plaster, vent under the old window, cover off.
+	_aim(level, Vector3(2.15, 1.28, 3.25), Vector3(0.05, 0.55, 3.20))
+	for _j in 8:
+		await process_frame
+	_save("kitchen-west-vent.png")
+	# Duct interior from the kitchen mouth.
+	_aim(level, Vector3(0.42, 0.48, 3.20), Vector3(-2.40, 0.48, 3.20))
+	for _j in 8:
+		await process_frame
+	_save("vent-duct-interior.png")
 	level.queue_free()
 	await process_frame

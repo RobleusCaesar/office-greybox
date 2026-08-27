@@ -122,6 +122,54 @@ func _run() -> void:
 		errors.append("DemonSpot_Reception missing")
 	if level.get_node_or_null("FutureAssetSlots/BreakRoom/BreakRoomTV") == null:
 		errors.append("break room TV missing")
+	if level.get_node_or_null("FutureAssetSlots/IntroCloset") == null:
+		errors.append("IntroCloset missing")
+	var ic_floor := level.get_node_or_null("Architecture/Floors/IntroClosetFloor") as CSGBox3D
+	if ic_floor == null:
+		errors.append("IntroCloset floor missing")
+	else:
+		if ic_floor.size.x < 6.0 or ic_floor.size.z < 6.0:
+			errors.append("IntroCloset floor too small to walk a loop (%s)" % ic_floor.size)
+		if ic_floor.position.x > -2.5:
+			errors.append("IntroCloset should sit west of the break room, got X=%s" % ic_floor.position.x)
+	if level.get_node_or_null("Architecture/Ceilings/IntroClosetCeiling") == null:
+		errors.append("IntroCloset ceiling missing")
+	if level.get_node_or_null("Architecture/Walls/IntroClosetWest") == null:
+		errors.append("IntroCloset west wall missing")
+	if level.get_node_or_null("FutureAssetSlots/BreakRoom/BreakRoomWindow") != null:
+		errors.append("old BreakRoomWindow must be gone")
+	if level.get_node_or_null("FutureAssetSlots/BreakRoom/BreakRoomWindowSill") != null:
+		errors.append("BreakRoomWindowSill must be gone")
+	if level.get_node_or_null("FutureAssetSlots/BreakRoom/BreakRoomWindowHead") != null:
+		errors.append("BreakRoomWindowHead must be gone")
+	if level.get_node_or_null("Architecture/Walls/BreakRoomWest/WindowCut") != null:
+		errors.append("BreakRoomWest WindowCut must be gone")
+	var vent_cut := level.get_node_or_null("Architecture/Walls/BreakRoomWest/VentCut") as CSGBox3D
+	if vent_cut == null:
+		errors.append("BreakRoomWest VentCut missing")
+	else:
+		if vent_cut.operation != 2:
+			errors.append("VentCut must subtract")
+		var west := level.get_node_or_null("Architecture/Walls/BreakRoomWest") as CSGBox3D
+		if west:
+			var vent_y := west.position.y + vent_cut.position.y
+			if vent_y > 1.15:
+				errors.append("vent opening is not beneath the old window (center Y %s)" % vent_y)
+	if level.get_node_or_null("Architecture/VentDuct") == null:
+		errors.append("VentDuct missing")
+	if level.get_node_or_null("Architecture/VentDuct/ClosetOpening") == null:
+		errors.append("closet-side vent opening missing")
+	if level.get_node_or_null("Architecture/VentDuct/DuctFloor") == null:
+		errors.append("VentDuct floor missing")
+	if level.get_node_or_null("FutureAssetSlots/IntroCloset/ChaosDoor/Slab") == null:
+		errors.append("chaos door slab missing")
+	var sc_floor := level.get_node_or_null("Architecture/Floors/SupplyClosetFloor") as CSGBox3D
+	if sc_floor and (sc_floor.size.x > 3.2 or sc_floor.size.z > 3.2):
+		errors.append("existing locked SupplyCloset must stay small")
+	var spawn := level.get_node_or_null("Player") as Node3D
+	if spawn:
+		if absf(spawn.position.x - 3.5) > 0.08 or absf(spawn.position.z - 2.1) > 0.08:
+			errors.append("player spawn moved to %s, expected (3.5, 0, 2.1)" % spawn.position)
 	var dead_ex := level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive")
 	if dead_ex == null:
 		errors.append("dead executive missing")
@@ -145,6 +193,12 @@ func _run() -> void:
 		if level.get_node_or_null("FutureAssetSlots/CEOOffice/BodyBlood_%d" % bi) != null:
 			errors.append("BodyBlood_%d blotch must be gone" % bi)
 	var dress_src := FileAccess.get_file_as_string("res://scripts/dressing.gd")
+	if not dress_src.contains("IntroCloset"):
+		errors.append("dressing must build IntroCloset shelves / boxes")
+	if not dress_src.contains("tex_cardboard"):
+		errors.append("dressing must use dedicated cardboard albedos")
+	if dress_src.contains("world_dress") or dress_src.contains("shotgun_vm"):
+		errors.append("do not invent world_dress.gd / shotgun_vm.gd names")
 	if dress_src.contains("Meshy_AI_Photoreal") or dress_src.contains("blood_seepi"):
 		errors.append("dressing must not load the Meshy_* blood filename")
 	if not dress_src.contains("blood_pool.glb"):
@@ -384,6 +438,28 @@ func _run() -> void:
 				errors.append("death must not queue_free the ember")
 
 	var space: PhysicsDirectSpaceState3D = level.get_world_3d().direct_space_state
+	var ic_walk := PhysicsRayQueryParameters3D.create(Vector3(-3.5, 1.7, 1.85), Vector3(-3.5, -0.2, 1.85))
+	ic_walk.collision_mask = 1
+	var ic_hit := space.intersect_ray(ic_walk)
+	if ic_hit.is_empty():
+		errors.append("IntroCloset is not walkable (no floor under aisle)")
+	elif ic_hit.position.y > 0.14:
+		errors.append("IntroCloset aisle blocked at %s" % ic_hit.position)
+	var ic_door := PhysicsRayQueryParameters3D.create(Vector3(-5.4, 1.7, 4.55), Vector3(-5.4, -0.2, 4.55))
+	ic_door.collision_mask = 1
+	var ic_door_hit := space.intersect_ray(ic_door)
+	if ic_door_hit.is_empty() or ic_door_hit.position.y > 0.14:
+		errors.append("IntroCloset west aisle is not walkable")
+	var vent_open := PhysicsRayQueryParameters3D.create(Vector3(0.55, 0.45, 3.20), Vector3(-1.80, 0.45, 3.20))
+	vent_open.collision_mask = 1
+	var vent_hit := space.intersect_ray(vent_open)
+	if not vent_hit.is_empty() and vent_hit.position.x > -0.05:
+		errors.append("vent opening blocked at %s" % vent_hit.position)
+	var sealed := PhysicsRayQueryParameters3D.create(Vector3(0.55, 1.55, 3.20), Vector3(-0.55, 1.55, 3.20))
+	sealed.collision_mask = 1
+	var sealed_hit := space.intersect_ray(sealed)
+	if sealed_hit.is_empty() or sealed_hit.position.x < -0.15:
+		errors.append("old window hole is not sealed")
 	var window := Vector3(38.1, 1.7, 11.5)
 	for origin in [Vector3(8.5, 1.7, 12.0), Vector3(17.4, 1.7, 12.0), Vector3(3.5, 1.7, 8.8), Vector3(3.5, 1.7, 2.1)]:
 		var q := PhysicsRayQueryParameters3D.create(origin, window)
