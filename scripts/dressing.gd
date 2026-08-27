@@ -819,6 +819,7 @@ func _ceo(level: Node3D) -> void:
 	# facing the window. Scale 1.48 → ~0.81 m sofa height (human, not dollhouse/stage).
 	# Stays west of the CEO body at (32.05, 0.27, 11.45) and clear of the window walk.
 	var couches := _instance_glb(ceo, "res://models/CEO_couch_coffee_table.glb", "CeoCouchSet", Vector3(27.48, 0.403, 11.50), Vector3(0, 90, 0), Vector3(1.48, 1.48, 1.48))
+	_relit_couch_set(couches)
 	_box_collision(couches, Vector3(2.40, 0.72, 2.70), Vector3(0.0, 0.0, 0.0))
 	# Dead executive — mid-office, visible from the south door, window ahead.
 	_build_ceo_body(ceo)
@@ -1056,6 +1057,46 @@ func _instance_glb(parent: Node, path: String, name: String, pos: Vector3, rot: 
 	inst.scale = scl
 	parent.add_child(inst)
 	return inst
+
+
+func _relit_couch_set(root: Node) -> void:
+	# Meshy couch GLB ships metallicFactor=1.0 (glTF default) and a ~0.12 albedo.
+	# That reads as a solid black silhouette from the CEO doorway. Keep the
+	# authored albedo/normal maps and the locked pose; force dielectric PBR so
+	# leather/wood actually receive office light.
+	var stack: Array[Node] = [root]
+	while stack.size():
+		var n: Node = stack.pop_back()
+		if n is MeshInstance3D:
+			var mi := n as MeshInstance3D
+			var mesh := mi.mesh
+			if mesh:
+				for i in mesh.get_surface_count():
+					var src := mesh.surface_get_material(i)
+					if src == null:
+						src = mi.get_surface_override_material(i)
+					if src is StandardMaterial3D:
+						mi.set_surface_override_material(i, _lit_couch_mat(src as StandardMaterial3D))
+		for c in n.get_children():
+			stack.append(c)
+
+
+func _lit_couch_mat(src: StandardMaterial3D) -> StandardMaterial3D:
+	var m := src.duplicate() as StandardMaterial3D
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
+	# Leather + wood are dielectrics. Drop the metallic-roughness map so a
+	# white/red packed channel cannot turn the set into a metal black hole.
+	m.metallic = 0.04
+	m.metallic_specular = 0.22
+	m.metallic_texture = null
+	m.roughness = 0.62
+	m.roughness_texture = null
+	# Authored albedo median is ~31/27/27. Lift so the texture reads as brown
+	# leather / wood under ambient 0.32 + the window, without going unshaded.
+	m.albedo_color = Color(2.55, 2.25, 2.05)
+	m.emission_enabled = false
+	m.emission_energy_multiplier = 0.0
+	return m
 
 
 func _apply_mesh_mats(root: Node, wood_path: String, metal_path: String) -> void:

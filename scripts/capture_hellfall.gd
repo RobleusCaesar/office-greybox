@@ -282,6 +282,15 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("fix3-ceo-couches.png")
+	# From inside the CEO office, window-side, so leather/wood must read (not black).
+	_aim(level, Vector3(30.60, 1.42, 11.50), Vector3(27.48, 0.42, 11.50))
+	for _j in 10:
+		await process_frame
+	_save("fix4-ceo-couches-textured.png")
+	_aim(level, Vector3(29.20, 1.28, 10.15), Vector3(27.55, 0.38, 11.35))
+	for _j in 8:
+		await process_frame
+	_save("fix4-ceo-couches-doorway.png")
 	var hud3 := level.get_node_or_null("Player/HUD") as CanvasLayer
 	if hud3:
 		hud3.visible = false

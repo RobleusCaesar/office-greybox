@@ -311,6 +311,8 @@ func _run() -> void:
 		errors.append("dressing must instance broken_door.glb")
 	if not dress_src.contains("CEO_couch_coffee_table.glb"):
 		errors.append("dressing must instance CEO_couch_coffee_table.glb")
+	if not dress_src.contains("_relit_couch_set"):
+		errors.append("couch set must be relit so it is not a black silhouette")
 	if not dress_src.contains("blood_decal_1.glb"):
 		errors.append("dressing must instance blood_decal_1.glb under the guard")
 	if not dress_src.contains("blood_decal_2.glb"):
@@ -465,12 +467,37 @@ func _run() -> void:
 	else:
 		var couches := level.get_node_or_null("FutureAssetSlots/CEOOffice/CeoCouchSet") as Node3D
 		if couches:
-			if couches.position.x < 26.20 or couches.position.x > 30.40:
-				errors.append("couches at %s are not on the wall backing the secretary desk" % couches.position)
-			if couches.position.x > 31.20:
-				errors.append("couches overlap the CEO body")
-			if couches.scale.x < 1.20 or couches.scale.x > 1.80:
-				errors.append("couch scale %s is dollhouse or stage, not human furniture" % couches.scale)
+			if absf(couches.position.x - 27.48) > 0.02 or absf(couches.position.y - 0.403) > 0.02 or absf(couches.position.z - 11.50) > 0.02:
+				errors.append("couches moved from locked pose (27.48, 0.403, 11.50) to %s" % couches.position)
+			if absf(couches.rotation_degrees.y - 90.0) > 4.0:
+				errors.append("couch yaw %s, expected 90 (bigger couch faces the window)" % couches.rotation_degrees.y)
+			if absf(couches.scale.x - 1.48) > 0.02:
+				errors.append("couch scale %s, expected 1.48" % couches.scale)
+			var couch_ok := false
+			var couch_stack: Array[Node] = [couches]
+			while couch_stack.size():
+				var cn: Node = couch_stack.pop_back()
+				if cn is MeshInstance3D:
+					var cmi := cn as MeshInstance3D
+					for si in cmi.get_surface_override_material_count():
+						var cm := cmi.get_surface_override_material(si)
+						if cm is StandardMaterial3D:
+							var csm := cm as StandardMaterial3D
+							couch_ok = true
+							if csm.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED:
+								errors.append("couch material is unshaded — must receive office light")
+							if csm.metallic > 0.10:
+								errors.append("couch metallic %s — black-hole metal, expected dielectric" % csm.metallic)
+							if csm.roughness < 0.35:
+								errors.append("couch roughness %s — chrome black hole" % csm.roughness)
+							if csm.albedo_texture == null:
+								errors.append("couch lost its albedo texture")
+							if csm.metallic_texture != null:
+								errors.append("couch still uses the Meshy metallic map")
+				for cc in cn.get_children():
+					couch_stack.append(cc)
+			if not couch_ok:
+				errors.append("couch set has no lit StandardMaterial3D override")
 	if level.get_node_or_null("FutureAssetSlots/Bathroom/BathroomBloodDrip") == null:
 		errors.append("bathroom drip stain (blood_decal_2) missing")
 	else:
