@@ -63,6 +63,7 @@ var _weapon_root: Node3D
 var _shotgun_mesh: Node3D
 var _pistol_mesh: Node3D
 var _hero_shotgun: Node3D
+var _has_gun: bool = false
 var crouched: bool = false
 var crawling: bool = false
 var _hud_health: Label
@@ -131,13 +132,17 @@ func _unhandled_input(event: InputEvent) -> void:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			return
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-			_set_weapon(SHOTGUN)
+			if _has_gun:
+				_set_weapon(SHOTGUN)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			_set_weapon(PISTOL)
+			if _has_gun:
+				_set_weapon(PISTOL)
 	elif event.is_action_pressed("weapon_1"):
-		_set_weapon(SHOTGUN)
+		if _has_gun:
+			_set_weapon(SHOTGUN)
 	elif event.is_action_pressed("weapon_2"):
-		_set_weapon(PISTOL)
+		if _has_gun:
+			_set_weapon(PISTOL)
 	elif event.is_action_pressed("reload"):
 		_start_reload()
 	elif event.is_action_pressed("interact"):
@@ -250,15 +255,29 @@ func add_ammo(shotgun_shells: int, pistol_rounds: int) -> void:
 	_emit_hud()
 
 
+func give_shotgun() -> void:
+	if _has_gun:
+		return
+	_has_gun = true
+	_weapon = SHOTGUN
+	if _weapon_root:
+		_weapon_root.visible = true
+	if _shotgun_mesh:
+		_shotgun_mesh.visible = true
+	if _pistol_mesh:
+		_pistol_mesh.visible = false
+	_emit_hud()
+
+
 func _try_interact() -> void:
 	if dead or input_locked:
 		return
-	var pickup := _aimed_ammo()
+	var pickup := _aimed_pickup()
 	if pickup and pickup.has_method("try_pickup"):
 		pickup.try_pickup(self)
 
 
-func _aimed_ammo() -> Node:
+func _aimed_pickup() -> Node:
 	var space := get_world_3d().direct_space_state
 	var origin := _camera.global_position
 	var dest := origin + (-_camera.global_transform.basis.z) * 2.3
@@ -273,19 +292,30 @@ func _aimed_ammo() -> Node:
 	var n: Object = hit.collider
 	if n is Node:
 		var node := n as Node
-		if node.is_in_group("ammo_pickup"):
+		if node.is_in_group("ammo_pickup") or node.is_in_group("weapon_pickup"):
 			return node
-		if node.get_parent() and node.get_parent().is_in_group("ammo_pickup"):
+		if node.get_parent() and (node.get_parent().is_in_group("ammo_pickup") or node.get_parent().is_in_group("weapon_pickup")):
 			return node.get_parent()
 	return null
 
 
 func _update_prompt() -> void:
-	if _hud_prompt:
-		_hud_prompt.visible = _aimed_ammo() != null
+	if _hud_prompt == null:
+		return
+	var pickup := _aimed_pickup()
+	if pickup == null:
+		_hud_prompt.visible = false
+		return
+	_hud_prompt.visible = true
+	if pickup.is_in_group("weapon_pickup"):
+		_hud_prompt.text = "E  take shotgun"
+	else:
+		_hud_prompt.text = "E  take ammo"
 
 
 func _try_fire() -> void:
+	if not _has_gun:
+		return
 	if _cool > 0.0:
 		return
 	if _reloading:
@@ -383,6 +413,8 @@ func _spawn_impact(pos: Vector3, nrm: Vector3) -> void:
 
 
 func _set_weapon(which: int) -> void:
+	if not _has_gun:
+		return
 	if _weapon == which:
 		return
 	_weapon = which
@@ -395,7 +427,7 @@ func _set_weapon(which: int) -> void:
 
 
 func _start_reload() -> void:
-	if _reloading or dead:
+	if not _has_gun or _reloading or dead:
 		return
 	if _weapon == SHOTGUN:
 		if _sg_mag >= SHOTGUN_MAG or _sg_res <= 0 or _cool > 0.0:
@@ -446,6 +478,12 @@ func _emit_hud() -> void:
 func _update_hud() -> void:
 	if _hud_health:
 		_hud_health.text = "HP  %d" % int(hp)
+	if not _has_gun:
+		if _hud_weapon:
+			_hud_weapon.text = ""
+		if _hud_ammo:
+			_hud_ammo.text = ""
+		return
 	if _hud_weapon:
 		_hud_weapon.text = "SHOTGUN" if _weapon == SHOTGUN else "PISTOL"
 	if _hud_ammo:
@@ -484,6 +522,9 @@ func _build_weapons() -> void:
 	_pistol_mesh.name = "Pistol"
 	_pistol_mesh.visible = false
 	_weapon_root.add_child(_pistol_mesh)
+	# Spawn unarmed — no holster gun, no shotgun in hands until E pickup.
+	_weapon_root.visible = false
+	_shotgun_mesh.visible = false
 	_box(_pistol_mesh, Vector3(0.045, 0.055, 0.16), Vector3(0.0, 0.02, -0.04), Color(0.50, 0.50, 0.52))
 	_box(_pistol_mesh, Vector3(0.035, 0.11, 0.055), Vector3(0.0, -0.06, 0.04), Color(0.38, 0.24, 0.14), true)
 	_box(_pistol_mesh, Vector3(0.03, 0.03, 0.10), Vector3(0.0, 0.03, -0.14), Color(0.58, 0.58, 0.60))

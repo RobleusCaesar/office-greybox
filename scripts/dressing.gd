@@ -300,6 +300,7 @@ func _breakroom(level: Node3D) -> void:
 	# Bigger / horizontal puddle (blood_decal_1) on the floor under him. Not the drip.
 	# Mesh is 1.87 × 1.88 × 0.27 standing — pitch 90 so the 0.27 axis is up.
 	_instance_glb(br, "res://models/blood_decal_1.glb", "GuardBloodPuddle", Vector3(1.02, 0.136, 5.88), Vector3(90, 90, 0), Vector3.ONE)
+	_spawn_shotgun_pickup(br)
 	# Cubicle keyboard + reception desk parts
 	var hall := _find(level, "FutureAssetSlots/EastHall")
 	if hall:
@@ -728,7 +729,8 @@ func _dread(level: Node3D) -> void:
 	fallen.rotation_degrees = Vector3(0, 16, 0)
 	root.add_child(fallen)
 	var broken := _instance_glb(fallen, "res://models/broken_door.glb", "BrokenDoor", Vector3(0.0, 0.055, 0.0), Vector3.ZERO, Vector3.ONE)
-	_box_collision(broken, Vector3(1.70, 0.12, 0.88), Vector3(0.0, 0.0, 0.0))
+	# Visual only — the 12 cm box was wedging players at the bathroom threshold.
+	_disable_collision(broken)
 	# Glass shards in EAST HALL only (not money-shot)
 	for j in 7:
 		var gx := 10.5 + j * 0.55
@@ -819,6 +821,7 @@ func _ceo(level: Node3D) -> void:
 	# facing the window. Scale 1.48 → ~0.81 m sofa height (human, not dollhouse/stage).
 	# Stays west of the CEO body at (32.05, 0.27, 11.45) and clear of the window walk.
 	var couches := _instance_glb(ceo, "res://models/CEO_couch_coffee_table.glb", "CeoCouchSet", Vector3(27.48, 0.403, 11.50), Vector3(0, 90, 0), Vector3(1.48, 1.48, 1.48))
+	_relit_couch_set(couches)
 	_box_collision(couches, Vector3(2.40, 0.72, 2.70), Vector3(0.0, 0.0, 0.0))
 	# Dead executive — mid-office, visible from the south door, window ahead.
 	_build_ceo_body(ceo)
@@ -977,6 +980,86 @@ func _ammo(level: Node3D) -> void:
 	_spawn_ammo(level, Vector3(8.55, 0.82, 8.55), "Ammo_Cubicle")
 
 
+func _spawn_shotgun_pickup(br: Node) -> void:
+	# World Meshy shotgun on the break-room floor next to the fallen guard.
+	# Not in the closet — player crawls out unarmed and finds it after a beat.
+	var area := Area3D.new()
+	area.name = "ShotgunPickup"
+	area.position = Vector3(1.82, 0.0, 5.16)
+	area.set_script(load("res://scripts/shotgun_pickup.gd"))
+	br.add_child(area)
+	var cs := CollisionShape3D.new()
+	var sh := BoxShape3D.new()
+	sh.size = Vector3(1.05, 0.28, 0.36)
+	cs.shape = sh
+	cs.position = Vector3(0.0, 0.12, 0.0)
+	area.add_child(cs)
+	# Authored long axis is X (~1.90). Scale 0.52 → ~1.0 m on the carpet.
+	var gun := _instance_glb(area, "res://models/shotgun.glb", "WorldShotgun", Vector3(0.0, 0.08, 0.0), Vector3(0, 18, 0), Vector3(0.52, 0.52, 0.52))
+	_disable_collision(gun)
+	_seat_on_floor(gun)
+	_pickup_halo(gun)
+	var lab := Label3D.new()
+	lab.name = "PickupLabel"
+	lab.text = "E  take shotgun"
+	lab.font_size = 26
+	lab.position = Vector3(0, 0.34, 0)
+	lab.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	lab.modulate = Color(0.62, 0.92, 0.68, 0.88)
+	area.add_child(lab)
+
+
+func _pickup_halo(root: Node) -> void:
+	# Subtle light-green outline + a small fill. Not a neon slab. Freed on pickup.
+	var light := OmniLight3D.new()
+	light.name = "PickupHaloLight"
+	light.light_color = Color(0.46, 0.90, 0.54)
+	light.light_energy = 0.38
+	light.omni_range = 1.05
+	light.shadow_enabled = false
+	light.position = Vector3(0.0, 0.18, 0.0)
+	root.add_child(light)
+	_apply_halo_pass(root)
+
+
+func _apply_halo_pass(n: Node) -> void:
+	if n is MeshInstance3D:
+		var mi := n as MeshInstance3D
+		var halo := _halo_mat()
+		if mi.mesh:
+			for i in mi.mesh.get_surface_count():
+				var src := mi.get_active_material(i)
+				if src is StandardMaterial3D:
+					var d := (src as StandardMaterial3D).duplicate() as StandardMaterial3D
+					d.next_pass = halo
+					mi.set_surface_override_material(i, d)
+				else:
+					mi.material_overlay = halo
+	for c in n.get_children():
+		_apply_halo_pass(c)
+
+
+func _halo_mat() -> StandardMaterial3D:
+	var halo := StandardMaterial3D.new()
+	halo.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	halo.albedo_color = Color(0.38, 0.86, 0.48, 0.26)
+	halo.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	halo.grow = true
+	halo.grow_amount = 0.014
+	halo.cull_mode = BaseMaterial3D.CULL_FRONT
+	return halo
+
+
+func _disable_collision(n: Node) -> void:
+	if n is CollisionObject3D:
+		(n as CollisionObject3D).collision_layer = 0
+		(n as CollisionObject3D).collision_mask = 0
+	if n is CollisionShape3D:
+		(n as CollisionShape3D).disabled = true
+	for c in n.get_children():
+		_disable_collision(c)
+
+
 func _spawn_ammo(level: Node3D, pos: Vector3, name: String) -> void:
 	var area := Area3D.new()
 	area.name = name
@@ -1056,6 +1139,46 @@ func _instance_glb(parent: Node, path: String, name: String, pos: Vector3, rot: 
 	inst.scale = scl
 	parent.add_child(inst)
 	return inst
+
+
+func _relit_couch_set(root: Node) -> void:
+	# Meshy couch GLB ships metallicFactor=1.0 (glTF default) and a ~0.12 albedo.
+	# That reads as a solid black silhouette from the CEO doorway. Keep the
+	# authored albedo/normal maps and the locked pose; force dielectric PBR so
+	# leather/wood actually receive office light.
+	var stack: Array[Node] = [root]
+	while stack.size():
+		var n: Node = stack.pop_back()
+		if n is MeshInstance3D:
+			var mi := n as MeshInstance3D
+			var mesh := mi.mesh
+			if mesh:
+				for i in mesh.get_surface_count():
+					var src := mesh.surface_get_material(i)
+					if src == null:
+						src = mi.get_surface_override_material(i)
+					if src is StandardMaterial3D:
+						mi.set_surface_override_material(i, _lit_couch_mat(src as StandardMaterial3D))
+		for c in n.get_children():
+			stack.append(c)
+
+
+func _lit_couch_mat(src: StandardMaterial3D) -> StandardMaterial3D:
+	var m := src.duplicate() as StandardMaterial3D
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
+	# Leather + wood are dielectrics. Drop the metallic-roughness map so a
+	# white/red packed channel cannot turn the set into a metal black hole.
+	m.metallic = 0.04
+	m.metallic_specular = 0.22
+	m.metallic_texture = null
+	m.roughness = 0.62
+	m.roughness_texture = null
+	# Authored albedo median is ~31/27/27. Lift so the texture reads as brown
+	# leather / wood under ambient 0.32 + the window, without going unshaded.
+	m.albedo_color = Color(2.55, 2.25, 2.05)
+	m.emission_enabled = false
+	m.emission_energy_multiplier = 0.0
+	return m
 
 
 func _apply_mesh_mats(root: Node, wood_path: String, metal_path: String) -> void:
