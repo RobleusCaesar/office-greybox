@@ -164,10 +164,13 @@ func _steel() -> StandardMaterial3D:
 
 func _skin() -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
-	m.albedo_color = Color(0.72, 0.5, 0.36)
+	m.albedo_color = Color(0.78, 0.56, 0.40)
 	m.albedo_texture = load("res://textures/hero/tex-hand-tan.png")
 	m.roughness = 0.58
 	m.metallic = 0.0
+	m.emission_enabled = true
+	m.emission = Color(0.55, 0.38, 0.24)
+	m.emission_energy_multiplier = 0.22
 	return m
 
 
@@ -242,8 +245,8 @@ func _build() -> void:
 	for i in 6:
 		_box(_pump, "Rib_%d" % i, Vector3(0.052, 0.046, 0.01), Vector3(0.0, 0.0, -0.05 + i * 0.018), wood)
 
-	_hand(_pump, "HandL", Vector3(-0.042, -0.032, 0.00), skin, true)
-	_hand(self, "HandR", Vector3(0.038, -0.048, 0.055), skin, false)
+	_hand(_pump, "HandL", Vector3(-0.050, -0.006, 0.012), skin, true)
+	_hand(self, "HandR", Vector3(0.050, -0.010, 0.028), skin, false)
 
 	_muzzle = Node3D.new()
 	_muzzle.name = "Muzzle"
@@ -280,10 +283,10 @@ func _attach_meshy_visual() -> void:
 	inst.name = "ShotgunMesh"
 	inst.rotation_degrees = Vector3(0, -90, 0)
 	inst.scale = Vector3(0.42, 0.42, 0.42)
-	# Pull the mesh back so the trigger/guard sits at the screen edge — but keep
-	# the grip in front of the camera near plane (0.08). Combined with weapon
-	# root z=-0.24 this is camera-z ≈ -0.14.
-	inst.position = Vector3(0.0, -0.008, 0.10)
+	# Pull the mesh back so the trigger/guard sits at the screen edge — keep the
+	# grip in front of the near plane (0.08). Combined with weapon root z=-0.26
+	# this is camera-z ≈ -0.18.
+	inst.position = Vector3(0.0, 0.006, 0.08)
 	add_child(inst)
 	_show_hands()
 
@@ -312,7 +315,7 @@ func _hand(parent: Node3D, name: String, pos: Vector3, skin: Material, left: boo
 	var hand := Node3D.new()
 	hand.name = name
 	hand.position = pos
-	hand.scale = Vector3(1.35, 1.35, 1.35)
+	hand.scale = Vector3(1.60, 1.60, 1.60)
 	hand.rotation_degrees = Vector3(-12 if left else -28, 8 if left else -6, 70 if left else -18)
 	parent.add_child(hand)
 	_box(hand, "Palm", Vector3(0.034, 0.016, 0.05), Vector3.ZERO, skin)

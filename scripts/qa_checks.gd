@@ -566,6 +566,8 @@ func _run() -> void:
 		errors.append("weapon root still at the old forward pose — pull the shotgun back")
 	if player_src_vm.contains("Vector3(0.20, -0.22, -0.16)"):
 		errors.append("weapon root z=-0.16 clips the Meshy grip behind the near plane")
+	if player_src_vm.contains("Vector3(0.22, -0.20, -0.24)"):
+		errors.append("weapon root y=-0.20 puts the hands under the 75° vertical FOV")
 	if FileAccess.file_exists("res://scenes/_check_audio.tscn") or FileAccess.file_exists("res://scenes/_ceo_rot_proof.tscn"):
 		errors.append("debug helper scenes must not ship")
 	var pane := level.get_node_or_null("FutureAssetSlots/CEOOffice/MoneyShotWindow/Pane_02") as CSGBox3D

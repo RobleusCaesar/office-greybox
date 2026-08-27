@@ -289,11 +289,12 @@ func _breakroom(level: Node3D) -> void:
 	_instance_glb(br, "res://models/refrigerator_open.glb", "RefrigeratorOpen", Vector3(6.40, 0.952, 0.65), Vector3(0, 0, 0), Vector3.ONE)
 	# Lunch table: mesh AABB y −0.533..0.533, height 1.07. Scale 0.72 → ~0.76 m top so the cup / papers still sit.
 	_instance_glb(br, "res://models/kitchen_lunch_table.glb", "KitchenLunchTable", Vector3(3.50, 0.384, 3.70), Vector3(0, 0, 0), Vector3(0.72, 0.72, 0.72))
-	# Fallen guard — NW corner (doorway wall × crawl-hole wall). On the floor, back/shoulder on both walls.
-	# Mesh AABB y −0.480..0.493, length along Z. Roll 90 so the back meets the west plaster.
-	var guard := _instance_glb(br, "res://models/fallen_security_guard.glb", "FallenSecurityGuard", Vector3(0.48, 0.48, 5.70), Vector3(-4, 8, 90), Vector3.ONE)
+	# Fallen guard — NW corner (doorway wall × crawl-hole wall). Lie as authored so
+	# the back is on the carpet (a 90° roll arched the torso and read as floating).
+	# Yaw tucks the shoulder into the north plaster; X keeps him on the west wall.
+	var guard := _instance_glb(br, "res://models/fallen_security_guard.glb", "FallenSecurityGuard", Vector3(0.52, 0.48, 5.58), Vector3(0, 16, 0), Vector3.ONE)
 	_seat_on_floor(guard)
-	_box_collision(guard, Vector3(0.70, 0.42, 1.55), Vector3(0.0, 0.0, 0.0))
+	_box_collision(guard, Vector3(0.70, 0.36, 1.70), Vector3(0.0, 0.0, 0.0))
 	# Cubicle keyboard + reception desk parts
 	var hall := _find(level, "FutureAssetSlots/EastHall")
 	if hall:
@@ -580,10 +581,11 @@ func _bathroom(level: Node3D) -> void:
 	var vanity := _instance_glb(bath, "res://models/bathroom_vanity.glb", "BathroomVanity", Vector3(0.15, 0.427, 6.81), Vector3(0, 0, 0), Vector3(1.50, 1.00, 1.00))
 	_box_collision(vanity, Vector3(2.85, 0.84, 0.40), Vector3(0.0, 0.0, 0.0))
 	_box(bath, "Soap", Vector3(0.08, 0.12, 0.06), Vector3(-0.2, 0.92, 6.90), _tex_mat("res://textures/tex_porcelain.png", Color(0.7, 0.75, 0.6)), Vector3.ZERO, false)
-	# Silver glass + wood frame. Compat has no IBL — keep metallic moderate and add a
-	# faint silver emission so the pane reads as smashed mirror, not a black rectangle.
-	var silver := _tex_mat("res://textures/tex_metal.png", Color(0.90, 0.92, 0.95), 0.30, 0.58, 0.26)
-	silver.metallic_specular = 0.42
+	# Silver glass + wood frame. Compat has no IBL — skip the dark metal texture,
+	# keep metallic at the QA floor, and emit enough silver that the pane cannot crush to black.
+	var silver := _tex_mat("", Color(0.88, 0.91, 0.95), 0.44, 0.55, 0.78)
+	silver.metallic_specular = 0.28
+	silver.emission = Color(0.70, 0.75, 0.82)
 	_box(bath, "MirrorWide", Vector3(2.85, 1.15, 0.018), Vector3(0.15, 1.72, 6.695), silver, Vector3.ZERO, false)
 	var frame := _mat("res://materials/mat_walnut.tres")
 	if frame == null:
@@ -712,10 +714,10 @@ func _dread(level: Node3D) -> void:
 	# Fallen door stood as wreckage at the bathroom opening (south jamb). Hall stays walkable.
 	var fallen := Node3D.new()
 	fallen.name = "FallenDoor"
-	fallen.position = Vector3(1.58, 0.0, 8.38)
-	fallen.rotation_degrees = Vector3(0, 14, 0)
+	fallen.position = Vector3(1.74, 0.0, 8.46)
+	fallen.rotation_degrees = Vector3(0, 6, 0)
 	root.add_child(fallen)
-	_box(fallen, "Slab", Vector3(0.08, 1.86, 0.90), Vector3(0.04, 0.70, 0.18), wood, Vector3(18, 0, -28))
+	_box(fallen, "Slab", Vector3(0.08, 1.86, 0.90), Vector3(0.02, 0.72, 0.10), wood, Vector3(12, 0, -18))
 	# Glass shards in EAST HALL only (not money-shot)
 	for j in 7:
 		var gx := 10.5 + j * 0.55
@@ -1203,10 +1205,11 @@ func _fix_floors(level: Node3D) -> void:
 	var bath := _find(level, "Architecture/Floors/BathroomFloor") as CSGBox3D
 	if bath:
 		var west := bath.position.x - bath.size.x * 0.5
-		bath.size.x = 1.94 - west
-		bath.position.x = (west + 1.94) * 0.5
+		# Meet the hall carpet at X=2.00 — a 6 cm gap read as a black band.
+		bath.size.x = 2.00 - west
+		bath.position.x = (west + 2.00) * 0.5
 		# Light porcelain so the opening does not read as a void against the taupe carpet.
-		var tile := _tex_mat("res://textures/tex_porcelain.png", Color(0.86, 0.86, 0.84), 0.34, 0.04)
+		var tile := _tex_mat("res://textures/tex_porcelain.png", Color(0.88, 0.88, 0.86), 0.38, 0.02)
 		tile.uv1_triplanar = true
 		tile.uv1_world_triplanar = true
 		tile.uv1_scale = Vector3(0.55, 0.55, 0.55)
@@ -1226,8 +1229,14 @@ func _fix_floors(level: Node3D) -> void:
 		eh.position = Vector3(11.50, -0.1000, 12.00)
 		eh.size = Vector3(13.00, 0.2000, 3.00)
 	var carpet := _office_carpet()
-	# Thin carpet lip over the seam (X 1.79–2.21, door Z 8.32–9.68). Raised to avoid z-fight.
-	_box(level, "BathDoorThreshold", Vector3(0.42, 0.016, 1.36), Vector3(2.00, 0.008, 9.00), carpet)
+	# Carpet doormat in the 1.2 m opening. Covers the hall/bath edge and the wall-foot z-fight.
+	_box(level, "BathDoorThreshold", Vector3(0.52, 0.034, 1.24), Vector3(2.00, 0.018, 9.00), carpet)
+	var sf := _find(level, "Architecture/Floors/SupplyClosetFloor") as CSGBox3D
+	if sf:
+		var se := sf.position.x + sf.size.x * 0.5
+		sf.size.x = se - 5.08
+		sf.position.x = (5.08 + se) * 0.5
+		_set_csg_mat(sf, carpet)
 
 
 func _flush_hall(level: Node3D) -> void:

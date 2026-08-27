@@ -217,7 +217,7 @@ func _shot_level() -> void:
 			await process_frame
 		_save("mop-and-bucket.png")
 	# Playtest fix 2 stills.
-	_aim(level, Vector3(3.35, 1.55, 9.00), Vector3(1.92, 0.12, 9.00))
+	_aim(level, Vector3(3.40, 1.55, 9.00), Vector3(1.70, 0.40, 9.00))
 	for _j in 8:
 		await process_frame
 	_save("fix2-bath-threshold.png")
@@ -245,7 +245,7 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("fix2-ceo-facedown.png")
-	_aim(level, Vector3(2.10, 1.32, 4.40), Vector3(0.40, 0.18, 5.85))
+	_aim(level, Vector3(2.05, 1.28, 4.55), Vector3(0.50, 0.12, 5.70))
 	for _j in 8:
 		await process_frame
 	_save("fix2-guard-corner.png")
