@@ -770,10 +770,11 @@ func _build_ceo_body(ceo: Node) -> void:
 		var inst := packed.instantiate() as Node3D
 		if inst:
 			inst.name = "CeoDeadMesh"
-			# Mesh AABB y −0.152..0.141, length along X. Parent Y=0.27 is locked.
-			# Yaw 90 so length follows the old +Z body; child Y seats the thinner mesh.
-			inst.position = Vector3(0.0, -0.118, 0.0)
-			inst.rotation_degrees = Vector3(0, 90, 0)
+			# Mesh AABB y −0.152..0.141, length along X. Parent Y=0.27 / X=0 is locked.
+			# Yaw 90 so length follows the old +Z body. X=180 flips the authored
+			# face-down mesh onto his back without moving the DeadExecutive parent.
+			inst.position = Vector3(0.0, -0.129, 0.0)
+			inst.rotation_degrees = Vector3(180, 90, 0)
 			inst.scale = Vector3.ONE
 			body.add_child(inst)
 			return

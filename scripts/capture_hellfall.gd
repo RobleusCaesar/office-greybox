@@ -151,8 +151,8 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("fridge-lunch-table.png")
-	# Bathroom vanity + toilets.
-	_aim(level, Vector3(-1.40, 1.40, 9.80), Vector3(0.15, 0.70, 6.90))
+	# Bathroom vanity + toilets (look south-west so sinks and a stall bowl share the frame).
+	_aim(level, Vector3(-1.10, 1.35, 10.40), Vector3(-2.40, 0.55, 7.40))
 	for _j in 8:
 		await process_frame
 	_save("bathroom-vanity-toilets.png")
