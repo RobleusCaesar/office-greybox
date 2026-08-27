@@ -55,24 +55,27 @@ func _setup_haunt_bed() -> void:
 	var stream: AudioStream = null
 	if FileAccess.file_exists("res://audio/under_broken_steel.mp3"):
 		stream = load("res://audio/under_broken_steel.mp3")
-		if stream is AudioStreamMP3:
-			(stream as AudioStreamMP3).loop = true
 	if stream == null:
 		if not FileAccess.file_exists("res://audio/haunt_bed.wav"):
 			return
 		stream = load("res://audio/haunt_bed.wav")
-		if stream is AudioStreamWAV:
-			var wav := stream as AudioStreamWAV
-			wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
-			wav.loop_begin = 0
-			wav.loop_end = wav.data.size() / 2
 	if stream == null:
 		return
+	stream = stream.duplicate()
+	if stream is AudioStreamMP3:
+		(stream as AudioStreamMP3).loop = true
+	elif stream is AudioStreamWAV:
+		var wav := stream as AudioStreamWAV
+		wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		wav.loop_begin = 0
+		wav.loop_end = wav.data.size() / 2
 	var bed := AudioStreamPlayer.new()
 	bed.name = "HauntBed"
 	bed.stream = stream
-	bed.volume_db = -12.0
-	bed.autoplay = true
+	bed.volume_db = -6.0
+	bed.bus = "Master"
+	bed.process_mode = Node.PROCESS_MODE_ALWAYS
+	bed.autoplay = false
 	add_child(bed)
 	bed.play()
 
@@ -143,19 +146,24 @@ func _spawn_demon() -> void:
 		d1.position = s1.global_position
 		add_child(d1)
 	# Ember Demon — second live enemy. Do not spawn Demon_02 at the CEO door.
+	_spawn_ember()
+
+
+func _spawn_ember() -> void:
 	var ember_ps: PackedScene = load("res://scenes/ember.tscn")
 	var s_rec := get_node_or_null("DemonSpots/DemonSpot_Reception") as Node3D
-	if ember_ps:
-		var ember: CharacterBody3D = ember_ps.instantiate()
-		ember.name = "Ember_01"
-		ember.max_hp = 120.0
-		ember.scale = Vector3.ONE
-		if s_rec:
-			ember.position = s_rec.global_position
-		else:
-			ember.position = Vector3(21.55, 0.0, 11.55)
-		ember.rotation_degrees = Vector3(0, -90, 0)
-		add_child(ember)
+	if ember_ps == null:
+		return
+	var enemy: CharacterBody3D = ember_ps.instantiate()
+	enemy.name = "Ember_01"
+	enemy.max_hp = 120.0
+	if s_rec:
+		enemy.position = s_rec.global_position
+	else:
+		enemy.position = Vector3(21.55, 0.0, 11.55)
+	enemy.rotation_degrees = Vector3(0, -90, 0)
+	add_child(enemy)
+	enemy.scale = Vector3(1.30, 1.30, 1.30)
 
 
 func _style_title(lab: Label, size: int, color: Color) -> void:

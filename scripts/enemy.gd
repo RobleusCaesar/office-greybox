@@ -71,9 +71,12 @@ func take_damage(amount: float, hit_pos: Vector3 = Vector3.ZERO, hit_normal: Vec
 	else:
 		hp -= amount
 	if hit_pos != Vector3.ZERO:
-		_blood(hit_pos, hit_normal)
+		_spawn_body_splat(hit_pos, hit_normal)
+		_spawn_spray(hit_pos, hit_normal)
 	else:
-		_blood(global_position + Vector3(0, 1.15, 0), Vector3.UP)
+		var fallback := global_position + Vector3(0, 1.15, 0)
+		_spawn_body_splat(fallback, Vector3.UP)
+		_spawn_spray(fallback, Vector3.UP)
 	_play_growl("pain")
 	if state == State.IDLE:
 		state = State.CHASE
@@ -223,7 +226,37 @@ func _load_growls() -> void:
 		_growls["idle"] = load("res://audio/demon_growl.wav")
 
 
-func _blood(pos: Vector3, nrm: Vector3) -> void:
+func _spawn_body_splat(pos: Vector3, nrm: Vector3) -> void:
+	# Parent to the demon so it rides the mesh — fade/free at 0.72s so it cannot hang in air.
+	var mi := MeshInstance3D.new()
+	mi.name = "BodySplat"
+	var q := QuadMesh.new()
+	q.size = Vector2(0.16, 0.16)
+	mi.mesh = q
+	var src: Material = load("res://materials/mat_blood.tres")
+	var mat: StandardMaterial3D
+	if src is StandardMaterial3D:
+		mat = (src as StandardMaterial3D).duplicate() as StandardMaterial3D
+	else:
+		mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(0.42, 0.05, 0.03, 0.88)
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.emission_enabled = false
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mi.material_override = mat
+	add_child(mi)
+	mi.global_position = pos + nrm.normalized() * 0.012
+	var up := nrm.normalized() if nrm.length() > 0.01 else Vector3.UP
+	var tmp := Vector3.RIGHT if absf(up.dot(Vector3.UP)) > 0.92 else Vector3.UP
+	var xaxis := up.cross(tmp).normalized()
+	var yaxis := xaxis.cross(up).normalized()
+	mi.global_transform.basis = Basis(xaxis, yaxis, up)
+	var tw := create_tween()
+	tw.tween_property(mat, "albedo_color:a", 0.0, 0.72)
+	tw.tween_callback(mi.queue_free)
+
+
+func _spawn_spray(pos: Vector3, nrm: Vector3) -> void:
 	var p := CPUParticles3D.new()
 	p.name = "AshBlood"
 	p.amount = 20
@@ -257,7 +290,7 @@ func _blood(pos: Vector3, nrm: Vector3) -> void:
 	p.global_position = pos
 	p.emitting = true
 	var tw := create_tween()
-	tw.tween_interval(0.9)
+	tw.tween_interval(0.55)
 	tw.tween_callback(p.queue_free)
 
 

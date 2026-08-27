@@ -18,10 +18,14 @@ var _residual: CPUParticles3D
 var _flash_left: float = 0.0
 var _pump_t: float = 1.0
 var _pumping: bool = false
+var _cock_sfx: AudioStreamPlayer
+var _reload_sfx: AudioStreamPlayer
+var _cocked_this_cycle: bool = false
 
 
 func _ready() -> void:
 	_build()
+	_build_sfx()
 
 
 func is_cycling() -> bool:
@@ -32,6 +36,7 @@ func fire() -> void:
 	_flash_left = 0.085
 	_pumping = true
 	_pump_t = 0.0
+	_cocked_this_cycle = false
 	if _sparks:
 		_sparks.restart()
 	if _smoke:
@@ -40,13 +45,69 @@ func fire() -> void:
 		_hang.restart()
 	if _residual:
 		_residual.restart()
+	play_cycle()
+
+
+func play_cycle() -> void:
+	# Cycle is the existing fire pump (CYCLE / PUMP_TRAVEL unchanged).
+	# Cock SFX fires when that pump starts in _apply_pump.
+	return
+
+
+func _play_close_pump() -> void:
+	_play_cock()
+
+
+func _play_cock() -> void:
+	if _cock_sfx and _cock_sfx.stream:
+		_cock_sfx.play()
 
 
 func insert_shell() -> void:
+	_insert_one()
+
+
+func _insert_one() -> void:
 	if _pump:
 		var tw := create_tween()
 		tw.tween_property(_pump, "position:z", PUMP_TRAVEL * 0.22, 0.08)
 		tw.tween_property(_pump, "position:z", 0.0, 0.12)
+	_play_reload()
+
+
+func _play_reload() -> void:
+	if _reload_sfx == null or _reload_sfx.stream == null:
+		return
+	_reload_sfx.play()
+	var dur := _reload_sfx.stream.get_length()
+	if dur > 0.0 and dur < 0.34:
+		var replay := get_tree().create_timer(dur)
+		replay.timeout.connect(func() -> void:
+			if is_instance_valid(_reload_sfx) and _reload_sfx.stream:
+				_reload_sfx.play()
+		)
+
+
+func _load_real_wav(path: String) -> AudioStream:
+	if not FileAccess.file_exists(path):
+		return null
+	var f := FileAccess.open(path, FileAccess.READ)
+	if f == null or f.get_length() <= 1024:
+		return null
+	return load(path) as AudioStream
+
+
+func _build_sfx() -> void:
+	_cock_sfx = AudioStreamPlayer.new()
+	_cock_sfx.name = "CockSfx"
+	_cock_sfx.volume_db = -2.0
+	_cock_sfx.stream = _load_real_wav("res://audio/shotgun_cocking.wav")
+	add_child(_cock_sfx)
+	_reload_sfx = AudioStreamPlayer.new()
+	_reload_sfx.name = "ReloadSfx"
+	_reload_sfx.volume_db = -3.0
+	_reload_sfx.stream = _load_real_wav("res://audio/shotgun_reloading.wav")
+	add_child(_reload_sfx)
 
 
 func _process(delta: float) -> void:
@@ -77,6 +138,9 @@ func _apply_pump(t: float) -> void:
 	if t < 0.14:
 		slide = 0.0
 	elif t < 0.46:
+		if not _cocked_this_cycle:
+			_cocked_this_cycle = true
+			_play_cock()
 		slide = smoothstep(0.14, 0.46, t) * PUMP_TRAVEL
 	elif t < 0.78:
 		slide = (1.0 - smoothstep(0.46, 0.78, t)) * PUMP_TRAVEL

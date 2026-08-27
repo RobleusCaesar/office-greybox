@@ -475,28 +475,26 @@ func _ceo(level: Node3D) -> void:
 	_quad(ceo, "PaintingPlant", Vector2(0.62, 0.78), Vector3(35.15, 1.70, 6.65), Vector3.ZERO, cert)
 	_box(ceo, "FrameCert", Vector3(0.55, 0.7, 0.04), Vector3(27.2, 1.7, 14.2), wood, Vector3(0, 90, 0), false)
 	_quad(ceo, "PaintingCert", Vector2(0.48, 0.62), Vector3(27.23, 1.7, 14.2), Vector3(0, 90, 0), paint)
-	# Dead executive — north of desk, off the window walk (Z~14.3, X~33.4)
-	_dead_exec(ceo)
+	# Dead executive — mid-office, visible from the south door, window ahead.
+	_build_ceo_body(ceo)
 
 
-func _dead_exec(ceo: Node) -> void:
-	# Proof ceo-mid.png — mid-office, visible from the south door, window ahead.
+func _build_ceo_body(ceo: Node) -> void:
+	# Locked: X=0 is supine (chest/face up). X=180 was prone. Do not change Y.
 	var body := Node3D.new()
 	body.name = "DeadExecutive"
 	body.position = Vector3(32.05, 0.27, 11.45)
-	body.rotation_degrees = Vector3(180, 18, 0)
+	body.rotation_degrees = Vector3(0, 18, 0)
 	body.scale = Vector3.ONE
 	ceo.add_child(body)
-	# Blood + rug stay on the floor (not pitched with the body).
+	# Rug stays on the floor (not pitched with the body).
 	var rug_a := _tex_mat("res://textures/tex_leather.png", Color(0.42, 0.30, 0.20), 0.85)
 	var rug_b := _tex_mat("res://textures/tex_leather.png", Color(0.62, 0.50, 0.36), 0.85)
 	var rug_c := _tex_mat("res://textures/tex_stone.png", Color(0.28, 0.28, 0.30), 0.80)
 	_box(ceo, "CeoRug_A", Vector3(2.10, 0.006, 0.36), Vector3(32.05, 0.004, 11.10), rug_a, Vector3(0, 18, 0), false)
 	_box(ceo, "CeoRug_B", Vector3(2.10, 0.006, 0.36), Vector3(32.05, 0.004, 11.45), rug_b, Vector3(0, 18, 0), false)
 	_box(ceo, "CeoRug_C", Vector3(2.10, 0.006, 0.36), Vector3(32.05, 0.004, 11.80), rug_c, Vector3(0, 18, 0), false)
-	var pool := _tex_mat("", Color(0.22, 0.015, 0.04, 0.92), 0.85)
-	pool.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_box(ceo, "CeoBloodPool", Vector3(1.15, 0.008, 0.62), Vector3(32.05, 0.012, 11.45), pool, Vector3(0, 18, 0), false)
+	_build_ceo_blood(ceo)
 	const GLB := "res://models/ceo_dead.glb"
 	if FileAccess.file_exists(GLB) or ResourceLoader.exists(GLB):
 		var packed: PackedScene = load(GLB)
@@ -508,8 +506,8 @@ func _dead_exec(ceo: Node) -> void:
 				inst.scale = Vector3.ONE
 				body.add_child(inst)
 				return
-	# Soft-fail: face toward local +Y, length along +Z. Parent pitch 180 flips
-	# the face into the floor. Origin is the torso, so Y=0.27 seats it.
+	# Soft-fail: face toward local +Y, length along +Z. Parent X=0 is supine.
+	# Origin is the torso, so Y=0.27 seats it.
 	var skin := _tex_mat("res://textures/tex_leather.png", Color(0.78, 0.58, 0.44), 0.50, 0.0, 0.10)
 	var hair := _tex_mat("res://textures/tex_leather.png", Color(0.12, 0.09, 0.07), 0.8)
 	var shirt := _tex_mat("res://textures/tex_paper.png", Color(0.94, 0.90, 0.80), 0.65, 0.0, 0.08)
@@ -527,6 +525,50 @@ func _dead_exec(ceo: Node) -> void:
 	_box(body, "LegR", Vector3(0.12, 0.10, 0.54), Vector3(0.11, 0.12, 0.54), suit, Vector3.ZERO, false)
 	_box(body, "ShoeL", Vector3(0.11, 0.08, 0.17), Vector3(-0.11, 0.08, 0.86), shoe, Vector3.ZERO, false)
 	_box(body, "ShoeR", Vector3(0.11, 0.08, 0.17), Vector3(0.11, 0.08, 0.86), shoe, Vector3.ZERO, false)
+
+
+func _wet_pool_mat(tex_path: String, tint: Color) -> StandardMaterial3D:
+	var base: Material = load("res://materials/mat_blood.tres")
+	var m: StandardMaterial3D
+	if base is StandardMaterial3D:
+		m = (base as StandardMaterial3D).duplicate() as StandardMaterial3D
+	else:
+		m = StandardMaterial3D.new()
+	if tex_path != "":
+		m.albedo_texture = load(tex_path)
+	m.albedo_color = tint
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.emission_enabled = false
+	m.roughness = 0.16
+	m.metallic = 0.12
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	return m
+
+
+func _build_ceo_blood(ceo: Node) -> void:
+	# Wet irregular pool — no huge sticker quads, no colored omni.
+	for gone in ["CeoBloodPool", "BodyPoolLight", "BodyBlood", "BodyBlood_A", "BodyBlood_B"]:
+		var old := ceo.get_node_or_null(gone)
+		if old:
+			old.free()
+	var smear := "res://textures/gen/blood_smear.png"
+	if not FileAccess.file_exists(smear):
+		smear = "res://textures/tex_blood.png"
+	var spray := "res://textures/hero/blood-spray-hq.png"
+	if not FileAccess.file_exists(spray):
+		spray = "res://textures/tex_blood.png"
+	var blotches := [
+		["BodyBlood_1", Vector3(32.04, 0.014, 11.42), Vector2(0.82, 0.54), 20.0, smear, Color(0.34, 0.02, 0.04, 0.94)],
+		["BodyBlood_2", Vector3(32.22, 0.016, 11.18), Vector2(0.58, 0.40), -32.0, spray, Color(0.40, 0.03, 0.05, 0.90)],
+		["BodyBlood_3", Vector3(32.24, 0.015, 11.92), Vector2(0.48, 0.38), 50.0, spray, Color(0.30, 0.02, 0.04, 0.88)],
+		["BodyBlood_4", Vector3(31.80, 0.013, 11.60), Vector2(0.44, 0.32), -44.0, smear, Color(0.26, 0.015, 0.03, 0.92)],
+		["BodyBlood_5", Vector3(31.94, 0.017, 11.04), Vector2(0.56, 0.36), 12.0, smear, Color(0.36, 0.025, 0.045, 0.96)],
+		["BodyBlood_6", Vector3(32.34, 0.014, 11.64), Vector2(0.36, 0.26), 64.0, spray, Color(0.38, 0.03, 0.05, 0.86)],
+		["BodyBlood_7", Vector3(32.10, 0.018, 11.72), Vector2(0.40, 0.30), -6.0, smear, Color(0.28, 0.02, 0.04, 0.91)],
+	]
+	for b in blotches:
+		var mat := _wet_pool_mat(str(b[4]), b[5])
+		_quad(ceo, str(b[0]), b[2], b[1], Vector3(-90.0, float(b[3]), 0.0), mat)
 
 
 func _city_mat(vista: String) -> StandardMaterial3D:

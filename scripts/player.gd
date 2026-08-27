@@ -29,6 +29,9 @@ const PISTOL_COOLDOWN := 0.26
 const PISTOL_MAG := 12
 const PISTOL_RESERVE := 36
 
+const BLAST_PATH := "res://audio/shotgun_blast.wav"
+const MAT_IMPACT: Material = preload("res://materials/mat_blood.tres")
+
 signal died
 signal health_changed(current: float, maximum: float)
 signal ammo_changed(weapon_name: String, mag: int, reserve: int)
@@ -66,6 +69,8 @@ var _snd_fire: AudioStreamPlayer
 var _snd_reload: AudioStreamPlayer
 var _snd_empty: AudioStreamPlayer
 var _snd_hurt: AudioStreamPlayer
+var _gun_sfx: AudioStreamPlayer
+var SND_BLAST: AudioStream = null
 
 
 func _ready() -> void:
@@ -241,7 +246,11 @@ func _try_fire() -> void:
 		_fire_hitscan(SHOTGUN_PELLETS, SHOTGUN_SPREAD, SHOTGUN_RANGE, SHOTGUN_DAMAGE, SHOTGUN_FALLOFF)
 		if _hero_shotgun and _hero_shotgun.has_method("fire"):
 			_hero_shotgun.fire()
-		if _snd_fire:
+		if _gun_sfx and SND_BLAST:
+			_gun_sfx.stream = SND_BLAST
+			_gun_sfx.play()
+		elif _snd_fire:
+			# WAVS_MISSING fallback — same blast as current main.
 			_snd_fire.stream = load("res://audio/shotgun_fire.wav")
 			_snd_fire.play()
 	else:
@@ -283,23 +292,22 @@ func _fire_hitscan(pellets: int, spread: float, max_range: float, damage: float,
 		var collider: Object = hit.collider
 		if collider and collider.has_method("take_damage"):
 			collider.take_damage(damage * scale, hit.position, hit.normal)
-		_spawn_splat(hit.position, hit.normal)
+		_spawn_impact(hit.position, hit.normal)
 
 
-func _spawn_splat(pos: Vector3, nrm: Vector3) -> void:
-	# Crimson alpha quads. No orange hit cubes.
+func _spawn_impact(pos: Vector3, nrm: Vector3) -> void:
+	# Duplicate the shared .tres — never mutate MAT_IMPACT in place (that's the hitch).
 	var mi := MeshInstance3D.new()
 	mi.name = "BloodSplat"
 	var q := QuadMesh.new()
 	q.size = Vector2(0.20, 0.20)
 	mi.mesh = q
-	var mat := StandardMaterial3D.new()
+	var mat := (MAT_IMPACT as StandardMaterial3D).duplicate() as StandardMaterial3D
 	mat.albedo_color = Color(0.38, 0.02, 0.05, 0.82)
-	mat.albedo_texture = load("res://textures/tex_blood.png")
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.roughness = 0.72
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat.emission_enabled = false
 	mi.material_override = mat
 	var host: Node = get_parent()
 	if host == null:
@@ -312,8 +320,7 @@ func _spawn_splat(pos: Vector3, nrm: Vector3) -> void:
 	var yaxis := xaxis.cross(up).normalized()
 	mi.global_transform.basis = Basis(xaxis, yaxis, up)
 	var tw := create_tween()
-	tw.tween_interval(18.0)
-	tw.tween_property(mat, "albedo_color:a", 0.0, 2.4)
+	tw.tween_property(mat, "albedo_color:a", 0.0, 0.72)
 	tw.tween_callback(mi.queue_free)
 
 
@@ -514,7 +521,21 @@ func _build_hud() -> void:
 	_hud_prompt.visible = false
 
 
+func _load_real_wav(path: String) -> AudioStream:
+	if not FileAccess.file_exists(path):
+		return null
+	var f := FileAccess.open(path, FileAccess.READ)
+	if f == null or f.get_length() <= 1024:
+		return null
+	return load(path) as AudioStream
+
+
 func _build_audio() -> void:
+	SND_BLAST = _load_real_wav(BLAST_PATH)
+	_gun_sfx = AudioStreamPlayer.new()
+	_gun_sfx.name = "GunSfx"
+	_gun_sfx.volume_db = -2.0
+	add_child(_gun_sfx)
 	_snd_fire = AudioStreamPlayer.new()
 	_snd_fire.volume_db = -4.0
 	add_child(_snd_fire)
