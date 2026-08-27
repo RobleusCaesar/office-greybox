@@ -437,8 +437,8 @@ func _run() -> void:
 		var mesh := rec_desk.get_node_or_null("ReceptionDeskMesh") as Node3D
 		if mesh == null:
 			errors.append("reception_desk.glb mesh missing")
-		elif absf(mesh.rotation_degrees.y + 90.0) > 4.0:
-			errors.append("reception desk mesh yaw %s, expected -90 so the sit/high-back faces the logo wall" % mesh.rotation_degrees.y)
+		elif absf(mesh.rotation_degrees.y - 90.0) > 4.0:
+			errors.append("reception desk mesh yaw %s, expected +90 so the sit-side faces the logo wall" % mesh.rotation_degrees.y)
 	var logo := level.get_node_or_null("FutureAssetSlots/Reception/AurumPlate") as MeshInstance3D
 	if logo == null:
 		errors.append("AURUM plate missing")

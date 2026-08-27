@@ -167,7 +167,7 @@ func _shot_level() -> void:
 		await process_frame
 	_save("locked-door-supply.png")
 	# Playtest pass — unique names so earlier Meshy stills stay.
-	_aim(level, Vector3(9.15, 1.45, 10.35), Vector3(10.20, 0.55, 8.40))
+	_aim(level, Vector3(10.48, 1.38, 10.25), Vector3(10.20, 0.55, 8.35))
 	for _j in 8:
 		await process_frame
 	_save("playtest-stalker-chase-path.png")
@@ -175,7 +175,7 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("playtest-alcove-cubicle.png")
-	_aim(level, Vector3(9.40, 1.45, 13.70), Vector3(8.50, 0.55, 15.20))
+	_aim(level, Vector3(9.55, 1.42, 13.55), Vector3(8.20, 0.45, 15.05))
 	for _j in 8:
 		await process_frame
 	_save("playtest-alcove-copy.png")

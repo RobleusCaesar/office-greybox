@@ -612,7 +612,8 @@ func _reception(level: Node3D) -> void:
 	var leather := _mat("res://materials/mat_leather.tres")
 	# Parent yaw 180: local −X is the sit-side (world east / logo wall). Receptionist
 	# sits with their back to the logo and faces the lobby. Counter height 0.86 m.
-	# GLB high-back is local +Z — yaw −90 on the mesh so that back faces the logo wall.
+	# GLB work surface / sit-side needs yaw +90 so it faces the logo wall (east).
+	# Receptionist sits on that side, back to the logo, looking into the lobby.
 	var desk := Node3D.new()
 	desk.name = "ReceptionDesk2"
 	desk.position = Vector3(24.55, 0.0, 11.50)
@@ -628,7 +629,7 @@ func _reception(level: Node3D) -> void:
 			inst.name = "ReceptionDeskMesh"
 			# Mesh AABB y −0.665..0.667. Sit on the floor; high back stays in the GLB.
 			inst.position = Vector3(0.0, 0.665, 0.0)
-			inst.rotation_degrees = Vector3(0, -90, 0)
+			inst.rotation_degrees = Vector3(0, 90, 0)
 			desk.add_child(inst)
 			var body := _box(desk, "ReceptionDesk", Vector3(1.16, 0.82, 1.88), Vector3(0.0, 0.41, 0.0), oak)
 			body.visible = false
