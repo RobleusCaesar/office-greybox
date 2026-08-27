@@ -20,13 +20,41 @@ func _run() -> void:
 		errors.append("jump action still present")
 	if not InputMap.has_action("interact"):
 		errors.append("missing interact action")
-	if not FileAccess.file_exists("res://textures/hero/title-street-fire.png"):
-		errors.append("title-street-fire.png missing")
+	var app_name := str(ProjectSettings.get_setting("application/config/name"))
+	if app_name != "HELLFALL":
+		errors.append("project name is %s, expected HELLFALL" % app_name)
+	var stretch_mode := str(ProjectSettings.get_setting("display/window/stretch/mode"))
+	if stretch_mode != "canvas_items":
+		errors.append("stretch mode is %s" % stretch_mode)
+	var stretch_aspect := str(ProjectSettings.get_setting("display/window/stretch/aspect"))
+	if stretch_aspect != "expand":
+		errors.append("stretch aspect is %s, expected expand" % stretch_aspect)
+	if not FileAccess.file_exists("res://textures/hero/title-17th-street.png"):
+		errors.append("title-17th-street.png missing")
+	if not FileAccess.file_exists("res://textures/hero/denver-fire-capitol-demon.png"):
+		errors.append("denver-fire-capitol-demon.png missing")
+	if not FileAccess.file_exists("res://textures/hero/aurum-logo.png"):
+		errors.append("aurum-logo.png missing")
 	if not FileAccess.file_exists("res://textures/hero/shotgun-walnut-steel.png"):
 		errors.append("shotgun-walnut-steel.png missing")
+	if not FileAccess.file_exists("res://audio/haunt_bed.wav"):
+		errors.append("haunt_bed.wav missing")
+	if not FileAccess.file_exists("res://audio/shotgun_fire.wav"):
+		errors.append("shotgun_fire.wav missing")
 	var title_src := FileAccess.get_file_as_string("res://scripts/title.gd")
 	if title_src.contains("denver-fire-vista"):
 		errors.append("title must not use denver-fire-vista")
+	if title_src.contains("backdrop.scale") or title_src.contains("func _process"):
+		errors.append("title Ken Burns / _process scale must be gone")
+	var title_scn := FileAccess.get_file_as_string("res://scenes/title.tscn")
+	if not title_scn.contains("title-17th-street.png"):
+		errors.append("title.tscn must use title-17th-street.png")
+	if not title_scn.contains("stretch_mode = 6"):
+		errors.append("title backdrop must be COVER (6)")
+	if not title_scn.contains("HELLFALL"):
+		errors.append("title wordmark must be HELLFALL")
+	if not title_scn.contains("Chapter 1: The Fall"):
+		errors.append("title tag missing")
 	var title_ps: PackedScene = load("res://scenes/title.tscn")
 	if title_ps == null:
 		errors.append("could not load title.tscn")
@@ -57,8 +85,15 @@ func _run() -> void:
 		errors.append("second demon must not exist")
 	if level.get_node_or_null("FutureAssetSlots/BreakRoom/BreakRoomTV") == null:
 		errors.append("break room TV missing")
-	if level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive") == null:
+	var dead_ex := level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive")
+	if dead_ex == null:
 		errors.append("dead executive missing")
+	elif dead_ex is Node3D:
+		var dp := (dead_ex as Node3D).position
+		if absf(dp.x - 32.0) > 1.2 or absf(dp.z - 11.5) > 1.4:
+			errors.append("dead executive at %s, expected ~32, 11.5" % dp)
+		if dp.z < 9.0:
+			errors.append("dead executive blocks the south-entry path")
 	var tv_src := FileAccess.get_file_as_string("res://scripts/tv.gd")
 	if not tv_src.contains("tv_not_a_test.png"):
 		errors.append("TV missing THIS IS NOT A TEST card")
@@ -74,8 +109,14 @@ func _run() -> void:
 			var tp := ""
 			if bm.albedo_texture:
 				tp = bm.albedo_texture.resource_path
-			if not tp.contains("denver-fire-vista"):
-				errors.append("diorama backdrop is %s, expected denver-fire-vista" % tp)
+			if not tp.contains("denver-fire-capitol-demon") and not tp.contains("denver-fire-vista"):
+				errors.append("diorama backdrop is %s, expected denver-fire-capitol-demon" % tp)
+		var faces := 0
+		for fn in ["Backdrop", "FaceN", "FaceS", "FaceFloor", "FaceRoof"]:
+			if dia.get_node_or_null(fn) != null:
+				faces += 1
+		if faces < 5:
+			errors.append("diorama missing city faces (%d/5)" % faces)
 		if dia.find_child("SmokeParticles", true, false) == null:
 			errors.append("diorama smoke particles missing")
 	var desk_n := level.get_node_or_null("FutureAssetSlots/CEOOffice/ExecutiveDesk")
@@ -106,6 +147,32 @@ func _run() -> void:
 	var env_node := level.get_node_or_null("WorldEnvironment") as WorldEnvironment
 	if env_node and env_node.environment and env_node.environment.sdfgi_enabled:
 		errors.append("SDFGI must stay off")
+	var nh := level.get_node_or_null("Architecture/Floors/NorthHallFloor") as CSGBox3D
+	if nh == null or nh.size.x < 2.95:
+		errors.append("north hall is not 3.0 m wide")
+	var eh := level.get_node_or_null("Architecture/Floors/EastHallFloor") as CSGBox3D
+	if eh == null or eh.size.z < 2.95:
+		errors.append("east hall is not 3.0 m wide")
+	var div := level.get_node_or_null("Architecture/Walls/ReceptionCEODivider") as CSGBox3D
+	if div == null:
+		errors.append("ReceptionCEODivider missing")
+	else:
+		if absf(div.position.x - 26.0) > 0.05:
+			errors.append("divider X is %s, expected 26" % div.position.x)
+		var z0 := div.position.z - div.size.z * 0.5
+		var z1 := div.position.z + div.size.z * 0.5
+		if z0 > 8.60 or z1 < 14.40:
+			errors.append("divider Z span %s–%s, expected 8.53–14.48" % [z0, z1])
+	var rec_desk := level.get_node_or_null("FutureAssetSlots/Reception/ReceptionDesk2") as Node3D
+	if rec_desk == null:
+		rec_desk = level.find_child("ReceptionDesk", true, false) as Node3D
+	var player_hud := level.get_node_or_null("Player")
+	if player_hud:
+		var mark := player_hud.find_child("TitleMark", true, false) as Label
+		if mark == null or mark.text != "HELLFALL":
+			errors.append("HUD TitleMark must be HELLFALL")
+	if level.get_node_or_null("HauntBed") == null:
+		errors.append("haunt bed loop missing")
 	var pane := level.get_node_or_null("FutureAssetSlots/CEOOffice/MoneyShotWindow/Pane_02") as CSGBox3D
 	if pane and pane.material is StandardMaterial3D:
 		if (pane.material as StandardMaterial3D).albedo_color.a > 0.35:

@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/title.gd" id="1_title"]
-[ext_resource type="Texture2D" path="res://textures/hero/title-street-fire.png" id="2_cover"]
+[ext_resource type="Texture2D" path="res://textures/hero/title-17th-street.png" id="2_cover"]
 [ext_resource type="Shader" path="res://shaders/title_veil.gdshader" id="3_veil"]
 [ext_resource type="Shader" path="res://shaders/title_flames.gdshader" id="4_flames"]
 [ext_resource type="Theme" path="res://themes/title.tres" id="5_theme"]
@@ -48,7 +48,7 @@ grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("2_cover")
 expand_mode = 1
-stretch_mode = 5
+stretch_mode = 6
 
 [node name="Veil" type="ColorRect" parent="."]
 layout_mode = 1
@@ -63,13 +63,9 @@ color = Color(1, 1, 1, 1)
 
 [node name="Flames" type="ColorRect" parent="."]
 layout_mode = 1
-anchors_preset = 0
-anchor_left = 0.08
-anchor_top = 0.42
-anchor_right = 0.5
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 0.0
-offset_bottom = 0.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -106,23 +102,17 @@ theme_override_colors/font_shadow_color = Color(0.02, 0.01, 0.01, 0.7)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
 theme_override_fonts/font = SubResource("TitleLetters")
-theme_override_font_sizes/font_size = 44
-text = "THE WINDOW"
+theme_override_font_sizes/font_size = 58
+text = "HELLFALL"
 horizontal_alignment = 0
 vertical_alignment = 1
-
-[node name="Rule" type="ColorRect" parent="UI/VBox"]
-custom_minimum_size = Vector2(168, 1)
-layout_mode = 2
-size_flags_horizontal = 0
-color = Color(0.72, 0.4, 0.16, 0.92)
 
 [node name="Tag" type="Label" parent="UI/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.84, 0.74, 0.86)
 theme_override_fonts/font = SubResource("TagLetters")
-theme_override_font_sizes/font_size = 13
-text = "a city on fire"
+theme_override_font_sizes/font_size = 14
+text = "Chapter 1: The Fall"
 horizontal_alignment = 0
 
 [node name="SpacerTop" type="Control" parent="UI/VBox"]

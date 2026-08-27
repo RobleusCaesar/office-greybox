@@ -28,6 +28,7 @@ func _ready() -> void:
 	_sting_player.stream = load("res://audio/window_sting.wav")
 	_sting_player.volume_db = -3.0
 	add_child(_sting_player)
+	_start_haunt()
 	if _player:
 		_player.died.connect(_on_player_died)
 	if _window_light:
@@ -48,6 +49,24 @@ func _process(delta: float) -> void:
 			_show_win()
 	else:
 		_win_time = 0.0
+
+
+func _start_haunt() -> void:
+	if not FileAccess.file_exists("res://audio/haunt_bed.wav"):
+		return
+	var bed := AudioStreamPlayer.new()
+	bed.name = "HauntBed"
+	var stream := load("res://audio/haunt_bed.wav")
+	if stream is AudioStreamWAV:
+		var wav := stream as AudioStreamWAV
+		wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		wav.loop_begin = 0
+		wav.loop_end = wav.data.size() / 2
+	bed.stream = stream
+	bed.volume_db = -24.0
+	bed.autoplay = true
+	add_child(bed)
+	bed.play()
 
 
 func _player_at_window() -> bool:
@@ -148,7 +167,7 @@ func _build_overlays() -> void:
 	menu_d.pressed.connect(_menu)
 	_death_ui.visible = false
 
-	_win_ui = _card(layer, "THE WINDOW")
+	_win_ui = _card(layer, "HELLFALL")
 	var sub := Label.new()
 	sub.text = "Denver is burning."
 	_style_title(sub, 18, Color(0.82, 0.55, 0.32, 0.95))

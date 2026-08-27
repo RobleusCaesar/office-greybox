@@ -31,12 +31,15 @@ float fbm(vec2 p) {
 
 void fragment() {
 	vec2 uv = SCREEN_UV;
-	vec2 fire_c = vec2(0.30, 0.72);
-	vec2 d = (uv - fire_c) / vec2(0.22, 0.28);
+	// Far-center fire at the end of 17th. Spare the 17TH ST sign and the wordmark.
+	vec2 fire_c = vec2(0.50, 0.44);
+	vec2 d = (uv - fire_c) / vec2(0.11, 0.15);
 	float ellipse = 1.0 - clamp(dot(d, d), 0.0, 1.0);
+	float spare_sign = 1.0 - smoothstep(0.70, 0.78, uv.x) * smoothstep(0.22, 0.72, uv.y);
+	float spare_mark = smoothstep(0.20, 0.36, uv.x);
 	vec3 base = texture(screen_tex, uv).rgb;
 	float warmth = smoothstep(0.28, 0.62, base.r) * smoothstep(0.22, 0.08, base.b) * smoothstep(0.15, 0.45, base.g);
-	float gate = ellipse * warmth;
+	float gate = ellipse * warmth * spare_sign * spare_mark;
 	float n = fbm(uv * 9.0 + vec2(0.0, -TIME * 0.55));
 	vec2 warp = vec2(
 		(fbm(uv * 7.0 + TIME * 0.35) - 0.5) * 0.012,

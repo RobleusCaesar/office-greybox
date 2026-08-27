@@ -8,6 +8,9 @@ func _process(delta: float) -> void:
 		if not (c is Node3D):
 			continue
 		var n := c as Node3D
+		# Keep every FX quad behind the glass (world X >= 38.2).
+		if n.global_position.x < 38.2:
+			n.global_position.x = 38.2
 		if n.name.begins_with("Fire"):
 			var s := 1.0 + 0.12 * sin(t * 7.0 + n.position.z)
 			n.scale = Vector3(s, 1.0 + 0.18 * sin(t * 5.5 + n.position.z * 0.4), s)

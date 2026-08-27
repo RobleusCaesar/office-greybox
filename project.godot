@@ -1,12 +1,12 @@
 ; Engine configuration file.
-; THE WINDOW — Godot 4.7 playable loop. Compatibility renderer for Web.
+; HELLFALL — Godot 4.7 playable loop. Compatibility renderer for Web.
 ; Founder: Rob Carpenter
 
 config_version=5
 
 [application]
 
-config/name="The Window"
+config/name="HELLFALL"
 config/description="Luxury office. Denver is on fire. First-person loop for Rob Carpenter."
 run/main_scene="res://scenes/title.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
@@ -16,6 +16,7 @@ config/features=PackedStringArray("4.3", "GL Compatibility")
 window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [input]
 

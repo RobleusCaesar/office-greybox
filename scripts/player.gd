@@ -283,6 +283,38 @@ func _fire_hitscan(pellets: int, spread: float, max_range: float, damage: float,
 		var collider: Object = hit.collider
 		if collider and collider.has_method("take_damage"):
 			collider.take_damage(damage * scale, hit.position, hit.normal)
+		_spawn_splat(hit.position, hit.normal)
+
+
+func _spawn_splat(pos: Vector3, nrm: Vector3) -> void:
+	# Crimson alpha quads. No orange hit cubes.
+	var mi := MeshInstance3D.new()
+	mi.name = "BloodSplat"
+	var q := QuadMesh.new()
+	q.size = Vector2(0.20, 0.20)
+	mi.mesh = q
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.38, 0.02, 0.05, 0.82)
+	mat.albedo_texture = load("res://textures/tex_blood.png")
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.roughness = 0.72
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mi.material_override = mat
+	var host: Node = get_parent()
+	if host == null:
+		host = self
+	host.add_child(mi)
+	mi.global_position = pos + nrm.normalized() * 0.012
+	var up := nrm.normalized() if nrm.length() > 0.01 else Vector3.UP
+	var tmp := Vector3.RIGHT if absf(up.dot(Vector3.UP)) > 0.92 else Vector3.UP
+	var xaxis := up.cross(tmp).normalized()
+	var yaxis := xaxis.cross(up).normalized()
+	mi.global_transform.basis = Basis(xaxis, yaxis, up)
+	var tw := create_tween()
+	tw.tween_interval(18.0)
+	tw.tween_property(mat, "albedo_color:a", 0.0, 2.4)
+	tw.tween_callback(mi.queue_free)
 
 
 func _set_weapon(which: int) -> void:
@@ -455,8 +487,20 @@ func _build_hud() -> void:
 	_hud_weapon = _label(root, "SHOTGUN", Vector2(0, 0), Vector2(280, 28), 16, HORIZONTAL_ALIGNMENT_RIGHT)
 	_dock(root, _hud_weapon, false, -96, 16)
 
-	var hint := _label(root, "LMB fire   R reload   E ammo   Space crouch   1/2 weapons   Esc release", Vector2(24, 16), Vector2(980, 28), 14, HORIZONTAL_ALIGNMENT_LEFT)
+	var hint := _label(root, "WASD move · Mouse look · LMB fire · R reload · 1 shotgun · 2 pistol · Space crouch · E use · Esc release", Vector2(24, 16), Vector2(980, 28), 14, HORIZONTAL_ALIGNMENT_LEFT)
 	hint.modulate = Color(1, 1, 1, 0.7)
+	var mark := _label(root, "HELLFALL", Vector2(0, 0), Vector2(280, 28), 16, HORIZONTAL_ALIGNMENT_RIGHT)
+	mark.name = "TitleMark"
+	mark.add_theme_color_override("font_color", Color(0.93, 0.88, 0.78, 0.92))
+	mark.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	mark.anchor_left = 1.0
+	mark.anchor_right = 1.0
+	mark.anchor_top = 0.0
+	mark.anchor_bottom = 0.0
+	mark.offset_left = -300
+	mark.offset_right = -24
+	mark.offset_top = 16
+	mark.offset_bottom = 44
 	_hud_prompt = _label(root, "E  take ammo", Vector2(0, 0), Vector2(240, 32), 18, HORIZONTAL_ALIGNMENT_CENTER)
 	_hud_prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	_hud_prompt.anchor_left = 0.5
