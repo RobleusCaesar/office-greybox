@@ -289,14 +289,17 @@ func _breakroom(level: Node3D) -> void:
 	_instance_glb(br, "res://models/refrigerator_open.glb", "RefrigeratorOpen", Vector3(6.40, 0.952, 0.65), Vector3(0, 0, 0), Vector3.ONE)
 	# Lunch table: mesh AABB y −0.533..0.533, height 1.07. Scale 0.72 → ~0.76 m top so the cup / papers still sit.
 	_instance_glb(br, "res://models/kitchen_lunch_table.glb", "KitchenLunchTable", Vector3(3.50, 0.384, 3.70), Vector3(0, 0, 0), Vector3(0.72, 0.72, 0.72))
-	# Fallen guard — NW corner (doorway wall × crawl-hole wall). Lie as authored so
-	# the back is on the carpet (a 90° roll arched the torso and read as floating).
-	# Yaw tucks the shoulder into the north plaster; X keeps him on the west wall.
-	var guard := _instance_glb(br, "res://models/fallen_security_guard.glb", "FallenSecurityGuard", Vector3(0.70, 0.48, 5.46), Vector3(0, 14, 0), Vector3.ONE)
+	# Fallen guard — collapsed against the west (vent) wall in the NW corner.
+	# Authored sit faces +Z / length along Z. Yaw 90 puts his back on the plaster
+	# and the body into the room — not floating mid-carpet. Do not roll 90° on X.
+	var guard := _instance_glb(br, "res://models/fallen_security_guard.glb", "FallenSecurityGuard", Vector3(1.02, 0.48, 5.88), Vector3(0, 90, 0), Vector3.ONE)
 	_seat_on_floor(guard)
 	# Authored sit/slump leaves a visible air gap once AABB-seated — plant him.
 	guard.position.y -= 0.14
 	_box_collision(guard, Vector3(0.70, 0.36, 1.70), Vector3(0.0, 0.0, 0.0))
+	# Bigger / horizontal puddle (blood_decal_1) on the floor under him. Not the drip.
+	# Mesh is 1.87 × 1.88 × 0.27 standing — pitch 90 so the 0.27 axis is up.
+	_instance_glb(br, "res://models/blood_decal_1.glb", "GuardBloodPuddle", Vector3(1.02, 0.136, 5.88), Vector3(90, 90, 0), Vector3.ONE)
 	# Cubicle keyboard + reception desk parts
 	var hall := _find(level, "FutureAssetSlots/EastHall")
 	if hall:
@@ -402,7 +405,8 @@ func _intro_closet(level: Node3D) -> void:
 	_floor_cartons(ic)
 	# Mop: east wall, RIGHT of the vent mouth (south). Scale 0.50 → ~0.95 m. load() only.
 	# Mesh AABB y −0.952..0.951, 1.64 × 1.90 × 1.27. Do not block the crawl hole or the aisle.
-	var mop := _instance_glb(ic, "res://models/mop_and_bucket.glb", "MopAndBucket", Vector3(-3.04, 0.476, 2.02), Vector3(0, 90, 0), Vector3(0.50, 0.50, 0.50))
+	# Last pose locked. Yaw 270 = previous 90 flipped 180° in place. Do not move rooms.
+	var mop := _instance_glb(ic, "res://models/mop_and_bucket.glb", "MopAndBucket", Vector3(-3.04, 0.476, 2.02), Vector3(0, 270, 0), Vector3(0.50, 0.50, 0.50))
 	_box_collision(mop, Vector3(0.42, 0.90, 0.52), Vector3(0.0, 0.0, 0.0))
 	var br := _find(level, "FutureAssetSlots/BreakRoom")
 	if br:
@@ -614,6 +618,10 @@ func _bathroom(level: Node3D) -> void:
 	var women := _tex_mat("res://textures/decal_women.png", Color.WHITE, 0.5)
 	women.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	_quad(level, "WomenDecal", Vector2(0.28, 0.28), Vector3(4.88, 1.55, 8.50), Vector3(0, 90, 0), women)
+	# Vertical drip (blood_decal_2 is the thin 1.90 m wall sheet). East bathroom
+	# wall — perpendicular to the urinals, opposite the stall run, north of the door cut.
+	# Yaw −90 faces the stain into the room. Do not put this under the guard.
+	_instance_glb(bath, "res://models/blood_decal_2.glb", "BathroomBloodDrip", Vector3(1.898, 1.10, 11.15), Vector3(0, -90, 0), Vector3.ONE)
 
 
 func _oak_mat() -> StandardMaterial3D:
@@ -701,7 +709,6 @@ func _dread(level: Node3D) -> void:
 	level.add_child(root)
 	var paper := _mat("res://materials/mat_paper.tres")
 	var blood := _mat("res://materials/mat_blood.tres")
-	var wood := _mat("res://materials/mat_wood.tres")
 	var glass := _mat("res://materials/mat_clear_glass.tres")
 	# Scattered papers
 	var papers := [
@@ -713,13 +720,15 @@ func _dread(level: Node3D) -> void:
 	for p in papers:
 		_box(root, "Paper_%d" % i, Vector3(0.22, 0.005, 0.16), p, paper, Vector3(0, float(i * 23), 0), false)
 		i += 1
-	# Fallen door stood as wreckage at the bathroom opening (south jamb). Hall stays walkable.
+	# Broken door INSIDE the bathroom at the south jamb — not a greybox slab in the hall frame.
+	# Mesh is already lying flat (1.90 × 0.11 × 0.99). Hall-side opening stays an opening.
 	var fallen := Node3D.new()
 	fallen.name = "FallenDoor"
-	fallen.position = Vector3(1.74, 0.0, 8.46)
-	fallen.rotation_degrees = Vector3(0, 6, 0)
+	fallen.position = Vector3(0.88, 0.0, 7.68)
+	fallen.rotation_degrees = Vector3(0, 16, 0)
 	root.add_child(fallen)
-	_box(fallen, "Slab", Vector3(0.08, 1.86, 0.90), Vector3(0.02, 0.72, 0.10), wood, Vector3(12, 0, -18))
+	var broken := _instance_glb(fallen, "res://models/broken_door.glb", "BrokenDoor", Vector3(0.0, 0.055, 0.0), Vector3.ZERO, Vector3.ONE)
+	_box_collision(broken, Vector3(1.70, 0.12, 0.88), Vector3(0.0, 0.0, 0.0))
 	# Glass shards in EAST HALL only (not money-shot)
 	for j in 7:
 		var gx := 10.5 + j * 0.55
@@ -805,6 +814,12 @@ func _ceo(level: Node3D) -> void:
 	_quad(ceo, "PaintingPlant", Vector2(0.62, 0.78), Vector3(35.15, 1.70, 6.65), Vector3.ZERO, denver)
 	_box(ceo, "FrameWest", Vector3(0.55, 0.7, 0.04), Vector3(27.2, 1.7, 14.2), wood, Vector3(0, 90, 0), false)
 	_quad(ceo, "PaintingWest", Vector2(0.48, 0.62), Vector3(27.23, 1.7, 14.2), Vector3(0, 90, 0), paint)
+	# Couch + coffee table set on the west wall that backs the secretary desk.
+	# Authored long axis is X (1.90). Yaw 90 runs the bigger couch along the divider
+	# facing the window. Scale 1.48 → ~0.81 m sofa height (human, not dollhouse/stage).
+	# Stays west of the CEO body at (32.05, 0.27, 11.45) and clear of the window walk.
+	var couches := _instance_glb(ceo, "res://models/CEO_couch_coffee_table.glb", "CeoCouchSet", Vector3(27.48, 0.403, 11.50), Vector3(0, 90, 0), Vector3(1.48, 1.48, 1.48))
+	_box_collision(couches, Vector3(2.40, 0.72, 2.70), Vector3(0.0, 0.0, 0.0))
 	# Dead executive — mid-office, visible from the south door, window ahead.
 	_build_ceo_body(ceo)
 
@@ -1242,7 +1257,8 @@ func _fix_floors(level: Node3D) -> void:
 
 
 func _flush_hall(level: Node3D) -> void:
-	# Bathroom long walls were 8.66 m and stabbed 0.58 m into the 3 m hall.
+	# Baked into level.tscn (BathroomSouth/North end at X=1.92, conference at Z=10.50).
+	# Keep this as a fail-safe so a stale scene cannot grow a hall ridge again.
 	for p in ["Architecture/Walls/BathroomSouth", "Architecture/Walls/BathroomNorth"]:
 		var w := _find(level, p) as CSGBox3D
 		if w:

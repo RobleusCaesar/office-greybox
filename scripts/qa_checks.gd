@@ -71,6 +71,8 @@ func _run() -> void:
 		"refrigerator_open.glb", "kitchen_lunch_table.glb",
 		"bathroom_vanity.glb", "toiletbowl.glb", "closed_door.glb",
 		"closed_elevator.glb", "mop_and_bucket.glb",
+		"broken_door.glb", "CEO_couch_coffee_table.glb",
+		"blood_decal_1.glb", "blood_decal_2.glb",
 	]:
 		if not FileAccess.file_exists("res://models/%s" % glb_name):
 			errors.append("%s missing" % glb_name)
@@ -158,7 +160,9 @@ func _run() -> void:
 	var br_west := level.get_node_or_null("Architecture/Walls/BreakRoomWest") as CSGBox3D
 	if ic_east == null:
 		errors.append("IntroClosetEast missing — closet must not share BreakRoomWest")
-	elif br_west:
+	elif absf(ic_east.position.x + 2.66) > 0.08:
+		errors.append("IntroClosetEast at X %s, expected -2.66" % ic_east.position.x)
+	if ic_east and br_west:
 		if absf(ic_east.position.x - br_west.position.x) < 2.0:
 			errors.append("closet east wall still shares BreakRoomWest (X %s vs %s)" % [ic_east.position.x, br_west.position.x])
 		var kitchen_west_face := br_west.position.x - br_west.size.x * 0.5
@@ -303,6 +307,14 @@ func _run() -> void:
 		errors.append("dressing must instance closed_elevator.glb")
 	if not dress_src.contains("mop_and_bucket.glb"):
 		errors.append("dressing must instance mop_and_bucket.glb")
+	if not dress_src.contains("broken_door.glb"):
+		errors.append("dressing must instance broken_door.glb")
+	if not dress_src.contains("CEO_couch_coffee_table.glb"):
+		errors.append("dressing must instance CEO_couch_coffee_table.glb")
+	if not dress_src.contains("blood_decal_1.glb"):
+		errors.append("dressing must instance blood_decal_1.glb under the guard")
+	if not dress_src.contains("blood_decal_2.glb"):
+		errors.append("dressing must instance blood_decal_2.glb on the bathroom wall")
 	if dress_src.contains("TODO: wire models/closed_elevator") or dress_src.contains("TODO: wire models/mop_and_bucket"):
 		errors.append("elevator / mop TODOs must be dropped once instanced")
 	if dress_src.contains("FileAccess.file_exists(\"res://models/ceo_dead") \
@@ -314,7 +326,10 @@ func _run() -> void:
 			or dress_src.contains("FileAccess.file_exists(\"res://models/fallen_security") \
 			or dress_src.contains("FileAccess.file_exists(\"res://models/closed_door") \
 			or dress_src.contains("FileAccess.file_exists(\"res://models/closed_elevator") \
-			or dress_src.contains("FileAccess.file_exists(\"res://models/mop_and"):
+			or dress_src.contains("FileAccess.file_exists(\"res://models/mop_and") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/broken_door") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/CEO_couch") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/blood_decal"):
 		errors.append("new Meshy glbs must load() without exists-gate")
 	if dress_src.contains("FileAccess.file_exists(\"res://textures/hero/tex-light-oak") \
 			or dress_src.contains("FileAccess.file_exists(\"res://textures/hero/denver-fire"):
@@ -388,10 +403,19 @@ func _run() -> void:
 				errors.append("guard at %s is not leaned in the NW doorway×vent corner" % guard.position)
 			if guard.position.y < 0.20 or guard.position.y > 0.70:
 				errors.append("guard Y %s — must sit on the floor, not float" % guard.position.y)
+			if absf(guard.rotation_degrees.y - 90.0) > 12.0:
+				errors.append("guard yaw %s — back must sit on the west wall (yaw ~90)" % guard.rotation_degrees.y)
 			if absf(guard.position.x - 3.5) < 0.80 and guard.position.z > 5.8:
 				errors.append("guard blocks the north doorway")
 			if guard.position.z > 2.70 and guard.position.z < 3.70 and guard.position.x < 0.55:
 				errors.append("guard blocks the west vent crawl")
+	var guard_puddle := level.get_node_or_null("FutureAssetSlots/BreakRoom/GuardBloodPuddle") as Node3D
+	if guard_puddle == null:
+		errors.append("bigger blood puddle (blood_decal_1) missing under the guard")
+	elif absf(guard_puddle.position.x - 1.02) > 0.35 or absf(guard_puddle.position.z - 5.88) > 0.45:
+		errors.append("guard puddle at %s is not under the guard" % guard_puddle.position)
+	elif absf(guard_puddle.rotation_degrees.x) < 70.0:
+		errors.append("guard puddle is not laid flat on the floor")
 	for ch_name in ["BreakRoomChair_01", "BreakRoomChair_02", "BreakRoomChair_03", "BreakRoomChair_04"]:
 		var ch := level.get_node_or_null("FutureAssetSlots/BreakRoom/%s" % ch_name)
 		if ch is GeometryInstance3D and (ch as GeometryInstance3D).visible:
@@ -423,10 +447,41 @@ func _run() -> void:
 				errors.append("mop blocks the crawl vent mouth (Z %s)" % mop.position.z)
 			if mop.position.x < -5.50:
 				errors.append("mop blocks the closet aisle")
+			if absf(mop.position.x + 3.04) > 0.04 or absf(mop.position.z - 2.02) > 0.04:
+				errors.append("mop moved from locked pose (-3.04, 0.476, 2.02) to %s" % mop.position)
+			var mop_yaw := mop.rotation_degrees.y
+			while mop_yaw < 0.0:
+				mop_yaw += 360.0
+			while mop_yaw >= 360.0:
+				mop_yaw -= 360.0
+			if absf(mop_yaw - 270.0) > 8.0:
+				errors.append("mop yaw %s — expected 270 (180° flip from 90)" % mop.rotation_degrees.y)
 	if level.get_node_or_null("FutureAssetSlots/EastHall/LockedDoor_DeadOffice/ClosedDoor") == null:
 		errors.append("dead-office lock must instance closed_door.glb")
 	if level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive/CeoDeadMesh") == null:
 		errors.append("CEO must instance ceo_dead2.glb")
+	if level.get_node_or_null("FutureAssetSlots/CEOOffice/CeoCouchSet") == null:
+		errors.append("CEO office missing CEO_couch_coffee_table.glb")
+	else:
+		var couches := level.get_node_or_null("FutureAssetSlots/CEOOffice/CeoCouchSet") as Node3D
+		if couches:
+			if couches.position.x < 26.20 or couches.position.x > 30.40:
+				errors.append("couches at %s are not on the wall backing the secretary desk" % couches.position)
+			if couches.position.x > 31.20:
+				errors.append("couches overlap the CEO body")
+			if couches.scale.x < 1.20 or couches.scale.x > 1.80:
+				errors.append("couch scale %s is dollhouse or stage, not human furniture" % couches.scale)
+	if level.get_node_or_null("FutureAssetSlots/Bathroom/BathroomBloodDrip") == null:
+		errors.append("bathroom drip stain (blood_decal_2) missing")
+	else:
+		var drip := level.get_node_or_null("FutureAssetSlots/Bathroom/BathroomBloodDrip") as Node3D
+		if drip:
+			if drip.position.x < 1.70 or drip.position.x > 2.05:
+				errors.append("drip at %s is not on the empty east bathroom wall" % drip.position)
+			if drip.position.z < 10.20 or drip.position.z > 12.40:
+				errors.append("drip at %s is not opposite the stalls / north of the door" % drip.position)
+			if absf(drip.rotation_degrees.x) > 20.0:
+				errors.append("drip was laid on the floor — it must stay vertical on the wall")
 	var sg_player := level.get_node_or_null("Player")
 	if sg_player and sg_player.find_child("ShotgunMesh", true, false) == null:
 		errors.append("hero shotgun must instance shotgun.glb as ShotgunMesh")
@@ -559,6 +614,15 @@ func _run() -> void:
 		errors.append("hero_shotgun must load() shotgun.glb without exists-gate")
 	if not vm_src.contains("WeddingBand") or not vm_src.contains("HandL") or not vm_src.contains("HandR"):
 		errors.append("hero_shotgun must still build tanned hands + wedding band")
+	var enemy_src := FileAccess.get_file_as_string("res://scripts/enemy.gd")
+	if enemy_src.contains("FileAccess.file_exists"):
+		errors.append("enemy must load() abyssal_stalker.glb without FileAccess.file_exists")
+	var ember_src := FileAccess.get_file_as_string("res://scripts/ember.gd")
+	if ember_src.contains("FileAccess.file_exists"):
+		errors.append("ember must load() ember_demon.glb without FileAccess.file_exists")
+	var export_cfg := FileAccess.get_file_as_string("res://export_presets.cfg")
+	if not export_cfg.contains("models/ceo_dead.glb"):
+		errors.append("unused ceo_dead.glb must be excluded from the web pack")
 	if not vm_src.contains("_show_hands"):
 		errors.append("hero_shotgun must keep hands visible on the Meshy mesh")
 	var player_src_vm := FileAccess.get_file_as_string("res://scripts/player.gd")
@@ -798,13 +862,15 @@ func _check_playtest_pass(level: Node, errors: PackedStringArray) -> void:
 		errors.append("FallenDoor missing")
 	else:
 		var fp := fallen.global_position
-		if fp.x < 1.20 or fp.x > 2.05 or fp.z < 7.90 or fp.z > 9.20:
-			errors.append("FallenDoor at %s is not stood at the bathroom doorway" % fp)
-		if fp.x > 2.15 and fp.z > 8.0 and fp.z < 11.0:
-			errors.append("FallenDoor still blocks the north hall")
+		if fp.x > 1.70 or fp.z > 8.20 or fp.z < 7.20:
+			errors.append("FallenDoor at %s is not lying inside at the south jamb" % fp)
+		if fp.x > 2.00:
+			errors.append("FallenDoor still occupies the hall frame")
+		if fallen.get_node_or_null("BrokenDoor") == null:
+			errors.append("FallenDoor must instance broken_door.glb as BrokenDoor")
 		var slab := fallen.get_node_or_null("Slab") as Node3D
-		if slab and slab.position.y < 0.30:
-			errors.append("FallenDoor is still flat on the floor, not stood at the opening")
+		if slab and slab is GeometryInstance3D and (slab as GeometryInstance3D).visible:
+			errors.append("greybox FallenDoor Slab is still visible in the bathroom frame")
 	var logo := level.get_node_or_null("FutureAssetSlots/Reception/AurumPlate") as MeshInstance3D
 	if logo == null or not logo.visible:
 		errors.append("logo node must be visible")
@@ -939,6 +1005,15 @@ func _check_playtest_fix2(level: Node, errors: PackedStringArray) -> void:
 	var glass := level.get_node_or_null("FutureAssetSlots/EastHall/DeadOfficeGlass") as Node3D
 	if glass and absf(glass.position.z - 10.50) > 0.08:
 		errors.append("conference glass at Z %s still leaks into the hall" % glass.position.z)
+	var cub_cut := level.get_node_or_null("Architecture/Walls/EastHallSouth/CubicleOpeningCut") as CSGBox3D
+	if cub_cut == null or cub_cut.operation != 2:
+		errors.append("cubicle alcove cut missing or not a hole")
+	var copy_cut := level.get_node_or_null("Architecture/Walls/EastHallNorth/CopyOpeningCut") as CSGBox3D
+	if copy_cut == null or copy_cut.operation != 2:
+		errors.append("copy alcove cut missing or not a hole")
+	var bath_cut := level.get_node_or_null("Architecture/Walls/NorthHallWest/BathroomDoorCut") as CSGBox3D
+	if bath_cut == null or bath_cut.operation != 2:
+		errors.append("bathroom hall doorway cut missing — opening must stay an opening")
 	var hall_map := level.get_node_or_null("WallDressing/HallMapFrame") as Node3D
 	if hall_map and hall_map.global_position.z > 10.70:
 		errors.append("HallMap still floats in the east-hall lane (Z %s)" % hall_map.global_position.z)

@@ -327,10 +327,10 @@ func _spawn_spray(pos: Vector3, nrm: Vector3) -> void:
 
 
 func _instance_visual() -> void:
-	if FileAccess.file_exists(GLB_PATH) or ResourceLoader.exists(GLB_PATH):
-		var packed := load(GLB_PATH) as PackedScene
-		if packed:
-			_visual = packed.instantiate() as Node3D
+	# load() only — packed-res FileAccess probes lie on HTML5.
+	var packed := load(GLB_PATH) as PackedScene
+	if packed:
+		_visual = packed.instantiate() as Node3D
 	if _visual:
 		_visual.name = "EmberDemon"
 		_visual.scale = Vector3(VISUAL_SCALE, VISUAL_SCALE, VISUAL_SCALE)
@@ -374,8 +374,10 @@ func _build_placeholder() -> void:
 func _mat(tex_path: String, color: Color, rough: float, emit: float) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.albedo_color = color
-	if tex_path != "" and (FileAccess.file_exists(tex_path) or ResourceLoader.exists(tex_path)):
-		m.albedo_texture = load(tex_path)
+	if tex_path != "":
+		var tex: Texture2D = load(tex_path)
+		if tex:
+			m.albedo_texture = tex
 	m.roughness = rough
 	if emit > 0.0:
 		m.emission_enabled = true
