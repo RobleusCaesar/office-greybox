@@ -2215,10 +2215,10 @@ omni_range = 3.200
 omni_attenuation = 1.150
 
 [node name="CEOLight" type="OmniLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.5000, 2.7000, 11.5000)
-editor_description = "Modest CEO fill. WindowLight still wins."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.0500, 2.4000, 11.4500)
+editor_description = "Modest CEO fill so the mid-office body reads. WindowLight still wins."
 light_color = Color(0.95, 0.88, 0.78, 1)
-light_energy = 1.400
+light_energy = 2.100
 light_specular = 0.30
 shadow_enabled = false
 omni_range = 8.000
