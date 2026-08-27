@@ -257,6 +257,31 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("fix2-elevator.png")
+	# Founder pass 3 — mop yaw, guard+puddle on the wall, hall opening, new door, drip, couches.
+	_aim(level, Vector3(-4.40, 1.20, 3.25), Vector3(-2.90, 0.40, 2.40))
+	for _j in 8:
+		await process_frame
+	_save("fix3-mop-yaw-flip.png")
+	_aim(level, Vector3(2.15, 1.28, 4.40), Vector3(0.55, 0.18, 5.85))
+	for _j in 8:
+		await process_frame
+	_save("fix3-guard-wall-puddle.png")
+	_aim(level, Vector3(3.50, 1.50, 11.20), Vector3(2.00, 1.05, 9.00))
+	for _j in 8:
+		await process_frame
+	_save("fix3-hall-bath-opening.png")
+	_aim(level, Vector3(1.35, 1.20, 9.10), Vector3(0.70, 0.12, 7.55))
+	for _j in 8:
+		await process_frame
+	_save("fix3-broken-door-south-jamb.png")
+	_aim(level, Vector3(0.20, 1.35, 10.20), Vector3(1.90, 1.10, 11.15))
+	for _j in 8:
+		await process_frame
+	_save("fix3-bathroom-drip-wall.png")
+	_aim(level, Vector3(31.40, 1.35, 11.50), Vector3(27.40, 0.45, 11.50))
+	for _j in 8:
+		await process_frame
+	_save("fix3-ceo-couches.png")
 	var hud3 := level.get_node_or_null("Player/HUD") as CanvasLayer
 	if hud3:
 		hud3.visible = false

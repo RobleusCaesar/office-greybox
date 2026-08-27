@@ -321,10 +321,7 @@ func _spawn_spray(pos: Vector3, nrm: Vector3) -> void:
 
 
 func _instance_glb() -> void:
-	if not FileAccess.file_exists(GLB_PATH) and not ResourceLoader.exists(GLB_PATH):
-		push_error("BLOCKED: missing abyssal_stalker.glb")
-		print("BLOCKED: missing abyssal_stalker.glb")
-		return
+	# load() only — packed-res FileAccess probes lie on HTML5.
 	var packed := load(GLB_PATH) as PackedScene
 	if packed == null:
 		push_error("BLOCKED: missing abyssal_stalker.glb")
