@@ -13,6 +13,9 @@ func apply(level: Node3D) -> void:
 	_diorama(level)
 	_ammo(level)
 	_emergency(level)
+	_locked_doors(level)
+	# TODO: wire models/closed_elevator.glb when it lands on main — replaces the existing elevator door, not a hall door.
+	# TODO: wire models/mop_and_bucket.glb when it lands on main — IntroCloset, wall LEFT or RIGHT of the vent mouth (east wall). Do not block the crawl hole or the aisle.
 
 
 func _mat(path: String) -> Material:
@@ -209,6 +212,11 @@ func _texture_existing(level: Node3D) -> void:
 		"FutureAssetSlots/Reception/BadgeNiche",
 		"FutureAssetSlots/Reception/BadgeCard",
 	])
+	# Hide CSG stand-ins that Rob's Meshy GLBs replace. Keep collision footprints.
+	_hide_visual(_find(level, "FutureAssetSlots/BreakRoom/Fridge"))
+	_hide_visual(_find(level, "FutureAssetSlots/BreakRoom/FridgeHandle"))
+	_hide_visual(_find(level, "FutureAssetSlots/BreakRoom/BreakRoomTable"))
+	_hide_visual(_find(level, "FutureAssetSlots/BreakRoom/TablePedestal"))
 	_reception(level)
 	_paint_remaining(level)
 
@@ -220,6 +228,13 @@ func _hide_csg(level: Node3D, paths: Array) -> void:
 			var c := n as CSGPrimitive3D
 			c.visible = false
 			c.use_collision = false
+
+
+func _hide_visual(n: Node) -> void:
+	if n is GeometryInstance3D:
+		(n as GeometryInstance3D).visible = false
+	elif n is Node3D:
+		(n as Node3D).visible = false
 
 
 func _paint_remaining(n: Node) -> void:
@@ -260,15 +275,22 @@ func _breakroom(level: Node3D) -> void:
 	_box(br, "Drawer_02", Vector3(0.55, 0.14, 0.04), Vector3(2.2, 0.35, 0.74), wood)
 	_box(br, "DrawerPull_01", Vector3(0.16, 0.02, 0.03), Vector3(1.4, 0.35, 0.78), metal, Vector3.ZERO, false)
 	_box(br, "DrawerPull_02", Vector3(0.16, 0.02, 0.03), Vector3(2.2, 0.35, 0.78), metal, Vector3.ZERO, false)
-	# Extra fridge handle bar
-	_box(br, "FridgeHandleBar", Vector3(0.03, 0.7, 0.04), Vector3(6.02, 1.15, 0.48), metal, Vector3.ZERO, false)
+	# load() only — do not exists-gate. Open-door fridge on the kitchenette footprint.
+	# Mesh AABB y −0.953..0.951, depth 1.30 (door open). Seat on the floor at the old fridge.
+	_instance_glb(br, "res://models/refrigerator_open.glb", "RefrigeratorOpen", Vector3(6.40, 0.952, 0.65), Vector3(0, 0, 0), Vector3.ONE)
+	# Lunch table: mesh AABB y −0.533..0.533, height 1.07. Scale 0.72 → ~0.76 m top so the cup / papers still sit.
+	_instance_glb(br, "res://models/kitchen_lunch_table.glb", "KitchenLunchTable", Vector3(3.50, 0.384, 3.70), Vector3(0, 0, 0), Vector3(0.72, 0.72, 0.72))
+	# Fallen guard — NE corner by the EXIT (north doorway), opposite the west-wall vent.
+	# Mesh AABB y −0.480..0.493, length along Z. Yaw 90 so he lies along X, off the doorway and vent.
+	var guard := _instance_glb(br, "res://models/fallen_security_guard.glb", "FallenSecurityGuard", Vector3(5.85, 0.480, 5.72), Vector3(0, 90, 0), Vector3.ONE)
+	_box_collision(guard, Vector3(0.70, 0.36, 1.70), Vector3(0.0, 0.0, 0.0))
 	# Cubicle keyboard + reception desk parts
 	var hall := _find(level, "FutureAssetSlots/EastHall")
 	if hall:
 		_box(hall, "CubicleKeyboard", Vector3(0.36, 0.02, 0.14), Vector3(8.15, 0.77, 8.62), metal, Vector3.ZERO, false)
 		_box(hall, "CubicleDrawer", Vector3(0.28, 0.1, 0.02), Vector3(8.15, 0.42, 8.82), wood, Vector3.ZERO, false)
 	# Reception desk is rebuilt in _reception (flipped, light wood).
-	# Table papers
+	# Table papers / cup rest on the new tabletop (~0.77 m).
 	_box(br, "TablePapers", Vector3(0.28, 0.01, 0.2), Vector3(3.7, 0.77, 3.55), paper, Vector3(0, 18, 0), false)
 	_instance_glb(br, "res://models/coffee_cup.glb", "CoffeeCup", Vector3(3.52, 0.77, 3.72), Vector3(0, 20, 0), Vector3(1, 1, 1))
 	# Wall TV facing into the room
@@ -529,26 +551,21 @@ func _bathroom(level: Node3D) -> void:
 	var porcelain := _tex_mat("res://textures/tex_porcelain.png", Color(0.90, 0.90, 0.88), 0.18, 0.04)
 	var metal := _mat("res://materials/mat_metal_furn.tres")
 	var wood := _mat("res://materials/mat_wood.tres")
-	# Toilets in the four stalls (west run)
+	# Toilets in the four stalls (west run). toiletbowl.glb is ~1.90 m tall — scale to a real bowl.
 	var tz := [7.95, 9.10, 10.25, 11.40]
 	for i in tz.size():
 		_toilet(bath, "Toilet_%d" % (i + 1), Vector3(-5.35, 0.0, tz[i]), porcelain, metal)
-	# Urinal bank on the north wall
+	# Urinal bank on the north wall — same bowl mesh, names kept for QA.
 	for i in 3:
 		var ux := -0.15 + i * 0.85
-		_box(bath, "Urinal_%d" % i, Vector3(0.34, 0.70, 0.26), Vector3(ux, 0.82, 12.58), porcelain)
-		_box(bath, "UrinalFlush_%d" % i, Vector3(0.08, 0.08, 0.06), Vector3(ux, 1.24, 12.70), metal, Vector3.ZERO, false)
+		_toilet(bath, "Urinal_%d" % i, Vector3(ux, 0.0, 12.48), porcelain, metal, 180.0)
 	# Urinal dividers between the three bowls
 	_box(bath, "UrinalDivider_0", Vector3(0.04, 0.95, 0.42), Vector3(0.275, 0.90, 12.62), porcelain)
 	_box(bath, "UrinalDivider_1", Vector3(0.04, 0.95, 0.42), Vector3(1.125, 0.90, 12.62), porcelain)
-	# Long vanity along the south wall
-	_box(bath, "Vanity", Vector3(3.20, 0.08, 0.52), Vector3(0.15, 0.78, 6.88), porcelain)
-	_box(bath, "VanityApron", Vector3(3.20, 0.22, 0.06), Vector3(0.15, 0.63, 7.10), porcelain)
-	for i in 3:
-		var vx := -1.05 + i * 1.05
-		_box(bath, "Basin_%d" % i, Vector3(0.48, 0.08, 0.40), Vector3(vx, 0.84, 6.90), porcelain, Vector3.ZERO, false)
-		_box(bath, "Faucet_%d" % i, Vector3(0.04, 0.12, 0.16), Vector3(vx, 0.98, 6.74), metal, Vector3.ZERO, false)
-	_box(bath, "Soap", Vector3(0.08, 0.12, 0.06), Vector3(-0.2, 1.15, 6.74), _tex_mat("res://textures/tex_porcelain.png", Color(0.7, 0.75, 0.6)), Vector3.ZERO, false)
+	# Vanity along the south wall. Mesh AABB y −0.427..0.427, 1.90 × 0.85 × 0.42.
+	var vanity := _instance_glb(bath, "res://models/bathroom_vanity.glb", "BathroomVanity", Vector3(0.15, 0.427, 6.81), Vector3(0, 0, 0), Vector3.ONE)
+	_box_collision(vanity, Vector3(1.88, 0.84, 0.40), Vector3(0.0, 0.0, 0.0))
+	_box(bath, "Soap", Vector3(0.08, 0.12, 0.06), Vector3(-0.2, 0.92, 6.90), _tex_mat("res://textures/tex_porcelain.png", Color(0.7, 0.75, 0.6)), Vector3.ZERO, false)
 	# Large smashed mirrors
 	var mirror := _tex_mat("res://textures/tex_metal.png", Color(0.78, 0.82, 0.86, 0.92), 0.08, 0.88)
 	mirror.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -747,17 +764,19 @@ func _build_ceo_body(ceo: Node) -> void:
 	_box(ceo, "CeoRug_B", Vector3(2.10, 0.006, 0.36), Vector3(32.05, 0.004, 11.45), rug_b, Vector3(0, 18, 0), false)
 	_box(ceo, "CeoRug_C", Vector3(2.10, 0.006, 0.36), Vector3(32.05, 0.004, 11.80), rug_c, Vector3(0, 18, 0), false)
 	_build_ceo_blood(ceo)
-	const GLB := "res://models/ceo_dead.glb"
-	if FileAccess.file_exists(GLB) or ResourceLoader.exists(GLB):
-		var packed: PackedScene = load(GLB)
-		if packed:
-			var inst := packed.instantiate() as Node3D
-			if inst:
-				inst.name = "CeoDeadMesh"
-				inst.position = Vector3.ZERO
-				inst.scale = Vector3.ONE
-				body.add_child(inst)
-				return
+	# load() only — do not exists-gate. ceo_dead2 replaces ceo_dead at the locked pose/spot.
+	var packed: PackedScene = load("res://models/ceo_dead2.glb")
+	if packed:
+		var inst := packed.instantiate() as Node3D
+		if inst:
+			inst.name = "CeoDeadMesh"
+			# Mesh AABB y −0.152..0.141, length along X. Parent Y=0.27 is locked.
+			# Yaw 90 so length follows the old +Z body; child Y seats the thinner mesh.
+			inst.position = Vector3(0.0, -0.118, 0.0)
+			inst.rotation_degrees = Vector3(0, 90, 0)
+			inst.scale = Vector3.ONE
+			body.add_child(inst)
+			return
 	# Soft-fail: face toward local +Y, length along +Z. Parent X=0 is supine.
 	# Origin is the torso, so Y=0.27 seats it.
 	var skin := _tex_mat("res://textures/tex_leather.png", Color(0.78, 0.58, 0.44), 0.50, 0.0, 0.10)
@@ -907,16 +926,37 @@ func _spawn_ammo(level: Node3D, pos: Vector3, name: String) -> void:
 	area.add_child(lab)
 
 
-func _toilet(parent: Node, name: String, pos: Vector3, porcelain: Material, metal: Material) -> void:
+func _toilet(parent: Node, name: String, pos: Vector3, porcelain: Material, metal: Material, yaw: float = 0.0) -> void:
 	var root := Node3D.new()
 	root.name = name
 	root.position = pos
+	root.rotation_degrees = Vector3(0, yaw, 0)
 	parent.add_child(root)
-	_box(root, "Tank", Vector3(0.38, 0.42, 0.16), Vector3(-0.14, 0.62, 0.0), porcelain)
-	_box(root, "Bowl", Vector3(0.36, 0.34, 0.48), Vector3(0.10, 0.22, 0.0), porcelain)
-	_box(root, "Seat", Vector3(0.34, 0.04, 0.42), Vector3(0.10, 0.40, 0.0), porcelain, Vector3.ZERO, false)
-	_box(root, "Lid", Vector3(0.34, 0.36, 0.04), Vector3(-0.12, 0.62, 0.0), porcelain, Vector3.ZERO, false)
-	_box(root, "Flush", Vector3(0.06, 0.04, 0.08), Vector3(-0.14, 0.86, 0.0), metal, Vector3.ZERO, false)
+	# load() only. Mesh is ~1.90 m tall; 0.40 scale is a real bowl (~0.76 m).
+	var bowl := _instance_glb(root, "res://models/toiletbowl.glb", "ToiletBowl", Vector3(0.0, 0.380, 0.0), Vector3.ZERO, Vector3(0.40, 0.40, 0.40))
+	_box_collision(root, Vector3(0.64, 0.74, 0.66), Vector3(0.0, 0.38, 0.0))
+	if bowl.get_child_count() == 0:
+		_box(root, "Tank", Vector3(0.38, 0.42, 0.16), Vector3(-0.14, 0.62, 0.0), porcelain)
+		_box(root, "Bowl", Vector3(0.36, 0.34, 0.48), Vector3(0.10, 0.22, 0.0), porcelain)
+		_box(root, "Seat", Vector3(0.34, 0.04, 0.42), Vector3(0.10, 0.40, 0.0), porcelain, Vector3.ZERO, false)
+		_box(root, "Lid", Vector3(0.34, 0.36, 0.04), Vector3(-0.12, 0.62, 0.0), porcelain, Vector3.ZERO, false)
+		_box(root, "Flush", Vector3(0.06, 0.04, 0.08), Vector3(-0.14, 0.86, 0.0), metal, Vector3.ZERO, false)
+
+
+func _locked_doors(level: Node3D) -> void:
+	# closed_door.glb replaces locked slabs. Keep CSG collision so they stay sealed.
+	# Do not swap IntroCloset ChaosDoor — sealed-can't-open behavior stays on that unique door.
+	_swap_locked_door(_find(level, "FutureAssetSlots/SupplyCloset/LockedDoor_Supply"), 90.0)
+	_swap_locked_door(_find(level, "FutureAssetSlots/EastHall/LockedDoor_DeadOffice"), 0.0)
+
+
+func _swap_locked_door(door: Node, yaw: float) -> void:
+	if door == null:
+		return
+	_hide_visual(door.get_node_or_null("Slab"))
+	_hide_visual(door.get_node_or_null("Handle"))
+	# Mesh AABB y −0.953..0.951, 0.88 × 1.90 × 0.15. Seat on the floor inside the frame.
+	_instance_glb(door, "res://models/closed_door.glb", "ClosedDoor", Vector3(0.0, 0.952, 0.0), Vector3(0, yaw, 0), Vector3.ONE)
 
 
 func _instance_glb(parent: Node, path: String, name: String, pos: Vector3, rot: Vector3, scl: Vector3) -> Node3D:

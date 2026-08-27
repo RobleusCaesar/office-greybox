@@ -66,6 +66,15 @@ func _run() -> void:
 		errors.append("reception_desk.glb.import missing — web export will skip this glb")
 	if not FileAccess.file_exists("res://models/blood_pool.glb.import"):
 		errors.append("blood_pool.glb.import missing — web export will skip this glb")
+	for glb_name in [
+		"shotgun.glb", "ceo_dead2.glb", "fallen_security_guard.glb",
+		"refrigerator_open.glb", "kitchen_lunch_table.glb",
+		"bathroom_vanity.glb", "toiletbowl.glb", "closed_door.glb",
+	]:
+		if not FileAccess.file_exists("res://models/%s" % glb_name):
+			errors.append("%s missing" % glb_name)
+		if not FileAccess.file_exists("res://models/%s.import" % glb_name):
+			errors.append("%s.import missing — web export will skip this glb" % glb_name)
 	if not FileAccess.file_exists("res://textures/gen/blood_smear.png"):
 		errors.append("blood_smear.png missing")
 	if not FileAccess.file_exists("res://textures/hero/blood-spray-hq.png"):
@@ -259,6 +268,31 @@ func _run() -> void:
 		errors.append("blood_pool / reception_desk must load() without exists-gate")
 	if not dress_src.contains("reception_desk.glb"):
 		errors.append("dressing must instance reception_desk.glb")
+	if dress_src.contains("res://models/ceo_dead.glb"):
+		errors.append("old ceo_dead.glb must be replaced by ceo_dead2.glb")
+	if not dress_src.contains("ceo_dead2.glb"):
+		errors.append("dressing must instance ceo_dead2.glb")
+	if not dress_src.contains("refrigerator_open.glb"):
+		errors.append("dressing must instance refrigerator_open.glb")
+	if not dress_src.contains("kitchen_lunch_table.glb"):
+		errors.append("dressing must instance kitchen_lunch_table.glb")
+	if not dress_src.contains("bathroom_vanity.glb"):
+		errors.append("dressing must instance bathroom_vanity.glb")
+	if not dress_src.contains("toiletbowl.glb"):
+		errors.append("dressing must instance toiletbowl.glb")
+	if not dress_src.contains("fallen_security_guard.glb"):
+		errors.append("dressing must instance fallen_security_guard.glb")
+	if not dress_src.contains("closed_door.glb"):
+		errors.append("dressing must instance closed_door.glb")
+	if dress_src.contains("FileAccess.file_exists(\"res://models/ceo_dead") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/shotgun") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/refrigerator") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/kitchen_lunch") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/bathroom_vanity") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/toiletbowl") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/fallen_security") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/closed_door"):
+		errors.append("new Meshy glbs must load() without exists-gate")
 	var tv_src := FileAccess.get_file_as_string("res://scripts/tv.gd")
 	if not tv_src.contains("tv_not_a_test.png"):
 		errors.append("TV missing THIS IS NOT A TEST card")
@@ -309,6 +343,42 @@ func _run() -> void:
 		errors.append("bathroom toilets missing")
 	if level.get_node_or_null("FutureAssetSlots/Bathroom/Urinal_0") == null:
 		errors.append("bathroom urinals missing")
+	if level.get_node_or_null("FutureAssetSlots/Bathroom/Toilet_1/ToiletBowl") == null:
+		errors.append("Toilet_1 must instance toiletbowl.glb")
+	if level.get_node_or_null("FutureAssetSlots/Bathroom/Urinal_0/ToiletBowl") == null:
+		errors.append("Urinal_0 must instance toiletbowl.glb")
+	if level.get_node_or_null("FutureAssetSlots/Bathroom/BathroomVanity") == null:
+		errors.append("bathroom vanity must instance bathroom_vanity.glb")
+	if level.get_node_or_null("FutureAssetSlots/BreakRoom/RefrigeratorOpen") == null:
+		errors.append("fridge must instance refrigerator_open.glb")
+	if level.get_node_or_null("FutureAssetSlots/BreakRoom/KitchenLunchTable") == null:
+		errors.append("table must instance kitchen_lunch_table.glb")
+	if level.get_node_or_null("FutureAssetSlots/BreakRoom/FallenSecurityGuard") == null:
+		errors.append("fallen security guard missing")
+	else:
+		var guard := level.get_node_or_null("FutureAssetSlots/BreakRoom/FallenSecurityGuard") as Node3D
+		if guard:
+			if guard.position.x < 4.8 or guard.position.z < 4.8:
+				errors.append("guard at %s is not in the NE exit corner (opposite the west vent)" % guard.position)
+			if guard.position.x < 2.0:
+				errors.append("guard blocks the west vent crawl")
+			if absf(guard.position.x - 3.5) < 0.80 and guard.position.z > 5.8:
+				errors.append("guard blocks the north doorway")
+	var fridge_csg := level.get_node_or_null("FutureAssetSlots/BreakRoom/Fridge") as CSGBox3D
+	if fridge_csg and fridge_csg.visible:
+		errors.append("old CSG fridge must be hidden")
+	var table_csg := level.get_node_or_null("FutureAssetSlots/BreakRoom/BreakRoomTable") as CSGBox3D
+	if table_csg and table_csg.visible:
+		errors.append("old CSG break-room table must be hidden")
+	if level.get_node_or_null("FutureAssetSlots/SupplyCloset/LockedDoor_Supply/ClosedDoor") == null:
+		errors.append("supply lock must instance closed_door.glb")
+	if level.get_node_or_null("FutureAssetSlots/EastHall/LockedDoor_DeadOffice/ClosedDoor") == null:
+		errors.append("dead-office lock must instance closed_door.glb")
+	if level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive/CeoDeadMesh") == null:
+		errors.append("CEO must instance ceo_dead2.glb")
+	var sg_player := level.get_node_or_null("Player")
+	if sg_player and sg_player.find_child("ShotgunMesh", true, false) == null:
+		errors.append("hero shotgun must instance shotgun.glb as ShotgunMesh")
 	var env_node := level.get_node_or_null("WorldEnvironment") as WorldEnvironment
 	if env_node and env_node.environment and env_node.environment.sdfgi_enabled:
 		errors.append("SDFGI must stay off")
@@ -421,6 +491,10 @@ func _run() -> void:
 		errors.append("hero_shotgun must load() cock/reload wavs without FileAccess.file_exists")
 	if not vm_src.contains("const PUMP_TRAVEL := 0.092") or not vm_src.contains("const CYCLE := 0.94"):
 		errors.append("shotgun recoil/pump timing must stay 0.092 / 0.94")
+	if not vm_src.contains("shotgun.glb"):
+		errors.append("hero_shotgun must instance shotgun.glb")
+	if vm_src.contains("FileAccess.file_exists(\"res://models/shotgun"):
+		errors.append("hero_shotgun must load() shotgun.glb without exists-gate")
 	if FileAccess.file_exists("res://scenes/_check_audio.tscn") or FileAccess.file_exists("res://scenes/_ceo_rot_proof.tscn"):
 		errors.append("debug helper scenes must not ship")
 	var pane := level.get_node_or_null("FutureAssetSlots/CEOOffice/MoneyShotWindow/Pane_02") as CSGBox3D

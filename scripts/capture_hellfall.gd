@@ -120,5 +120,56 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("vent_duct_interior.png")
+	# Shotgun in first-person hands at spawn.
+	var hud2 := level.get_node_or_null("Player/HUD") as CanvasLayer
+	if hud2:
+		hud2.visible = false
+	var pcam_on := false
+	var player := level.get_node_or_null("Player") as Node3D
+	if player and player.has_method("get_look_camera"):
+		var pcam: Camera3D = player.get_look_camera()
+		if pcam:
+			var old_cap := level.get_node_or_null("CaptureCam")
+			if old_cap and old_cap is Camera3D:
+				(old_cap as Camera3D).current = false
+			pcam.current = true
+			pcam_on = true
+	for _j in 10:
+		await process_frame
+	_save("shotgun-in-hands.png")
+	if pcam_on and player and player.has_method("get_look_camera"):
+		var pcam2: Camera3D = player.get_look_camera()
+		if pcam2:
+			pcam2.current = false
+	# Guard in the NE break-room corner (EXIT), opposite the west vent.
+	_aim(level, Vector3(3.70, 1.35, 4.40), Vector3(5.85, 0.25, 5.72))
+	for _j in 8:
+		await process_frame
+	_save("guard-breakroom-corner.png")
+	# Fridge + lunch table from the north doorway.
+	_aim(level, Vector3(3.50, 1.45, 6.10), Vector3(4.80, 0.55, 2.40))
+	for _j in 8:
+		await process_frame
+	_save("fridge-lunch-table.png")
+	# Bathroom vanity + toilets.
+	_aim(level, Vector3(-1.40, 1.40, 9.80), Vector3(0.15, 0.70, 6.90))
+	for _j in 8:
+		await process_frame
+	_save("bathroom-vanity-toilets.png")
+	# Stall toilets from the aisle.
+	_aim(level, Vector3(-3.10, 1.20, 9.50), Vector3(-5.35, 0.40, 9.10))
+	for _j in 8:
+		await process_frame
+	_save("bathroom-stall-toilets.png")
+	# Locked supply door.
+	_aim(level, Vector3(3.15, 1.45, 8.50), Vector3(5.00, 1.05, 8.50))
+	for _j in 8:
+		await process_frame
+	_save("locked-door-supply.png")
+	if level.get_node_or_null("FutureAssetSlots/IntroCloset/MopAndBucket"):
+		_aim(level, Vector3(-4.40, 1.20, 3.25), Vector3(-2.90, 0.40, 2.40))
+		for _j in 8:
+			await process_frame
+		_save("mop-and-bucket.png")
 	level.queue_free()
 	await process_frame
