@@ -2205,13 +2205,13 @@ omni_range = 8.500
 omni_attenuation = 1.150
 
 [node name="ReceptionDeskLight" type="OmniLight3D" parent="Lights"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.8000, 2.2000, 11.5000)
-editor_description = "Desk lamp-ish."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.4000, 2.3500, 11.5000)
+editor_description = "Desk lamp-ish. Kept off the AURUM plate so the gold type reads."
 light_color = Color(1.00, 0.90, 0.75, 1)
-light_energy = 0.700
-light_specular = 0.30
+light_energy = 0.420
+light_specular = 0.12
 shadow_enabled = false
-omni_range = 3.500
+omni_range = 3.200
 omni_attenuation = 1.150
 
 [node name="CEOLight" type="OmniLight3D" parent="Lights"]

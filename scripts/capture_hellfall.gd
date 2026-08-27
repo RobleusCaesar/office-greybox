@@ -75,7 +75,7 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("reception-desk.png")
-	_aim(level, Vector3(28.55, 1.48, 8.05), Vector3(36.40, 1.20, 11.50))
+	_aim(level, Vector3(29.80, 1.42, 8.20), Vector3(33.40, 0.35, 11.45))
 	for _j in 8:
 		await process_frame
 	_save("ceo-mid.png")

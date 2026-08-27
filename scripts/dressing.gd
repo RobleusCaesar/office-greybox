@@ -389,9 +389,11 @@ func _reception(level: Node3D) -> void:
 	_box(desk, "ReceptionPapers", Vector3(0.18, 0.01, 0.24), Vector3(-0.16, 0.87, -0.55), paper, Vector3(0, 16, 0), false)
 	_box(desk, "Stapler", Vector3(0.08, 0.035, 0.03), Vector3(0.10, 0.88, 0.72), metal, Vector3.ZERO, false)
 	_box(desk, "Tape", Vector3(0.07, 0.05, 0.07), Vector3(0.14, 0.885, -0.88), metal, Vector3.ZERO, false)
-	# Chair on the wall side, under the AURUM sign.
+	# Chair on the wall side, under the AURUM sign — back peeks over the desk.
 	_box(desk, "LeatherSeat", Vector3(0.44, 0.06, 0.42), Vector3(-0.78, 0.46, 0.0), leather, Vector3.ZERO, false)
-	_box(desk, "LeatherBack", Vector3(0.06, 0.62, 0.42), Vector3(-0.98, 0.84, 0.0), leather, Vector3.ZERO, false)
+	_box(desk, "LeatherBack", Vector3(0.07, 0.78, 0.44), Vector3(-0.96, 0.92, 0.0), leather, Vector3.ZERO, false)
+	_box(desk, "LeatherArm_L", Vector3(0.28, 0.14, 0.06), Vector3(-0.78, 0.58, 0.20), leather, Vector3.ZERO, false)
+	_box(desk, "LeatherArm_R", Vector3(0.28, 0.14, 0.06), Vector3(-0.78, 0.58, -0.20), leather, Vector3.ZERO, false)
 	# Dark walnut panels on the divider west face, then the AURUM plate.
 	var panel := _tex_mat("res://textures/tex_walnut.png", Color(0.24, 0.14, 0.08), 0.50)
 	panel.uv1_triplanar = true
@@ -400,11 +402,9 @@ func _reception(level: Node3D) -> void:
 	for i in 5:
 		var z := 9.55 + i * 0.98
 		_box(rec, "WalnutPanel_%d" % i, Vector3(0.018, 2.72, 0.92), Vector3(25.888, 1.50, z), panel, Vector3.ZERO, false)
-	var plate := _tex_mat("res://textures/hero/aurum-logo.png", Color.WHITE, 0.55)
-	plate.metallic = 0.35
-	plate.emission_enabled = true
-	plate.emission = Color(0.42, 0.32, 0.12)
-	plate.emission_energy_multiplier = 0.16
+	var plate := _tex_mat("res://textures/hero/aurum-logo.png", Color.WHITE, 0.72)
+	plate.metallic = 0.04
+	plate.roughness = 0.72
 	_box(rec, "AurumPlate", Vector3(0.03, 0.92, 1.45), Vector3(25.86, 1.82, 11.50), plate, Vector3.ZERO, false)
 
 
