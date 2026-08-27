@@ -1,3 +1,8 @@
 .godot/
 export/
 *.zip
+tools/node_modules/
+tools/_glb_backup/
+
+models/ceo_dead.glb.import
+models/ceo_dead_*

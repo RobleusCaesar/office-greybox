@@ -1,0 +1,200 @@
+[
+  {
+    "file": "shotgun.glb",
+    "in_bytes": 17425152,
+    "out_bytes": 2752284,
+    "in_verts": 231586,
+    "out_verts": 43027,
+    "tex": 1024,
+    "simplified": true
+  },
+  {
+    "file": "ceo_dead2.glb",
+    "in_bytes": 16756920,
+    "out_bytes": 1837648,
+    "in_verts": 228918,
+    "out_verts": 28498,
+    "tex": 1024,
+    "simplified": true
+  },
+  {
+    "file": "fallen_security_guard.glb",
+    "in_bytes": 16913104,
+    "out_bytes": 1865160,
+    "in_verts": 231657,
+    "out_verts": 28753,
+    "tex": 1024,
+    "simplified": true
+  },
+  {
+    "file": "CEO_couch_coffee_table.glb",
+    "in_bytes": 19868876,
+    "out_bytes": 2959960,
+    "in_verts": 293872,
+    "out_verts": 51123,
+    "tex": 1024,
+    "simplified": true
+  },
+  {
+    "file": "bathroom_vanity.glb",
+    "in_bytes": 16972152,
+    "out_bytes": 1791524,
+    "in_verts": 229856,
+    "out_verts": 27028,
+    "tex": 1024,
+    "simplified": true
+  },
+  {
+    "file": "kitchen_lunch_table.glb",
+    "in_bytes": 16956944,
+    "out_bytes": 1684928,
+    "in_verts": 229099,
+    "out_verts": 24876,
+    "tex": 1024,
+    "simplified": true
+  },
+  {
+    "file": "refrigerator_open.glb",
+    "in_bytes": 17674152,
+    "out_bytes": 1976176,
+    "in_verts": 239682,
+    "out_verts": 28208,
+    "tex": 1024,
+    "simplified": true
+  },
+  {
+    "file": "reception_desk.glb",
+    "in_bytes": 16871284,
+    "out_bytes": 1909496,
+    "in_verts": 227044,
+    "out_verts": 28889,
+    "tex": 1024,
+    "simplified": true
+  },
+  {
+    "file": "mop_and_bucket.glb",
+    "in_bytes": 16014900,
+    "out_bytes": 1811820,
+    "in_verts": 229150,
+    "out_verts": 25870,
+    "tex": 1024,
+    "simplified": true
+  },
+  {
+    "file": "broken_door.glb",
+    "in_bytes": 19235976,
+    "out_bytes": 2034904,
+    "in_verts": 273926,
+    "out_verts": 33395,
+    "tex": 1024,
+    "simplified": true
+  },
+  {
+    "file": "closed_door.glb",
+    "in_bytes": 17405760,
+    "out_bytes": 1146660,
+    "in_verts": 247019,
+    "out_verts": 20176,
+    "tex": 512,
+    "simplified": true
+  },
+  {
+    "file": "closed_elevator.glb",
+    "in_bytes": 15572964,
+    "out_bytes": 1077168,
+    "in_verts": 223483,
+    "out_verts": 18449,
+    "tex": 512,
+    "simplified": true
+  },
+  {
+    "file": "toiletbowl.glb",
+    "in_bytes": 7070580,
+    "out_bytes": 706756,
+    "in_verts": 56157,
+    "out_verts": 12252,
+    "tex": 512,
+    "simplified": true
+  },
+  {
+    "file": "blood_pool.glb",
+    "in_bytes": 8284612,
+    "out_bytes": 813500,
+    "in_verts": 61325,
+    "out_verts": 13578,
+    "tex": 512,
+    "simplified": true
+  },
+  {
+    "file": "blood_decal_1.glb",
+    "in_bytes": 4698588,
+    "out_bytes": 496196,
+    "in_verts": 22280,
+    "out_verts": 8538,
+    "tex": 512,
+    "simplified": true
+  },
+  {
+    "file": "blood_decal_2.glb",
+    "in_bytes": 5646384,
+    "out_bytes": 317204,
+    "in_verts": 11703,
+    "out_verts": 4810,
+    "tex": 512,
+    "simplified": true
+  },
+  {
+    "file": "abyssal_stalker.glb",
+    "in_bytes": 6737168,
+    "out_bytes": 1086472,
+    "in_verts": 1507,
+    "out_verts": 1507,
+    "tex": 1024,
+    "simplified": false
+  },
+  {
+    "file": "ember_demon.glb",
+    "in_bytes": 1858292,
+    "out_bytes": 1318764,
+    "in_verts": 16294,
+    "out_verts": 16294,
+    "tex": 1024,
+    "simplified": false
+  },
+  {
+    "file": "coffee_cup.glb",
+    "in_bytes": 132540,
+    "out_bytes": 103204,
+    "in_verts": 3624,
+    "out_verts": 3624,
+    "tex": 512,
+    "simplified": false
+  },
+  {
+    "file": "executive_desk.glb",
+    "in_bytes": 125164,
+    "out_bytes": 97500,
+    "in_verts": 3420,
+    "out_verts": 3420,
+    "tex": 512,
+    "simplified": false
+  },
+  {
+    "file": "hardcover_book.glb",
+    "in_bytes": 27520,
+    "out_bytes": 21564,
+    "in_verts": 708,
+    "out_verts": 708,
+    "tex": 512,
+    "simplified": false
+  },
+  {
+    "file": "office_copier.glb",
+    "in_bytes": 53028,
+    "out_bytes": 41356,
+    "in_verts": 1416,
+    "out_verts": 1416,
+    "tex": 512,
+    "simplified": false
+  }
+]
