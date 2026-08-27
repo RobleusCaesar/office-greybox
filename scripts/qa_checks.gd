@@ -93,8 +93,8 @@ func _run() -> void:
 		var yaw := ember.rotation_degrees.y
 		if absf(yaw + 90.0) > 8.0 and absf(absf(yaw) - 270.0) > 8.0:
 			errors.append("Ember_01 yaw %s, expected -90" % yaw)
-		if absf(ember.scale.x - 1.0) > 0.05:
-			errors.append("Ember_01 scale %s, expected 1.0" % ember.scale)
+		if absf(ember.scale.x - 1.30) > 0.05:
+			errors.append("Ember_01 scale %s, expected 1.30" % ember.scale)
 		if ember.get_node_or_null("EmberDemon") == null and ember.get_node_or_null("EmberPlaceholder") == null:
 			errors.append("Ember_01 has no mesh")
 	if level.get_node_or_null("DemonSpots/DemonSpot_Reception") == null:
@@ -110,14 +110,24 @@ func _run() -> void:
 		if absf(dp.x - 32.05) > 0.20 or absf(dp.y - 0.27) > 0.12 or absf(dp.z - 11.45) > 0.20:
 			errors.append("dead executive at %s, expected (32.05, 0.27, 11.45)" % dp)
 		var dr := dn.rotation_degrees
-		if absf(dr.x - 180.0) > 2.0 or absf(dr.y - 18.0) > 2.0:
-			errors.append("dead executive rot %s, expected (180, 18, 0)" % dr)
+		if absf(dr.x - 0.0) > 2.0 or absf(dr.y - 18.0) > 2.0:
+			errors.append("dead executive rot %s, expected (0, 18, 0) supine" % dr)
 		if absf(dn.scale.x - 1.0) > 0.05:
 			errors.append("dead executive scale %s, expected 1.0" % dn.scale)
 		if dp.z < 9.0:
 			errors.append("dead executive blocks the south-entry path")
-	if level.get_node_or_null("FutureAssetSlots/CEOOffice/CeoBloodPool") == null:
-		errors.append("CEO blood pool missing")
+	if level.get_node_or_null("FutureAssetSlots/CEOOffice/CeoBloodPool") != null:
+		errors.append("CeoBloodPool sticker must be gone")
+	if level.get_node_or_null("FutureAssetSlots/CEOOffice/BodyPoolLight") != null:
+		errors.append("BodyPoolLight must be gone")
+	for bi in range(1, 8):
+		if level.get_node_or_null("FutureAssetSlots/CEOOffice/BodyBlood_%d" % bi) == null:
+			errors.append("BodyBlood_%d missing" % bi)
+	var bb1 := level.get_node_or_null("FutureAssetSlots/CEOOffice/BodyBlood_1") as MeshInstance3D
+	if bb1 and bb1.material_override is StandardMaterial3D:
+		var bm1 := bb1.material_override as StandardMaterial3D
+		if bm1.emission_enabled:
+			errors.append("CEO floor blood must not emit")
 	var tv_src := FileAccess.get_file_as_string("res://scripts/tv.gd")
 	if not tv_src.contains("tv_not_a_test.png"):
 		errors.append("TV missing THIS IS NOT A TEST card")
@@ -208,8 +218,33 @@ func _run() -> void:
 		var mark := player_hud.find_child("TitleMark", true, false) as Label
 		if mark == null or mark.text != "HELLFALL":
 			errors.append("HUD TitleMark must be HELLFALL")
-	if level.get_node_or_null("HauntBed") == null:
+	var haunt := level.get_node_or_null("HauntBed") as AudioStreamPlayer
+	if haunt == null:
 		errors.append("haunt bed loop missing")
+	else:
+		if absf(haunt.volume_db + 6.0) > 0.15:
+			errors.append("HauntBed volume_db %s, expected -6.0" % haunt.volume_db)
+		if haunt.process_mode != Node.PROCESS_MODE_ALWAYS:
+			errors.append("HauntBed process_mode must be ALWAYS")
+		if haunt.autoplay:
+			errors.append("HauntBed autoplay must be false")
+	var title_play := FileAccess.get_file_as_string("res://scripts/title.gd")
+	if not title_play.contains("volume_db = -80"):
+		errors.append("title Play must unlock Web Audio at -80 dB before change_scene")
+	var player_src := FileAccess.get_file_as_string("res://scripts/player.gd")
+	if not player_src.contains("shotgun_blast.wav"):
+		errors.append("player must reference audio/shotgun_blast.wav")
+	if not player_src.contains("_spawn_impact"):
+		errors.append("player must fade air blood in _spawn_impact")
+	if not player_src.contains("0.72"):
+		errors.append("player impact splat must die at 0.72s")
+	var vm_src := FileAccess.get_file_as_string("res://scripts/hero_shotgun.gd")
+	if not vm_src.contains("shotgun_cocking.wav") or not vm_src.contains("shotgun_reloading.wav"):
+		errors.append("hero_shotgun must reference Rob's cock/reload wavs")
+	if not vm_src.contains("CockSfx") or not vm_src.contains("ReloadSfx"):
+		errors.append("hero_shotgun must have dedicated CockSfx and ReloadSfx")
+	if FileAccess.file_exists("res://scenes/_check_audio.tscn") or FileAccess.file_exists("res://scenes/_ceo_rot_proof.tscn"):
+		errors.append("debug helper scenes must not ship")
 	var pane := level.get_node_or_null("FutureAssetSlots/CEOOffice/MoneyShotWindow/Pane_02") as CSGBox3D
 	if pane and pane.material is StandardMaterial3D:
 		if (pane.material as StandardMaterial3D).albedo_color.a > 0.35:
