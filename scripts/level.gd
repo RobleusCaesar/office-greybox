@@ -28,7 +28,7 @@ func _ready() -> void:
 	_sting_player.stream = load("res://audio/window_sting.wav")
 	_sting_player.volume_db = -3.0
 	add_child(_sting_player)
-	_start_haunt()
+	_setup_haunt_bed()
 	if _player:
 		_player.died.connect(_on_player_died)
 	if _window_light:
@@ -51,19 +51,27 @@ func _process(delta: float) -> void:
 		_win_time = 0.0
 
 
-func _start_haunt() -> void:
-	if not FileAccess.file_exists("res://audio/haunt_bed.wav"):
+func _setup_haunt_bed() -> void:
+	var stream: AudioStream = null
+	if FileAccess.file_exists("res://audio/under_broken_steel.mp3"):
+		stream = load("res://audio/under_broken_steel.mp3")
+		if stream is AudioStreamMP3:
+			(stream as AudioStreamMP3).loop = true
+	if stream == null:
+		if not FileAccess.file_exists("res://audio/haunt_bed.wav"):
+			return
+		stream = load("res://audio/haunt_bed.wav")
+		if stream is AudioStreamWAV:
+			var wav := stream as AudioStreamWAV
+			wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+			wav.loop_begin = 0
+			wav.loop_end = wav.data.size() / 2
+	if stream == null:
 		return
 	var bed := AudioStreamPlayer.new()
 	bed.name = "HauntBed"
-	var stream := load("res://audio/haunt_bed.wav")
-	if stream is AudioStreamWAV:
-		var wav := stream as AudioStreamWAV
-		wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
-		wav.loop_begin = 0
-		wav.loop_end = wav.data.size() / 2
 	bed.stream = stream
-	bed.volume_db = -24.0
+	bed.volume_db = -12.0
 	bed.autoplay = true
 	add_child(bed)
 	bed.play()
