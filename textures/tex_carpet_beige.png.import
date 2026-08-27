@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://caef02dddba12"
-path="res://.godot/imported/tex_cardboard_fragile.png-c0640df57e65e1221f1823f3ccde7894.ctex"
+uid="uid://bpartyuj0hblk"
+path="res://.godot/imported/tex_carpet_beige.png-e76eae5d0a5ba5202f712c6300f1a4f7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://textures/tex_cardboard_fragile.png"
-dest_files=["res://.godot/imported/tex_cardboard_fragile.png-c0640df57e65e1221f1823f3ccde7894.ctex"]
+source_file="res://textures/tex_carpet_beige.png"
+dest_files=["res://.godot/imported/tex_carpet_beige.png-e76eae5d0a5ba5202f712c6300f1a4f7.ctex"]
 
 [params]
 

@@ -90,28 +90,33 @@ func _shot_level() -> void:
 	var hud := level.get_node_or_null("Player/HUD") as CanvasLayer
 	if hud:
 		hud.visible = false
-	# Intro closet: three walls of shelves + boxes, looking west from the duct mouth.
-	_aim(level, Vector3(-2.70, 1.48, 3.25), Vector3(-6.55, 1.10, 3.25))
+	# Closet looking EAST — vent is a hole in IntroClosetEast, no black box in the room.
+	_aim(level, Vector3(-5.40, 1.35, 3.25), Vector3(-2.66, 0.48, 3.20))
 	for _j in 10:
 		await process_frame
-	_save("intro_closet_west_door.png")
-	# Corner that reads north + west + south runs.
-	_aim(level, Vector3(-3.20, 1.42, 1.70), Vector3(-6.20, 1.15, 5.50))
+	_save("intro_closet_east_vent.png")
+	# Closet aisle: carpet + light + three walls of shelves.
+	_aim(level, Vector3(-4.40, 1.48, 3.25), Vector3(-8.80, 1.05, 3.25))
 	for _j in 8:
 		await process_frame
-	_save("intro_closet_corner.png")
+	_save("intro_closet_aisle.png")
+	# Shelf boxes so FRAGILE / COPY PAPER read at aisle distance.
+	_aim(level, Vector3(-6.40, 1.28, 2.20), Vector3(-7.40, 1.05, 0.55))
+	for _j in 8:
+		await process_frame
+	_save("intro_closet_shelf_boxes.png")
 	# Floor carton so FRAGILE / tape faces read as dedicated albedos.
-	_aim(level, Vector3(-5.15, 0.58, 1.85), Vector3(-5.85, 0.32, 1.05))
+	_aim(level, Vector3(-7.81, 0.58, 1.85), Vector3(-8.51, 0.32, 1.05))
 	for _j in 8:
 		await process_frame
 	_save("intro_closet_fragile_carton.png")
-	# Kitchen west wall: sealed plaster, vent under the old window, cover off.
-	_aim(level, Vector3(1.85, 1.22, 3.25), Vector3(0.08, 0.48, 3.20))
+	# Kitchen west wall: hole in BreakRoomWest, duct does not stick into the kitchen.
+	_aim(level, Vector3(1.85, 1.22, 3.25), Vector3(0.00, 0.48, 3.20))
 	for _j in 8:
 		await process_frame
 	_save("kitchen_west_vent.png")
-	# Duct interior from the kitchen mouth.
-	_aim(level, Vector3(0.38, 0.46, 3.20), Vector3(-2.45, 0.46, 3.20))
+	# Duct interior from the kitchen mouth — gap only.
+	_aim(level, Vector3(0.38, 0.46, 3.20), Vector3(-2.60, 0.46, 3.20))
 	for _j in 8:
 		await process_frame
 	_save("vent_duct_interior.png")
