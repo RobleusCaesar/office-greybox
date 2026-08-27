@@ -238,6 +238,8 @@ func _run() -> void:
 	var player_src := FileAccess.get_file_as_string("res://scripts/player.gd")
 	if not player_src.contains("shotgun_blast.wav"):
 		errors.append("player must reference audio/shotgun_blast.wav")
+	if not player_src.contains("shotgun_fire.wav"):
+		errors.append("player must fall back to shotgun_fire.wav when blast is missing")
 	if not player_src.contains("_spawn_impact"):
 		errors.append("player must fade air blood in _spawn_impact")
 	if not player_src.contains("0.72"):
