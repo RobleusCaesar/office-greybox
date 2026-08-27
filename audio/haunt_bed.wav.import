@@ -2,13 +2,13 @@
 
 importer="wav"
 type="AudioStreamWAV"
-uid="uid://bhauntbedloop01"
-path="res://.godot/imported/haunt_bed.wav-c4e8a91b0d2f6e7713a5c8d9e0f1a2b3.sample"
+uid="uid://dhsiw2gwdvm7q"
+path="res://.godot/imported/haunt_bed.wav-fdda6e01efb8e6bbed2868e3b9ddc04a.sample"
 
 [deps]
 
 source_file="res://audio/haunt_bed.wav"
-dest_files=["res://.godot/imported/haunt_bed.wav-c4e8a91b0d2f6e7713a5c8d9e0f1a2b3.sample"]
+dest_files=["res://.godot/imported/haunt_bed.wav-fdda6e01efb8e6bbed2868e3b9ddc04a.sample"]
 
 [params]
 

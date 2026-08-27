@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ccapitoldemonvista"
-path="res://.godot/imported/denver-fire-capitol-demon.png-b2c3d4e5f60718293a4b5c6d7e8f901a.ctex"
+uid="uid://bonsl3v4x084i"
+path="res://.godot/imported/denver-fire-capitol-demon.png-6f2d054c44c21e615f09a5a58843055b.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://textures/hero/denver-fire-capitol-demon.png"
-dest_files=["res://.godot/imported/denver-fire-capitol-demon.png-b2c3d4e5f60718293a4b5c6d7e8f901a.ctex"]
+dest_files=["res://.godot/imported/denver-fire-capitol-demon.png-6f2d054c44c21e615f09a5a58843055b.ctex"]
 
 [params]
 
