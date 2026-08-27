@@ -88,25 +88,16 @@ func _play_reload() -> void:
 		)
 
 
-func _load_real_wav(path: String) -> AudioStream:
-	if not FileAccess.file_exists(path):
-		return null
-	var f := FileAccess.open(path, FileAccess.READ)
-	if f == null or f.get_length() <= 1024:
-		return null
-	return load(path) as AudioStream
-
-
 func _build_sfx() -> void:
 	_cock_sfx = AudioStreamPlayer.new()
 	_cock_sfx.name = "CockSfx"
 	_cock_sfx.volume_db = -2.0
-	_cock_sfx.stream = _load_real_wav("res://audio/shotgun_cocking.wav")
+	_cock_sfx.stream = load("res://audio/shotgun_cocking.wav") as AudioStream
 	add_child(_cock_sfx)
 	_reload_sfx = AudioStreamPlayer.new()
 	_reload_sfx.name = "ReloadSfx"
 	_reload_sfx.volume_db = -3.0
-	_reload_sfx.stream = _load_real_wav("res://audio/shotgun_reloading.wav")
+	_reload_sfx.stream = load("res://audio/shotgun_reloading.wav") as AudioStream
 	add_child(_reload_sfx)
 
 

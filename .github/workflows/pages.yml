@@ -72,6 +72,128 @@ jobs:
           test -f export/web/index.html
           test -f export/web/index.wasm
 
+      - name: Cache-bust Godot loader (pck/wasm/js)
+        run: |
+          set -euo pipefail
+          SHA="${GITHUB_SHA:0:7}"
+          export SHA
+          python3 - <<'PY'
+          import os
+          import pathlib
+          import re
+          import sys
+
+          sha = os.environ["SHA"]
+          if not re.fullmatch(r"[0-9a-fA-F]{7}", sha):
+              print(f"Refusing to patch with invalid short SHA: {sha!r}", file=sys.stderr)
+              sys.exit(1)
+
+          root = pathlib.Path("export/web")
+          html_path = root / "index.html"
+          js_path = root / "index.js"
+          if not html_path.is_file():
+              print("export/web/index.html missing", file=sys.stderr)
+              sys.exit(1)
+
+          # Do not rename the executable or rewrite `.pck`/`.wasm` concatenations.
+          # Those become Godot's --main-pack / FS path. Query-string bust on the
+          # HTTP request is enough (GitHub Pages max-age=600 + IndexedDB/HTTP cache).
+          engine_file = re.compile(r'(?<![\w./-])index\.(pck|wasm)(?!\?)')
+          script_src = re.compile(r'(src=["\'])index\.js(["\'])')
+
+          html = html_path.read_text(encoding="utf-8")
+          comment = (
+              f"<!-- hellfall-build: {sha} "
+              f"index.js?{sha} index.pck?{sha} index.wasm?{sha} -->"
+          )
+          if f"hellfall-build: {sha}" not in html:
+              if "<head>" in html:
+                  html = html.replace("<head>", f"<head>\n{comment}", 1)
+              else:
+                  html = comment + "\n" + html
+
+          html = script_src.sub(rf"\1index.js?{sha}\2", html)
+          if f"index.js?{sha}" not in html:
+              html = re.sub(
+                  r'(<script[^>]+src=["\'])index\.js(["\'])',
+                  rf"\1index.js?{sha}\2",
+                  html,
+                  count=1,
+              )
+
+          interceptor = f"""<script data-hellfall-fetch-bust="1">
+          (function () {{
+            var SHA = {sha!r};
+            function bust(u) {{
+              if (typeof u !== "string") return u;
+              try {{
+                var url = new URL(u, window.location.href);
+                var base = url.pathname.split("/").pop();
+                if (base !== "index.pck" && base !== "index.wasm" && base !== "index.js") return u;
+                if (url.search.indexOf(SHA) !== -1) return url.href;
+                url.search = SHA;
+                return url.href;
+              }} catch (e) {{
+                return u;
+              }}
+            }}
+            if (typeof window.fetch === "function") {{
+              var origFetch = window.fetch;
+              window.fetch = function (input, init) {{
+                if (typeof input === "string") {{
+                  input = bust(input);
+                }} else if (typeof Request !== "undefined" && input instanceof Request) {{
+                  var next = bust(input.url);
+                  if (next !== input.url) input = new Request(next, input);
+                }}
+                return origFetch.call(this, input, init);
+              }};
+            }}
+          }})();
+          </script>
+          """
+          if "hellfall-fetch-bust" not in html:
+              if "</head>" in html:
+                  html = html.replace("</head>", interceptor + "</head>", 1)
+              elif "<script" in html:
+                  html = html.replace("<script", interceptor + "<script", 1)
+              else:
+                  html = interceptor + html
+
+          html_path.write_text(html, encoding="utf-8")
+
+          if js_path.is_file():
+              js = js_path.read_text(encoding="utf-8", errors="replace")
+              if re.search(r'(?<![\w./-])index\.(pck|wasm)(?!\?)', js):
+                  js_path.write_text(engine_file.sub(rf"index.\1?{sha}", js), encoding="utf-8")
+
+          html_out = html_path.read_text(encoding="utf-8")
+          js_out = js_path.read_text(encoding="utf-8", errors="replace") if js_path.is_file() else ""
+          checks = [
+              f"hellfall-build: {sha}" in html_out,
+              f"index.js?{sha}" in html_out,
+              f"index.pck?{sha}" in html_out,
+              f"index.wasm?{sha}" in html_out,
+              "hellfall-fetch-bust" in html_out,
+          ]
+          if not all(checks):
+              print("Cache-bust patch did not land expected query strings.", file=sys.stderr)
+              print(
+                  f"comment={checks[0]} js={checks[1]} pck={checks[2]} "
+                  f"wasm={checks[3]} fetch={checks[4]}",
+                  file=sys.stderr,
+              )
+              sys.exit(1)
+          # Keep the on-disk executable names; only the request URL is busted.
+          if not (root / "index.html").is_file() or not (root / "index.wasm").is_file():
+              print("Required export files missing after cache-bust.", file=sys.stderr)
+              sys.exit(1)
+          print(f"Cache-busted Godot web loader with ?{sha}")
+          print(f"index.js hardcoded engine names patched: {bool(js_out and 'index.pck?'+sha in js_out)}")
+          PY
+          test -f export/web/index.html
+          test -f export/web/index.wasm
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
