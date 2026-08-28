@@ -601,11 +601,13 @@ func _place_closet_sits(ic: Node) -> void:
 	var manager := _instance_glb(ic, "res://models/man_sitting.glb", "ClosetManager", Vector3(-6.20, 0.0, 1.58), Vector3(0, 0, 0), Vector3.ONE)
 	_seat_on_floor(manager)
 	_disable_collision(manager)
-	# Intern: intern_sitting AABB ~1.04 × 1.90 × 1.77, faces −Z. Scale 1.0, seat
-	# on the floor. East wall, RIGHT of the vent (south), south of the mop so
-	# the crawl hole stays open. Yaw 90 → faces west into the room / player.
-	var intern := _instance_glb(ic, "res://models/intern_sitting.glb", "ClosetIntern", Vector3(-3.55, 0.0, 1.12), Vector3(0, 90, 0), Vector3.ONE)
+	# Intern: intern_sitting AABB ~1.04 × 1.90 × 1.77, faces +Z. Scale 1.0.
+	# East wall, RIGHT of the vent (south), south of the mop so the crawl hole
+	# stays open. Yaw −90 → faces west into the room / player. Collision off.
+	# _seat_on_floor uses sparse low verts; drop 14 cm so the huddle sits.
+	var intern := _instance_glb(ic, "res://models/intern_sitting.glb", "ClosetIntern", Vector3(-3.55, 0.0, 1.12), Vector3(0, -90, 0), Vector3.ONE)
 	_seat_on_floor(intern)
+	intern.position.y -= 0.14
 	_disable_collision(intern)
 
 

@@ -2,19 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://4eca1d147be6"
-path="res://.godot/imported/emissive.jpg-4eca1d147be6e8fbcebf4d6aab420223.ctex"
+uid="uid://bopaihxy10jq0"
+path="res://.godot/imported/intern_sitting_base_color.jpg-f5e3906284d17a2702f6f71d89f391d3.ctex"
 metadata={
 "vram_texture": false
 }
 generator_parameters={
-"md5": "df6611c7bafe01c3ca03b374b9554e64"
+"md5": "dff124896f9a15a963783c42a4c85f00"
 }
 
 [deps]
 
-source_file="res://models/extracted/man_sitting/emissive.jpg"
-dest_files=["res://.godot/imported/emissive.jpg-4eca1d147be6e8fbcebf4d6aab420223.ctex"]
+source_file="res://models/intern_sitting_base_color.jpg"
+dest_files=["res://.godot/imported/intern_sitting_base_color.jpg-f5e3906284d17a2702f6f71d89f391d3.ctex"]
 
 [params]
 

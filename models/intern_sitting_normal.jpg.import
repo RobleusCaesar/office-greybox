@@ -2,19 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://60d9bf975868"
-path="res://.godot/imported/emissive.jpg-60d9bf975868b28be7f4f00a9536a4ff.ctex"
+uid="uid://dsanaqwol4f5e"
+path="res://.godot/imported/intern_sitting_normal.jpg-bfa90fd19b539c7e432c5d43ac08e58f.ctex"
 metadata={
 "vram_texture": false
 }
 generator_parameters={
-"md5": "3fa70085d3e5ed5cfeb98356f9351c78"
+"md5": "8e9103989b6ded885b302526a4ee7a15"
 }
 
 [deps]
 
-source_file="res://models/extracted/intern_sitting/emissive.jpg"
-dest_files=["res://.godot/imported/emissive.jpg-60d9bf975868b28be7f4f00a9536a4ff.ctex"]
+source_file="res://models/intern_sitting_normal.jpg"
+dest_files=["res://.godot/imported/intern_sitting_normal.jpg-bfa90fd19b539c7e432c5d43ac08e58f.ctex"]
 
 [params]
 
@@ -24,7 +24,7 @@ compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=0
+compress/normal_map=1
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1

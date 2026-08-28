@@ -2,19 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://a385f5a48170"
-path="res://.godot/imported/base_color.jpg-a385f5a48170063e101a29b6fe9730fa.ctex"
+uid="uid://d2fqc73k374or"
+path="res://.godot/imported/man_sitting_base_color.jpg-33b7ffc7ef3aab875e51edea8fb9bacb.ctex"
 metadata={
 "vram_texture": false
 }
 generator_parameters={
-"md5": "43e666500ce139f26b9b71fd1f36f68e"
+"md5": "7d06f65e5fcd4c14760ad1a0acd15d19"
 }
 
 [deps]
 
-source_file="res://models/extracted/intern_sitting/base_color.jpg"
-dest_files=["res://.godot/imported/base_color.jpg-a385f5a48170063e101a29b6fe9730fa.ctex"]
+source_file="res://models/man_sitting_base_color.jpg"
+dest_files=["res://.godot/imported/man_sitting_base_color.jpg-33b7ffc7ef3aab875e51edea8fb9bacb.ctex"]
 
 [params]
 

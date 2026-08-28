@@ -2,19 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://3c93178539f0"
-path="res://.godot/imported/metallic_roughness.jpg-3c93178539f0f3554d9ac204be6fa66f.ctex"
+uid="uid://dvle14jmkab7j"
+path="res://.godot/imported/intern_sitting_metallic_roughness.jpg-b1f07f9b780620bfa4840a560f8c0e70.ctex"
 metadata={
 "vram_texture": false
 }
 generator_parameters={
-"md5": "78c2164ca7b61d22d60efbbb2486e1ba"
+"md5": "d34bd574e9eedd70be3dde6c418ffb2a"
 }
 
 [deps]
 
-source_file="res://models/extracted/intern_sitting/metallic_roughness.jpg"
-dest_files=["res://.godot/imported/metallic_roughness.jpg-3c93178539f0f3554d9ac204be6fa66f.ctex"]
+source_file="res://models/intern_sitting_metallic_roughness.jpg"
+dest_files=["res://.godot/imported/intern_sitting_metallic_roughness.jpg-b1f07f9b780620bfa4840a560f8c0e70.ctex"]
 
 [params]
 

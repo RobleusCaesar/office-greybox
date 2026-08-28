@@ -2,19 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dd47c94223e0"
-path="res://.godot/imported/normal.jpg-dd47c94223e02714c238781324c1f2b3.ctex"
+uid="uid://dsu0i13y5miey"
+path="res://.godot/imported/man_sitting_metallic_roughness.jpg-12b47eee5950da799bab8f7f07bc321f.ctex"
 metadata={
 "vram_texture": false
 }
 generator_parameters={
-"md5": "c43852f4623d8c7cc8c09b189c55507a"
+"md5": "55a862b828f7e764b17f1006b95897a8"
 }
 
 [deps]
 
-source_file="res://models/extracted/intern_sitting/normal.jpg"
-dest_files=["res://.godot/imported/normal.jpg-dd47c94223e02714c238781324c1f2b3.ctex"]
+source_file="res://models/man_sitting_metallic_roughness.jpg"
+dest_files=["res://.godot/imported/man_sitting_metallic_roughness.jpg-12b47eee5950da799bab8f7f07bc321f.ctex"]
 
 [params]
 
@@ -24,7 +24,7 @@ compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=1
+compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
