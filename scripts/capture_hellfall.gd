@@ -266,7 +266,7 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("closet-sit-manager.png")
-	_aim(level, Vector3(-5.40, 1.05, 3.10), Vector3(-3.40, 0.55, 1.20))
+	_aim(level, Vector3(-5.40, 1.05, 3.55), Vector3(-3.30, 0.50, 4.20))
 	for _j in 8:
 		await process_frame
 	_save("closet-sit-intern.png")

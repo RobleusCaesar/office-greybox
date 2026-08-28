@@ -358,9 +358,12 @@ func _breakroom(level: Node3D) -> void:
 	# Authored sit/slump leaves a visible air gap once AABB-seated — plant him.
 	guard.position.y -= 0.14
 	_box_collision(guard, Vector3(0.70, 0.36, 1.70), Vector3(0.0, 0.0, 0.0))
-	# Bigger / horizontal puddle (blood_decal_1) on the floor under him. Not the drip.
-	# Mesh is 1.87 × 1.88 × 0.27 standing — pitch 90 so the 0.27 axis is up.
-	_instance_glb(br, "res://models/blood_decal_1.glb", "GuardBloodPuddle", Vector3(1.02, 0.136, 5.88), Vector3(90, 90, 0), Vector3.ONE)
+	# Bigger / horizontal puddle (blood_decal_1) under him. Authored standing
+	# 1.87 × 1.88 × 0.27. Old (90, 90, 0) laid it flat with the spiked underside
+	# pointing UP and the slab floating. +180° on X hides the spikes in the
+	# floor; flush the stain so it is not a raised sheet.
+	var puddle := _instance_glb(br, "res://models/blood_decal_1.glb", "GuardBloodPuddle", Vector3(1.02, 0.0, 5.88), Vector3(-90, 90, 0), Vector3.ONE)
+	_flush_stain_to_floor(puddle)
 	_spawn_shotgun_pickup(br)
 	# Cubicle keyboard + reception desk parts
 	var hall := _find(level, "FutureAssetSlots/EastHall")
@@ -598,16 +601,29 @@ func _place_closet_sits(ic: Node) -> void:
 	# Manager: man_sitting AABB ~1.29 × 1.13 × 1.91, origin mid-torso, faces +Z.
 	# Leans back on the south shelf run (front ~Z=0.54). Scale 1.0 = human sit
 	# (same language as ceo_dead2). Looks north at the player. Collision off.
+	# Do not scale the manager. Do not scale the player.
 	var manager := _instance_glb(ic, "res://models/man_sitting.glb", "ClosetManager", Vector3(-6.20, 0.0, 1.58), Vector3(0, 0, 0), Vector3.ONE)
 	_seat_on_floor(manager)
 	_disable_collision(manager)
-	# Intern: intern_sitting AABB ~1.04 × 1.90 × 1.77, faces +Z. Scale 1.0.
-	# East wall, RIGHT of the vent (south), south of the mop so the crawl hole
-	# stays open. Yaw −90 → faces west into the room / player. Collision off.
-	# _seat_on_floor uses sparse low verts; drop 14 cm so the huddle sits.
-	var intern := _instance_glb(ic, "res://models/intern_sitting.glb", "ClosetIntern", Vector3(-3.55, 0.0, 1.12), Vector3(0, -90, 0), Vector3.ONE)
+	var mgr_top := _sit_top(manager)
+	# Intern: intern_sitting AABB ~1.04 × 1.90 × 1.77 at scale 1.0 — too tall.
+	# Measure sit-top after _seat_on_floor, then scale so seated height matches
+	# the manager. Re-seat after scale (scale changes how far she sinks).
+	# East wall, north of the vent hole (toward the player at z=4.20). Order
+	# along the wall south→north: mop (2.02) — vent (~3.20) — intern. Yaw −90
+	# faces west into the room. Collision off. Do not sit on the mop.
+	var intern := _instance_glb(ic, "res://models/intern_sitting.glb", "ClosetIntern", Vector3(-3.30, 0.0, 4.20), Vector3(0, -90, 0), Vector3.ONE)
 	_seat_on_floor(intern)
-	intern.position.y -= 0.14
+	var intern_top := _sit_top(intern)
+	var sit_scale := 1.0
+	if intern_top > 0.05:
+		sit_scale = mgr_top / intern_top
+	intern.scale = Vector3(sit_scale, sit_scale, sit_scale)
+	intern.position = Vector3(-3.30, 0.0, 4.20)
+	intern.rotation_degrees = Vector3(0, -90, 0)
+	_seat_on_floor(intern)
+	# East wall west face is X=-2.74 (center -2.66, 16 cm plaster). Keep a gap.
+	_nudge_aabb_max_x(intern, -2.78)
 	_disable_collision(intern)
 
 
@@ -1399,12 +1415,39 @@ func _accum_aabb(n: Node, acc: Array) -> void:
 		_accum_aabb(c, acc)
 
 
-func _seat_on_floor(n: Node3D) -> void:
+func _world_aabb(n: Node3D) -> AABB:
 	var acc := [true, AABB()]
 	_accum_aabb(n, acc)
 	if acc[0]:
+		return AABB()
+	return acc[1]
+
+
+func _sit_top(n: Node3D) -> float:
+	var a := _world_aabb(n)
+	return a.position.y + a.size.y
+
+
+func _nudge_aabb_max_x(n: Node3D, wall_x: float) -> void:
+	var a := _world_aabb(n)
+	if a.size.x <= 0.0:
 		return
-	var a: AABB = acc[1]
+	n.global_position.x += wall_x - (a.position.x + a.size.x)
+
+
+func _flush_stain_to_floor(n: Node3D) -> void:
+	# After the puddle is laid flat, bury the volume so the visible top is a
+	# floor stain — no gap, no raised slab, no shadow under a floating sheet.
+	var a := _world_aabb(n)
+	if a.size.y <= 0.0:
+		return
+	n.global_position.y += 0.006 - (a.position.y + a.size.y)
+
+
+func _seat_on_floor(n: Node3D) -> void:
+	var a := _world_aabb(n)
+	if a.size == Vector3.ZERO and a.position == Vector3.ZERO:
+		return
 	n.global_position.y -= a.position.y
 
 
