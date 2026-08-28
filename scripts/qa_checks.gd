@@ -537,7 +537,7 @@ func _run() -> void:
 			errors.append("ClosetIntern blocks the vent hole at %s" % intern.position)
 		if intern.scale.x > 0.85 or intern.scale.x < 0.45:
 			errors.append("ClosetIntern scale %s — seated height must match ClosetManager" % intern.scale)
-		var intern_look := intern.transform.basis.z
+		var intern_look := intern.transform.basis.z.normalized()
 		if intern_look.x > -0.70:
 			errors.append("ClosetIntern is not facing into the room (basis.z %s)" % intern_look)
 		var intern_aabb := _world_aabb(intern)

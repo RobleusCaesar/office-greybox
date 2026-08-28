@@ -41,7 +41,8 @@ func _run() -> void:
 	if hud:
 		hud.visible = false
 	# Intern vs manager seated height — both in frame from the west aisle.
-	_aim(level, Vector3(-7.55, 1.08, 3.05), Vector3(-4.70, 0.52, 2.90), 72.0)
+	# Looking east: manager south/left, intern north/right of the vent.
+	_aim(level, Vector3(-7.40, 1.12, 2.95), Vector3(-4.40, 0.55, 3.10), 70.0)
 	for _j in 10:
 		await process_frame
 	_save("after-intern-vs-manager-height.png")
@@ -50,17 +51,22 @@ func _run() -> void:
 	for _j in 8:
 		await process_frame
 	_save("after-intern-vs-vent.png")
-	# Shoes on the floor — low, at her soles.
+	# Shoes on the floor — side-on at sole height, not looking into her lap.
 	if intern:
 		var feet := intern.global_position
-		_aim(level, Vector3(feet.x - 1.15, 0.18, feet.z + 0.15), Vector3(feet.x, 0.03, feet.z), 58.0)
+		_aim(level, Vector3(feet.x - 0.85, 0.22, feet.z - 0.55), Vector3(feet.x + 0.10, 0.02, feet.z + 0.05), 52.0)
 	else:
-		_aim(level, Vector3(-4.50, 0.18, 4.30), Vector3(-3.30, 0.03, 4.20), 58.0)
+		_aim(level, Vector3(-4.15, 0.22, 3.65), Vector3(-3.20, 0.02, 4.25), 52.0)
 	for _j in 8:
 		await process_frame
 	_save("after-intern-shoes-floor.png")
-	# Guard blood flush under the body — low, stain not a floating slab.
-	_aim(level, Vector3(2.25, 0.32, 4.55), Vector3(1.05, 0.02, 5.80), 58.0)
+	# Guard blood from Rob's playtest angle — stain flush, no gap under a slab.
+	var halo := level.get_node_or_null("FutureAssetSlots/BreakRoom/ShotgunPickup")
+	if halo:
+		for c in halo.get_children():
+			if c is Label3D:
+				(c as Label3D).visible = false
+	_aim(level, Vector3(2.45, 1.18, 4.55), Vector3(1.05, 0.04, 5.85), 58.0)
 	for _j in 8:
 		await process_frame
 	_save("after-guard-blood-flush.png")
