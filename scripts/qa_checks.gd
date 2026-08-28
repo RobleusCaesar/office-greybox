@@ -455,6 +455,20 @@ func _run() -> void:
 		errors.append("guard puddle at %s is not under the guard" % guard_puddle.position)
 	elif absf(guard_puddle.rotation_degrees.x) < 70.0:
 		errors.append("guard puddle is not laid flat on the floor")
+	else:
+		# −90 (or 270) = old +90 pitch flipped 180° on X so spikes bury in the floor.
+		var px := guard_puddle.rotation_degrees.x
+		while px > 180.0:
+			px -= 360.0
+		while px < -180.0:
+			px += 360.0
+		if absf(px + 90.0) > 12.0:
+			errors.append("guard puddle X rot %s — expected −90 (spikes down)" % guard_puddle.rotation_degrees.x)
+		var puddle_aabb := _world_aabb(guard_puddle)
+		if puddle_aabb.size.y > 0.0:
+			var puddle_top := puddle_aabb.position.y + puddle_aabb.size.y
+			if puddle_top > 0.04 or puddle_top < -0.01:
+				errors.append("guard puddle top Y %s is not flush with the floor" % puddle_top)
 	for ch_name in ["BreakRoomChair_01", "BreakRoomChair_02", "BreakRoomChair_03", "BreakRoomChair_04"]:
 		var ch := level.get_node_or_null("FutureAssetSlots/BreakRoom/%s" % ch_name)
 		if ch is GeometryInstance3D and (ch as GeometryInstance3D).visible:
@@ -515,12 +529,27 @@ func _run() -> void:
 	else:
 		if intern.position.x > -2.80 or intern.position.x < -5.10:
 			errors.append("ClosetIntern at %s is not on the east wall" % intern.position)
-		if intern.position.z > 2.55:
-			errors.append("ClosetIntern at Z %s covers the vent or mop" % intern.position.z)
-		if intern.position.z < 0.55:
-			errors.append("ClosetIntern clips the south shelves at %s" % intern.position)
+		if intern.position.z < 3.70:
+			errors.append("ClosetIntern at Z %s is not north of the vent hole" % intern.position.z)
+		if intern.position.z > 5.20:
+			errors.append("ClosetIntern clips the north shelves at %s" % intern.position)
 		if intern.position.z > 2.70 and intern.position.z < 3.70:
 			errors.append("ClosetIntern blocks the vent hole at %s" % intern.position)
+		if intern.scale.x > 0.85 or intern.scale.x < 0.45:
+			errors.append("ClosetIntern scale %s — seated height must match ClosetManager" % intern.scale)
+		var intern_look := intern.transform.basis.z
+		if intern_look.x > -0.70:
+			errors.append("ClosetIntern is not facing into the room (basis.z %s)" % intern_look)
+		var intern_aabb := _world_aabb(intern)
+		if intern_aabb.size.y > 0.0:
+			if intern_aabb.position.y < -0.04 or intern_aabb.position.y > 0.035:
+				errors.append("ClosetIntern soles not on the floor (AABB min Y %s)" % intern_aabb.position.y)
+			if mgr:
+				var mgr_aabb := _world_aabb(mgr)
+				var intern_top := intern_aabb.position.y + intern_aabb.size.y
+				var mgr_top := mgr_aabb.position.y + mgr_aabb.size.y
+				if absf(intern_top - mgr_top) > 0.08:
+					errors.append("ClosetIntern sit-top %.3f != ClosetManager sit-top %.3f" % [intern_top, mgr_top])
 	if level.get_node_or_null("FutureAssetSlots/EastHall/LockedDoor_DeadOffice/ClosedDoor") == null:
 		errors.append("dead-office lock must instance closed_door.glb")
 	if level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive/CeoDeadMesh") == null:
@@ -1245,6 +1274,28 @@ func _action_has_key(action: String, key: Key) -> bool:
 		if ev is InputEventKey and (ev.physical_keycode == key or ev.keycode == key):
 			return true
 	return false
+
+
+func _accum_aabb(n: Node, acc: Array) -> void:
+	if n is MeshInstance3D:
+		var mi := n as MeshInstance3D
+		if mi.mesh:
+			var a: AABB = mi.global_transform * mi.mesh.get_aabb()
+			if acc[0]:
+				acc[1] = a
+				acc[0] = false
+			else:
+				acc[1] = (acc[1] as AABB).merge(a)
+	for c in n.get_children():
+		_accum_aabb(c, acc)
+
+
+func _world_aabb(n: Node3D) -> AABB:
+	var acc := [true, AABB()]
+	_accum_aabb(n, acc)
+	if acc[0]:
+		return AABB()
+	return acc[1]
 
 
 func _box_size(n: Node) -> Vector3:
