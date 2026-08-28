@@ -211,7 +211,8 @@ func _wall_fill(origin: Vector3, along: Vector3, inward: Vector3, a0: float, a1:
 		var mid := t + w * 0.5
 		var pos := origin + along * mid + inward * INSET
 		pos.y = 0.12 + PANEL_H * 0.5
-		_push_panel(pos, along, inward, w / PANEL_W, 1.0)
+		# Hairline kit gap so the sheet edge reads as a panel, not a stretch.
+		_push_panel(pos, along, inward, maxf(0.16, w - 0.008) / PANEL_W, 1.0)
 		t += w
 		remain -= w
 
@@ -385,8 +386,9 @@ func _instance_bay(parent: Node, name: String, mid: Vector3, along: Vector3, inw
 			var yaw := _face_yaw(inward) + float(((seed + hi * 2 + k) % 5) - 2) * 3.0
 			var bscale := 0.88 + 0.08 * float((seed + hi + k) % 4)
 			var box_h := 0.20 * bscale
-			var pos := along * (t * (bay - 0.16)) + inward * (depth * 0.50 + 0.02 * float(k - 1))
-			pos.y = heights[hi] + 0.014 + box_h * 0.5
+			var pos := along * (t * (bay - 0.16)) + inward * (depth * 0.50)
+			# Board center is at heights[hi], half-thick 0.014. Sit the box on the top.
+			pos.y = heights[hi] + 0.014 + box_h * 0.5 + 0.001
 			_box_at(root, "Box_%d_%d" % [hi, k], pos, yaw, Vector3(bscale, bscale, bscale), false)
 
 

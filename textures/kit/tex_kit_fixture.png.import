@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://kit1012kitpbr"
-path="res://.godot/imported/tex_kit_fixture.png-kit.ctex"
+uid="uid://cr1btw72efxr8"
+path="res://.godot/imported/tex_kit_fixture.png-5b5adf652791b20aea65285491ca2e60.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://textures/kit/tex_kit_fixture.png"
-dest_files=["res://.godot/imported/tex_kit_fixture.png-kit.ctex"]
+dest_files=["res://.godot/imported/tex_kit_fixture.png-5b5adf652791b20aea65285491ca2e60.ctex"]
 
 [params]
 

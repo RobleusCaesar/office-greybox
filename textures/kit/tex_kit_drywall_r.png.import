@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://kit1011kitpbr"
-path="res://.godot/imported/tex_kit_drywall_r.png-kit.ctex"
+uid="uid://cr1btw62efxr8"
+path="res://.godot/imported/tex_kit_drywall_r.png-d871f574284fa07cf4295b16f9aa8123.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://textures/kit/tex_kit_drywall_r.png"
-dest_files=["res://.godot/imported/tex_kit_drywall_r.png-kit.ctex"]
+dest_files=["res://.godot/imported/tex_kit_drywall_r.png-d871f574284fa07cf4295b16f9aa8123.ctex"]
 
 [params]
 

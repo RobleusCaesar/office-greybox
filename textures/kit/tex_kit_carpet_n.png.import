@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://kit1004kitpbr"
-path="res://.godot/imported/tex_kit_carpet_n.png-kit.ctex"
+uid="uid://cr1btwa2efxr8"
+path="res://.godot/imported/tex_kit_carpet_n.png-7dceacf483c0f6adec9053ba98be5652.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://textures/kit/tex_kit_carpet_n.png"
-dest_files=["res://.godot/imported/tex_kit_carpet_n.png-kit.ctex"]
+dest_files=["res://.godot/imported/tex_kit_carpet_n.png-7dceacf483c0f6adec9053ba98be5652.ctex"]
 
 [params]
 

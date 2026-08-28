@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://kit1006kitpbr"
-path="res://.godot/imported/tex_kit_ceiling.png-kit.ctex"
+uid="uid://cr1btwc2efxr8"
+path="res://.godot/imported/tex_kit_ceiling.png-0b0d6f1f7234d4f71d3624a4418e3b4c.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://textures/kit/tex_kit_ceiling.png"
-dest_files=["res://.godot/imported/tex_kit_ceiling.png-kit.ctex"]
+dest_files=["res://.godot/imported/tex_kit_ceiling.png-0b0d6f1f7234d4f71d3624a4418e3b4c.ctex"]
 
 [params]
 

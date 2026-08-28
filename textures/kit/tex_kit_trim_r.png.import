@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://kit1015kitpbr"
-path="res://.godot/imported/tex_kit_trim_r.png-kit.ctex"
+uid="uid://cr1btxb2efxr8"
+path="res://.godot/imported/tex_kit_trim_r.png-ac133c4839bd60c1becb763444662aef.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://textures/kit/tex_kit_trim_r.png"
-dest_files=["res://.godot/imported/tex_kit_trim_r.png-kit.ctex"]
+dest_files=["res://.godot/imported/tex_kit_trim_r.png-ac133c4839bd60c1becb763444662aef.ctex"]
 
 [params]
 

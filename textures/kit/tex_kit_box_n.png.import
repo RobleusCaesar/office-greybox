@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://kit1001kitpbr"
-path="res://.godot/imported/tex_kit_box_n.png-kit.ctex"
+uid="uid://cr1btv62efxr8"
+path="res://.godot/imported/tex_kit_box_n.png-8d630c2e8ae572af97f4c72dbbc6d2db.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://textures/kit/tex_kit_box_n.png"
-dest_files=["res://.godot/imported/tex_kit_box_n.png-kit.ctex"]
+dest_files=["res://.godot/imported/tex_kit_box_n.png-8d630c2e8ae572af97f4c72dbbc6d2db.ctex"]
 
 [params]
 

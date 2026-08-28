@@ -31,8 +31,8 @@ func _run() -> void:
 	for _j in 8:
 		await process_frame
 	_save("kit-break-room.png")
-	# Wall-seam closeup — south-west closet corner, panel + trim + carpet tile.
-	_aim(level, Vector3(-8.55, 0.42, 1.35), Vector3(-9.52, 0.12, 0.16), 48.0)
+	# Wall-seam closeup — break-room west plaster, south of the vent, clear of the kitchenette.
+	_aim(level, Vector3(1.35, 0.34, 1.85), Vector3(0.12, 0.06, 1.15), 42.0)
 	for _j in 8:
 		await process_frame
 	_save("kit-wall-seam-closeup.png")

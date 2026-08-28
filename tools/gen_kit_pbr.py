@@ -121,18 +121,18 @@ def carpet() -> None:
     ys, xs = np.mgrid[0:N, 0:N]
     streak = 0.5 + 0.5 * np.sin((xs * 0.41 + ys * 0.07) + pile * 4.0)
     loops = 0.5 + 0.5 * np.sin(xs * 0.95 + nap * 6.0) * np.sin(ys * 0.22)
-    # Tile rebate / seam (holds a close-up as a real carpet tile).
+    # Tile rebate / seam — office carpet, not a chalkboard grid.
     t = np.linspace(0, 1, N)
     edge = np.minimum(np.minimum(t[None, :], 1.0 - t[None, :]), np.minimum(t[:, None], 1.0 - t[:, None]))
-    seam = np.clip(1.0 - edge * 42.0, 0.0, 1.0)
-    seam = seam ** 1.6
+    seam = np.clip(1.0 - edge * 90.0, 0.0, 1.0)
+    seam = seam ** 2.2
     lint = rng.random((N, N))
     base = np.array([0.70, 0.58, 0.46])
     fiber = np.array([0.78, 0.66, 0.52])
     dark = np.array([0.42, 0.34, 0.26])
     mix = 0.55 * pile + 0.25 * nap + 0.20 * streak
     rgb = base * (0.88 + 0.18 * mix[..., None]) + fiber * (0.10 * loops[..., None])
-    rgb = rgb * (1.0 - seam[..., None] * 0.22) + dark * seam[..., None] * 0.22
+    rgb = rgb * (1.0 - seam[..., None] * 0.08) + dark * seam[..., None] * 0.08
     rgb = rgb - (lint > 0.997).astype(np.float64)[..., None] * 0.05
     rgb = np.clip(rgb, 0.0, 1.0)
     h = pile * 0.45 + nap * 0.35 + loops * 0.15 - seam * 0.7
