@@ -268,6 +268,11 @@ func _run() -> void:
 		if level.get_node_or_null("FutureAssetSlots/CEOOffice/BodyBlood_%d" % bi) != null:
 			errors.append("BodyBlood_%d blotch must be gone" % bi)
 	var dress_src := FileAccess.get_file_as_string("res://scripts/dressing.gd")
+	if not dress_src.contains("office_kit.gd"):
+		errors.append("dressing must apply the closet/break office kit")
+	if dress_src.contains("FileAccess.file_exists(\"res://scripts/office_kit") \
+			or dress_src.contains("FileAccess.file_exists(\"res://materials/kit"):
+		errors.append("office kit must load() without exists-gate")
 	if not dress_src.contains("IntroCloset"):
 		errors.append("dressing must build IntroCloset shelves / boxes")
 	if not dress_src.contains("tex_cardboard"):
@@ -617,6 +622,70 @@ func _run() -> void:
 	if env_node and env_node.environment:
 		if absf(env_node.environment.ambient_light_energy - 0.32) > 0.05:
 			errors.append("global ambient energy %s — do not retune the money-shot mood" % env_node.environment.ambient_light_energy)
+		if env_node.environment.fog_enabled and env_node.environment.fog_density > 0.008:
+			errors.append("office fog is too heavy (%s) — keep it off or barely there" % env_node.environment.fog_density)
+		if env_node.environment.volumetric_fog_enabled:
+			errors.append("volumetric fog must stay off — this is an office, not an arena")
+	var kit := level.get_node_or_null("OfficeKit")
+	if kit == null:
+		errors.append("OfficeKit missing — closet/break must be built from the modular kit")
+	else:
+		if kit.get_node_or_null("WallPanels") == null:
+			errors.append("OfficeKit wall panels missing")
+		if kit.get_node_or_null("FloorTiles") == null:
+			errors.append("OfficeKit floor tiles missing")
+		if kit.get_node_or_null("CeilingTiles") == null:
+			errors.append("OfficeKit ceiling tiles missing")
+		if kit.get_node_or_null("Trim") == null:
+			errors.append("OfficeKit trim missing")
+		if kit.get_node_or_null("Fixtures") == null:
+			errors.append("OfficeKit fixtures missing")
+		if kit.has_meta("kit_counts"):
+			var kc: Dictionary = kit.get_meta("kit_counts")
+			if int(kc.get("wall_panel", 0)) < 20:
+				errors.append("too few kit wall panels (%s)" % kc.get("wall_panel", 0))
+			if int(kc.get("floor_tile", 0)) < 80:
+				errors.append("too few kit floor tiles (%s)" % kc.get("floor_tile", 0))
+			if int(kc.get("box", 0)) < 20:
+				errors.append("too few instanced kit boxes (%s)" % kc.get("box", 0))
+			if int(kc.get("shelf_bay", 0)) < 12:
+				errors.append("too few shelf-bay instances (%s)" % kc.get("shelf_bay", 0))
+	for kit_mat in [
+		"res://materials/kit/mat_kit_drywall.tres",
+		"res://materials/kit/mat_kit_carpet.tres",
+		"res://materials/kit/mat_kit_ceiling.tres",
+		"res://materials/kit/mat_kit_trim.tres",
+		"res://materials/kit/mat_kit_box.tres",
+	]:
+		if not FileAccess.file_exists(kit_mat):
+			errors.append("%s missing" % kit_mat)
+	for kit_tex in [
+		"tex_kit_drywall.png", "tex_kit_carpet.png", "tex_kit_ceiling.png",
+		"tex_kit_trim.png", "tex_kit_box.png",
+	]:
+		var kt := "res://textures/kit/%s" % kit_tex
+		if not FileAccess.file_exists(kt):
+			errors.append("%s missing" % kit_tex)
+		if not FileAccess.file_exists(kt + ".import"):
+			errors.append("%s.import missing — web export will skip this texture" % kit_tex)
+	var kit_carpet := load("res://materials/kit/mat_kit_carpet.tres")
+	if kit_carpet is StandardMaterial3D:
+		var kcm := kit_carpet as StandardMaterial3D
+		if kcm.metallic > 0.04:
+			errors.append("kit carpet metallic %s — wet stone, expected dry pile" % kcm.metallic)
+		if kcm.roughness < 0.80:
+			errors.append("kit carpet roughness %s — too glossy / wet" % kcm.roughness)
+		var ctp := kcm.albedo_texture.resource_path if kcm.albedo_texture else ""
+		if not ctp.contains("carpet"):
+			errors.append("kit carpet albedo is %s" % ctp)
+	if intern:
+		if absf(intern.scale.x - 0.594389) > 0.02:
+			errors.append("ClosetIntern scale %s, expected 0.594389" % intern.scale)
+		if absf(intern.position.z - 4.20) > 0.04:
+			errors.append("ClosetIntern Z %s, expected 4.20" % intern.position.z)
+	if mgr:
+		if absf(mgr.position.x + 6.20) > 0.04 or absf(mgr.position.z - 1.58) > 0.08:
+			errors.append("ClosetManager moved from locked (-6.20, 0.569, 1.58) to %s" % mgr.position)
 	var win_l := level.get_node_or_null("Lights/WindowLight") as OmniLight3D
 	if win_l and absf(win_l.light_energy - 8.8) > 0.20:
 		errors.append("WindowLight energy %s, expected 8.8" % win_l.light_energy)

@@ -11,6 +11,7 @@ func apply_near(level: Node3D) -> void:
 	# Closet + mop + painted architecture. Enough for Play / first frame.
 	_texture_existing(level)
 	_intro_closet(level)
+	_office_kit(level)
 	_flush_hall(level)
 
 
@@ -441,6 +442,16 @@ func _sheet_metal() -> StandardMaterial3D:
 	return m
 
 
+func _office_kit(level: Node3D) -> void:
+	# Modular kit: tiled PBR panels, one box, one shelf bay, authored office light.
+	# load() only. Fog stays off.
+	var kit_script: Script = load("res://scripts/office_kit.gd")
+	if kit_script == null:
+		return
+	var kit = kit_script.new()
+	kit.apply(level)
+
+
 func _intro_closet(level: Node3D) -> void:
 	var ic := _find(level, "FutureAssetSlots/IntroCloset")
 	if ic == null:
@@ -461,13 +472,7 @@ func _intro_closet(level: Node3D) -> void:
 		"Architecture/VentDuct/ClosetLip_B",
 	]:
 		_set_csg_mat(_find(level, p), metal)
-	# Floor-to-ceiling units on N / S / W. East wall is the vent — no shelves.
-	# Recentered for the gapped closet (east wall at X=-2.66, west at X=-9.66).
-	_shelf_run(ic, "South", Vector3(-9.14, 0.0, 0.10), Vector3.RIGHT, Vector3.BACK, 6.16, 5)
-	_shelf_run(ic, "North", Vector3(-9.14, 0.0, 6.32), Vector3.RIGHT, Vector3.FORWARD, 6.16, 5)
-	_shelf_run(ic, "WestS", Vector3(-9.56, 0.0, 0.56), Vector3.BACK, Vector3.RIGHT, 2.06, 2)
-	_shelf_run(ic, "WestN", Vector3(-9.56, 0.0, 3.90), Vector3.BACK, Vector3.RIGHT, 2.24, 2)
-	_floor_cartons(ic)
+	# Shelves + floor cartons come from the shared kit (one bay, one box).
 	# Mop: east wall, RIGHT of the vent mouth (south). Scale 0.50 → ~0.95 m. load() only.
 	# Mesh AABB y −0.952..0.951, 1.64 × 1.90 × 1.27. Do not block the crawl hole or the aisle.
 	# Last pose locked. Yaw 270 = previous 90 flipped 180° in place. Do not move rooms.
@@ -602,28 +607,21 @@ func _place_closet_sits(ic: Node) -> void:
 	# Leans back on the south shelf run (front ~Z=0.54). Scale 1.0 = human sit
 	# (same language as ceo_dead2). Looks north at the player. Collision off.
 	# Do not scale the manager. Do not scale the player.
-	var manager := _instance_glb(ic, "res://models/man_sitting.glb", "ClosetManager", Vector3(-6.20, 0.0, 1.58), Vector3(0, 0, 0), Vector3.ONE)
+	var manager := _instance_glb(ic, "res://models/man_sitting.glb", "ClosetManager", Vector3(-6.20, 0.569, 1.58), Vector3(0, 0, 0), Vector3.ONE)
 	_seat_on_floor(manager)
+	manager.position = Vector3(-6.20, 0.569, 1.58)
+	manager.scale = Vector3.ONE
 	_disable_collision(manager)
-	var mgr_top := _sit_top(manager)
-	# Intern: intern_sitting AABB ~1.04 × 1.90 × 1.77 at scale 1.0 — too tall.
-	# Measure sit-top after _seat_on_floor, then scale so seated height matches
-	# the manager. Re-seat after scale (scale changes how far she sinks).
-	# East wall, north of the vent hole (toward the player at z=4.20). Order
-	# along the wall south→north: mop (2.02) — vent (~3.20) — intern. Yaw −90
-	# faces west into the room. Collision off. Do not sit on the mop.
-	var intern := _instance_glb(ic, "res://models/intern_sitting.glb", "ClosetIntern", Vector3(-3.30, 0.0, 4.20), Vector3(0, -90, 0), Vector3.ONE)
+	# Locked intern: east wall, north of the vent, yaw −90, sit-height match.
+	var intern := _instance_glb(ic, "res://models/intern_sitting.glb", "ClosetIntern", Vector3(-3.302, 0.566, 4.20), Vector3(0, -90, 0), Vector3(0.594389, 0.594389, 0.594389))
 	_seat_on_floor(intern)
-	var intern_top := _sit_top(intern)
-	var sit_scale := 1.0
-	if intern_top > 0.05:
-		sit_scale = mgr_top / intern_top
-	intern.scale = Vector3(sit_scale, sit_scale, sit_scale)
-	intern.position = Vector3(-3.30, 0.0, 4.20)
+	intern.position = Vector3(-3.302, 0.566, 4.20)
 	intern.rotation_degrees = Vector3(0, -90, 0)
-	_seat_on_floor(intern)
-	# East wall west face is X=-2.74 (center -2.66, 16 cm plaster). Keep a gap.
+	intern.scale = Vector3(0.594389, 0.594389, 0.594389)
 	_nudge_aabb_max_x(intern, -2.78)
+	intern.position.z = 4.20
+	intern.rotation_degrees = Vector3(0, -90, 0)
+	intern.scale = Vector3(0.594389, 0.594389, 0.594389)
 	_disable_collision(intern)
 
 
@@ -1327,22 +1325,18 @@ func _trim_span(root: Node, i: Array, along_x: bool, a0: float, a1: float, fixed
 
 
 func _walls(level: Node3D) -> void:
-	var root := Node3D.new()
-	root.name = "WallDressing"
-	level.add_child(root)
-	var trim := _mat("res://materials/mat_trim.tres")
+	var root := level.get_node_or_null("WallDressing") as Node3D
+	if root == null:
+		root = Node3D.new()
+		root.name = "WallDressing"
+		level.add_child(root)
+	var trim := _mat("res://materials/kit/mat_kit_trim.tres")
+	if trim == null:
+		trim = _mat("res://materials/mat_trim.tres")
 	var scuff := _tex_mat("res://textures/tex_scuff.png", Color(0.50, 0.44, 0.36, 0.62), 0.92)
 	scuff.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	var i := [0]
-	# Break room — skip the vent on the shared west wall (Z 2.72–3.68)
-	_trim_span(root, i, true, 0.20, 6.80, 0.12, [], trim)
-	_trim_span(root, i, false, 0.20, 6.40, 0.12, [[2.72, 3.68]], trim)
-	_trim_span(root, i, false, 0.20, 6.40, 6.88, [], trim)
-	# Intro closet — skip chaos door and the closet-side duct mouth
-	_trim_span(root, i, true, -9.46, -2.88, 0.12, [], trim)
-	_trim_span(root, i, true, -9.46, -2.88, 6.34, [], trim)
-	_trim_span(root, i, false, 0.20, 6.30, -9.58, [[2.70, 3.80]], trim)
-	_trim_span(root, i, false, 0.20, 6.30, -2.78, [[2.72, 3.68]], trim)
+	# Closet + break trim is the instanced kit. Hall stays flat.
 	# L-shaped hallway walls stay flat — no baseboard / chair-rail nubs in the walk path.
 	# CEO side of the divider only (reception / logo face stays flush).
 	_trim_span(root, i, false, 8.53, 14.48, 26.14, [], trim)
