@@ -74,6 +74,7 @@ func _run() -> void:
 		"broken_door.glb", "CEO_couch_coffee_table.glb",
 		"blood_decal_1.glb", "blood_decal_2.glb",
 		"abyssal_stalker.glb", "ember_demon.glb",
+		"man_sitting.glb", "intern_sitting.glb",
 	]:
 		if not FileAccess.file_exists("res://models/%s" % glb_name):
 			errors.append("%s missing" % glb_name)
@@ -238,6 +239,9 @@ func _run() -> void:
 			errors.append("player still spawns in the break room")
 		if spawn.position.x > -2.90:
 			errors.append("player spawn clips the closet east wall / vent")
+		var look := -spawn.global_transform.basis.z
+		if look.x > 0.55:
+			errors.append("player spawn still faces the vent (look %s)" % look)
 	var dead_ex := level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive")
 	if dead_ex == null:
 		errors.append("dead executive missing")
@@ -342,8 +346,18 @@ func _run() -> void:
 			or dress_src.contains("FileAccess.file_exists(\"res://models/mop_and") \
 			or dress_src.contains("FileAccess.file_exists(\"res://models/broken_door") \
 			or dress_src.contains("FileAccess.file_exists(\"res://models/CEO_couch") \
-			or dress_src.contains("FileAccess.file_exists(\"res://models/blood_decal"):
+			or dress_src.contains("FileAccess.file_exists(\"res://models/blood_decal") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/man_sitting") \
+			or dress_src.contains("FileAccess.file_exists(\"res://models/intern_sitting"):
 		errors.append("new Meshy glbs must load() without exists-gate")
+	if not dress_src.contains("man_sitting.glb"):
+		errors.append("dressing must instance man_sitting.glb")
+	if not dress_src.contains("intern_sitting.glb"):
+		errors.append("dressing must instance intern_sitting.glb")
+	if not dress_src.contains("ClosetManager"):
+		errors.append("dressing must name the manager ClosetManager")
+	if not dress_src.contains("ClosetIntern"):
+		errors.append("dressing must name the intern ClosetIntern")
 	if dress_src.contains("FileAccess.file_exists(\"res://textures/hero/tex-light-oak") \
 			or dress_src.contains("FileAccess.file_exists(\"res://textures/hero/denver-fire"):
 		errors.append("oak / diorama vista must load() without exists-gate")
@@ -481,6 +495,32 @@ func _run() -> void:
 				mop_yaw -= 360.0
 			if absf(mop_yaw - 270.0) > 8.0:
 				errors.append("mop yaw %s — expected 270 (180° flip from 90)" % mop.rotation_degrees.y)
+	var mgr := level.get_node_or_null("FutureAssetSlots/IntroCloset/ClosetManager") as Node3D
+	if mgr == null:
+		errors.append("ClosetManager missing — man_sitting.glb must instance in IntroCloset")
+	else:
+		if mgr.position.z > 2.40 or mgr.position.z < 0.80:
+			errors.append("ClosetManager at %s is not against the south shelves" % mgr.position)
+		if mgr.position.x > -4.60 or mgr.position.x < -8.20:
+			errors.append("ClosetManager at %s is not opposite the seated player" % mgr.position)
+		if absf(mgr.scale.x - 1.0) > 0.08:
+			errors.append("ClosetManager scale %s, expected human sit 1.0" % mgr.scale)
+		var mgr_look := mgr.transform.basis.z
+		# Mesh faces +Z. After yaw 0 that is world +Z (north, toward the player).
+		if mgr_look.z < 0.70:
+			errors.append("ClosetManager is not looking at the player (basis.z %s)" % mgr_look)
+	var intern := level.get_node_or_null("FutureAssetSlots/IntroCloset/ClosetIntern") as Node3D
+	if intern == null:
+		errors.append("ClosetIntern missing — intern_sitting.glb must instance in IntroCloset")
+	else:
+		if intern.position.x > -2.80 or intern.position.x < -5.10:
+			errors.append("ClosetIntern at %s is not on the east wall" % intern.position)
+		if intern.position.z > 2.55:
+			errors.append("ClosetIntern at Z %s covers the vent or mop" % intern.position.z)
+		if intern.position.z < 0.55:
+			errors.append("ClosetIntern clips the south shelves at %s" % intern.position)
+		if intern.position.z > 2.70 and intern.position.z < 3.70:
+			errors.append("ClosetIntern blocks the vent hole at %s" % intern.position)
 	if level.get_node_or_null("FutureAssetSlots/EastHall/LockedDoor_DeadOffice/ClosedDoor") == null:
 		errors.append("dead-office lock must instance closed_door.glb")
 	if level.get_node_or_null("FutureAssetSlots/CEOOffice/DeadExecutive/CeoDeadMesh") == null:
@@ -639,6 +679,15 @@ func _run() -> void:
 		errors.append("player must expose give_shotgun() for the E pickup")
 	if not player_src.contains("_has_gun"):
 		errors.append("player must spawn unarmed (_has_gun)")
+	if not player_src.contains("SIT_EYE") or not player_src.contains("sitting"):
+		errors.append("player must start seated (SIT_EYE / sitting)")
+	if not player_src.contains("const SIT_EYE := 0.92"):
+		errors.append("SIT_EYE must stay ~0.92 (sitting height 0.85–1.0)")
+	if player_hud:
+		if player_hud.get("sitting") == false:
+			errors.append("player must spawn sitting")
+		if player_hud.get("CRAWL_CAP") != null and absf(float(player_hud.CRAWL_CAP) - 0.72) > 0.01:
+			errors.append("crawl capsule %s, expected 0.72" % player_hud.CRAWL_CAP)
 	if not player_src.contains("shotgun_blast.wav"):
 		errors.append("player must reference audio/shotgun_blast.wav")
 	if not player_src.contains("shotgun_fire.wav"):

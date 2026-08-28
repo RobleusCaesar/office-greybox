@@ -257,11 +257,23 @@ func _shot_level() -> void:
 	for _j in 8:
 		await process_frame
 	_save("fix2-elevator.png")
-	# Closet spawn: unarmed, facing the vent. Shotgun is NOT here.
-	_aim(level, Vector3(-6.20, 1.55, 3.25), Vector3(-2.66, 0.48, 3.20))
+	# Closet spawn: seated, looking at the manager. Not the vent. Unarmed.
+	_aim(level, Vector3(-6.20, 0.92, 4.20), Vector3(-6.20, 0.72, 1.70))
+	for _j in 10:
+		await process_frame
+	_save("closet-sit-player-pov.png")
+	_aim(level, Vector3(-4.10, 1.15, 3.55), Vector3(-6.10, 0.55, 1.70))
 	for _j in 8:
 		await process_frame
-	_save("fix5-closet-spawn-unarmed.png")
+	_save("closet-sit-manager.png")
+	_aim(level, Vector3(-5.40, 1.05, 3.10), Vector3(-3.40, 0.55, 1.20))
+	for _j in 8:
+		await process_frame
+	_save("closet-sit-intern.png")
+	_aim(level, Vector3(-5.10, 1.35, 4.55), Vector3(-5.20, 0.55, 1.80))
+	for _j in 8:
+		await process_frame
+	_save("closet-sit-wide.png")
 	# Shotgun on the break-room floor next to the guard.
 	_aim(level, Vector3(2.55, 1.20, 4.35), Vector3(1.55, 0.12, 5.30))
 	for _j in 8:

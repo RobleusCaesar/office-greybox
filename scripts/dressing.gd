@@ -470,6 +470,7 @@ func _intro_closet(level: Node3D) -> void:
 	# Last pose locked. Yaw 270 = previous 90 flipped 180° in place. Do not move rooms.
 	var mop := _instance_glb(ic, "res://models/mop_and_bucket.glb", "MopAndBucket", Vector3(-3.04, 0.476, 2.02), Vector3(0, 270, 0), Vector3(0.50, 0.50, 0.50))
 	_box_collision(mop, Vector3(0.42, 0.90, 0.52), Vector3(0.0, 0.0, 0.0))
+	_place_closet_sits(ic)
 	var br := _find(level, "FutureAssetSlots/BreakRoom")
 	if br:
 		_vent_cover(br)
@@ -590,6 +591,24 @@ func _carton(parent: Node, name: String, size: Vector3, pos: Vector3, yaw: float
 	_quad(root, "Bottom", Vector2(size.x, size.z), Vector3(0, -hy - 0.001, 0), Vector3(90, 0, 0), card)
 	var body := _box(root, "Body", size, Vector3.ZERO, card, Vector3.ZERO, collide)
 	body.visible = false
+
+
+func _place_closet_sits(ic: Node) -> void:
+	# PLACE ONLY. Seated stills. No VO / door yank / skip.
+	# Manager: man_sitting AABB ~1.29 × 1.13 × 1.91, origin mid-torso, faces +Z.
+	# Leans back on the south shelf run (front ~Z=0.54). Scale 1.0 = human sit
+	# (same language as ceo_dead2). Looks north at the player. Collision off.
+	var manager := _instance_glb(ic, "res://models/man_sitting.glb", "ClosetManager", Vector3(-6.20, 0.0, 1.58), Vector3(0, 0, 0), Vector3.ONE)
+	_seat_on_floor(manager)
+	_disable_collision(manager)
+	# Intern: intern_sitting AABB ~1.04 × 1.90 × 1.77, faces +Z. Scale 1.0.
+	# East wall, RIGHT of the vent (south), south of the mop so the crawl hole
+	# stays open. Yaw −90 → faces west into the room / player. Collision off.
+	# _seat_on_floor uses sparse low verts; drop 14 cm so the huddle sits.
+	var intern := _instance_glb(ic, "res://models/intern_sitting.glb", "ClosetIntern", Vector3(-3.55, 0.0, 1.12), Vector3(0, -90, 0), Vector3.ONE)
+	_seat_on_floor(intern)
+	intern.position.y -= 0.14
+	_disable_collision(intern)
 
 
 func _floor_cartons(ic: Node) -> void:
