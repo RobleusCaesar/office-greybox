@@ -9,9 +9,12 @@ const MAX_HP := 100.0
 const STAND_EYE := 1.7
 const CROUCH_EYE := 1.05
 const CRAWL_EYE := 0.52
+const SIT_EYE := 0.92
 const STAND_CAP := 1.8
 const CROUCH_CAP := 1.15
 const CRAWL_CAP := 0.72
+const SIT_CAP := 1.00
+const SIT_SPEED := 1.8
 
 const SHOTGUN := 0
 const PISTOL := 1
@@ -66,6 +69,7 @@ var _hero_shotgun: Node3D
 var _has_gun: bool = false
 var crouched: bool = false
 var crawling: bool = false
+var sitting: bool = true
 var _hud_health: Label
 var _hud_ammo: Label
 var _hud_weapon: Label
@@ -159,6 +163,7 @@ func _toggle_crawl() -> void:
 			crawling = false
 	else:
 		crawling = true
+		sitting = false
 
 
 func _can_leave_crawl() -> bool:
@@ -199,9 +204,14 @@ func _apply_stance(delta: float) -> float:
 		h = CRAWL_CAP
 		speed = CRAWL_SPEED
 	elif crouched:
+		sitting = false
 		eye = CROUCH_EYE
 		h = CROUCH_CAP
 		speed = CROUCH_SPEED
+	elif sitting:
+		eye = SIT_EYE
+		h = SIT_CAP
+		speed = SIT_SPEED
 	if _head:
 		_head.position.y = lerpf(_head.position.y, eye, clampf(delta * 10.0, 0.0, 1.0))
 	if _col and _col.shape is CapsuleShape3D:

@@ -4097,5 +4097,5 @@ omni_range = 5.000
 omni_attenuation = 1.150
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
-transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, -6.2000, 0.0000, 3.2500)
-editor_description = "Spawn in IntroCloset aisle (-6.20, 0, 3.25) facing +X (east) toward the vent/kitchen. Unarmed. Not in the vent, not on the mop."
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.2000, 0.0000, 4.2000)
+editor_description = "Seated in IntroCloset opposite ClosetManager (-6.20, 0, 4.20) facing south at the manager. Not the vent. Unarmed. Sit eye ~0.92. C still crawls."
